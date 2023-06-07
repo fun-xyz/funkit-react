@@ -13,11 +13,18 @@
         "mocha": true,
         "jest": true
     },
-    "extends": ["eslint:recommended", "plugin:@typescript-eslint/recommended", "plugin:prettier/recommended", "prettier", "plugin:import/recommended",
-            "plugin:import/typescript"],
+    "extends": [
+      "eslint:recommended",
+      "plugin:@typescript-eslint/recommended",
+      "plugin:prettier/recommended",
+      "prettier",
+      "plugin:import/recommended",
+      "plugin:import/typescript",
+      "plugin:react/recommended",
+      "plugin:react-hooks/recommended"],
     "rules": {
         "no-var": 0,
-        "indent": ["error", 4, { "SwitchCase": 1 }],
+
         "quotes": ["error", "double"],
         "eqeqeq": "error",
         "unused-imports/no-unused-imports": "error",
