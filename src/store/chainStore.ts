@@ -1,10 +1,12 @@
 import { EnvOption } from "fun-wallet/dist/src/config";
+import { Chain } from "fun-wallet/dist/src/data";
 import { buildAndUpdateConfig } from "./configureStore";
 import { convertToChain } from "../Networks";
 
 export interface ChainStoreInterface {
   chain: string | null;
   chainId: number | null;
+  supportedChainIds: Chain[];
   switchChain: (chain: number) => void;
 }
 
