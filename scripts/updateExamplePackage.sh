@@ -23,7 +23,7 @@ done
 echo "Package name: ${package_name}"
 echo "Version: ${version}"
 echo "---------- Building ----------"
-echo -e "\n\n"
+echo -e "\n"
 # Remove existing dist/ directory
 rm -r dist/
 
@@ -31,21 +31,25 @@ rm -r dist/
 yarn build
 
 # Create a tarball
-yarn pack
+npm pack
 
 
 
 # Generate the tarball file name
-tarball_file="${package_name}-v${version}.tgz"
+tarball_file="${package_name}-${version}.tgz"
 
 echo -e "\n"
 echo "---------- Installing ----------"
 echo " tarbal name:| ${tarball_file} |"
 echo -e "\n\n"
 
+cd  example/
 
+rm "${tarball_file}"
+
+ls
 # Copy the tarball to the examples folder
-cp -f "${tarball_file}" "example/${tarball_file}"
+cp -f "../${tarball_file}" "./${tarball_file}"
 
 # Change directory to examples/
 cd example/
