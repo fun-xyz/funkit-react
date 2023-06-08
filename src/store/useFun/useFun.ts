@@ -1,33 +1,32 @@
 // eslint-disable-next-line prettier/prettier
 "use client";
-import { Eoa, FunWallet } from "fun-wallet"
-import { configureEnvironment } from "fun-wallet/dist/src/config"
+import { EnvOption, Eoa, FunWallet } from "fun-wallet"
 import { Chain } from "fun-wallet/dist/src/data"
 import { create } from "zustand"
 import { ChainStoreInterface, handleChainSwitching } from "../chainStore"
-import { ConfigureStoreInterface } from "../configureStore"
-import { ConnectorStoreInterface } from "../connectorStore"
-import type { Web3ReactHooks } from "@web3-react/core"
-import type { Connector, Web3ReactStore } from "@web3-react/types"
+import { ConfigureStoreInterface, buildAndUpdateConfig, setConfig } from "../configureStore"
+import { ConnectorArray, ConnectorStoreInterface } from "../connectorStore"
+import { ErrorStoreInterface, FunError } from "../errorStore"
 
-export interface useFunStoreInterface extends ConnectorStoreInterface, ChainStoreInterface, ConfigureStoreInterface {
+export interface useFunStoreInterface extends ConnectorStoreInterface, ChainStoreInterface, ConfigureStoreInterface, ErrorStoreInterface {
     index: number
     setIndex: (index: number) => void
     resetIndex: () => void
     FunWallet: FunWallet | null
     setFunWallet: (FunWallet: FunWallet) => void
-    Authorizer: Eoa | null
-    setAuthorizer: (Authorizer: Eoa) => void
+    Eoa: Eoa | null
+    setEoa: (Authorizer: Eoa) => void
     uniqueId: string | null
     setUniqueId: (uniqueId: string) => void
     account: string | null
     setAccount: (account: string) => void
+    setLogin: (config: EnvOption, index: number, account: string, funWallet: FunWallet, eoa: Eoa, uniqueId: string) => void
     ensName: string | null
     setEnsName: (ensName: string) => void
 }
 
 export interface createUseFunInterface {
-    connectors: [Connector, Web3ReactHooks][] | [Connector, Web3ReactHooks, Web3ReactStore][]
+    connectors: ConnectorArray
     supportedChains: Chain[]
     defaultIndex?: number
     connectEagerly?: boolean
@@ -56,12 +55,15 @@ export const createUseFun = (hookBuildParams: createUseFunInterface) => {
             resetIndex: () => set({ index: 0 }),
             FunWallet: null,
             setFunWallet: (FunWallet: FunWallet) => set(() => ({ FunWallet })),
-            Authorizer: null,
-            setAuthorizer: (Authorizer: Eoa) => set(() => ({ Authorizer })),
+            Eoa: null,
+            setEoa: (Authorizer: Eoa) => set(() => ({ Eoa: Authorizer })),
             uniqueId: null,
             setUniqueId: (uniqueId: string) => set(() => ({ uniqueId })),
             account: null,
             setAccount: (account: string) => set(() => ({ account })),
+            setLogin: (config: EnvOption, index: number, account: string, funWallet: FunWallet, Eoa: Eoa, uniqueId: string) => {
+                set(() => ({ config, index, account, FunWallet: funWallet, Eoa, uniqueId }))
+            },
             ensName: null,
             setEnsName: (ensName: string) => set(() => ({ ensName })),
             chain: null,
@@ -72,16 +74,21 @@ export const createUseFun = (hookBuildParams: createUseFunInterface) => {
                     return await handleChainSwitching(chainId, config)
                 }),
             config: null,
-            setConfig: (newConfig: any) => {
+            updateConfig: (newConfig: any) => {
                 return set(async (state: useFunStoreInterface) => {
-                    const finalConfig = {
-                        ...state.config,
-                        ...newConfig
-                    }
-                    await configureEnvironment(finalConfig)
-                    return { config: finalConfig }
+                    return await buildAndUpdateConfig(newConfig, state.config || {})
                 })
-            }
+            },
+            setConfig: (newConfig: any) => {
+                return set(async () => {
+                    return await setConfig(newConfig)
+                })
+            },
+            error: null,
+            errors: [],
+            setFunError: (error: FunError) => set((state) => ({ error, errors: state.errors.concat([error]) })),
+            resetFunError: () => set({ error: null }),
+            resetFunErrors: () => set({ errors: [] })
         })
         // persist(
         //     ,
