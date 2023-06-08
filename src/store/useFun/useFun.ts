@@ -34,7 +34,6 @@ export interface createUseFunInterface {
 }
 
 export const createUseFun = (hookBuildParams: createUseFunInterface) => {
-    console.log("createUseFun", hookBuildParams.connectors)
     return create(
         (set: any): useFunStoreInterface => ({
             connectors: hookBuildParams.connectors,

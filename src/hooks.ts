@@ -6,6 +6,7 @@ import { connectors } from "./connectors"
 import { Ethereum, Goerli, Polygon } from "./Networks"
 import { createUseFun, createUseFunInterface } from "./store"
 
+
 export const useFun = createUseFun({
     connectors: [connectors.CoinbaseWallet(), connectors.Metamask()],
     supportedChains: [Goerli, Polygon, Ethereum],
@@ -34,3 +35,4 @@ export const useBuildFunWallet = (build: createUseFunInterface) => {
 
 
 // how to go from Provider to fun walletqaaaaaa
+
