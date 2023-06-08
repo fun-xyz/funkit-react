@@ -30,6 +30,8 @@ rm -r dist/
 # Build the project
 yarn build
 
+echo "---------- Packing ----------"
+echo -e "\n"
 # Create a tarball
 npm pack
 
@@ -43,7 +45,8 @@ echo "---------- Installing ----------"
 echo " tarbal name:| ${tarball_file} |"
 echo -e "\n\n"
 
-cd  example/
+# Change directory to examples/
+cd example/
 
 rm "${tarball_file}"
 
@@ -51,8 +54,6 @@ ls
 # Copy the tarball to the examples folder
 cp -f "../${tarball_file}" "./${tarball_file}"
 
-# Change directory to examples/
-cd example/
 
 # Install the new tarball as a dependency
 yarn add "./${tarball_file}"

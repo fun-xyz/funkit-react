@@ -10,7 +10,7 @@ const CoinbaseWalletConnector = (
             new CoinbaseWallet({
                 actions,
                 options: {
-                    url: RPC_URLs,
+                    url: RPC_URLs[0],
                     appName: appName
                 }
             })
