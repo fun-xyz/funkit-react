@@ -28,6 +28,6 @@
         "moduleResolution": "node",
         "esModuleInterop": true
     },
-    "include": ["./**/*"],
-    "exclude": ["node_modules", "dist", "Web3-reactFork", "example"]
+    "include": ["./**/*", "../example", "../../Web3-reactFork"],
+    "exclude": ["node_modules", "dist", "../../Web3-reactFork", "../example"]
 }
