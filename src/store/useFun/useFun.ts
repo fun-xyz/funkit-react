@@ -3,9 +3,10 @@
 import { EnvOption, Eoa, FunWallet } from "fun-wallet"
 import { Chain } from "fun-wallet/dist/src/data"
 import { create } from "zustand"
+import { ConnectorArray } from "../../connectors/Connector"
 import { ChainStoreInterface, handleChainSwitching } from "../chainStore"
 import { ConfigureStoreInterface, buildAndUpdateConfig, setConfig } from "../configureStore"
-import { ConnectorArray, ConnectorStoreInterface } from "../connectorStore"
+import { ConnectorStoreInterface } from "../connectorStore"
 import { ErrorStoreInterface, FunError } from "../errorStore"
 
 export interface useFunStoreInterface extends ConnectorStoreInterface, ChainStoreInterface, ConfigureStoreInterface, ErrorStoreInterface {
@@ -40,17 +41,18 @@ export const createUseFun = (hookBuildParams: createUseFunInterface) => {
             setGroupId: (groupId: string) => set(() => ({ groupId })),
             requiredActiveConnectors: 0,
             setRequiredActiveConnectors: (requiredActiveConnectors: number) => set(() => ({ requiredActiveConnectors })),
-            activeConnectors: 0,
-            addActiveConnectors: () =>
-                set((state: useFunStoreInterface) => ({
-                    activeConnectors: state.activeConnectors + 1
-                })),
-            removeActiveConnectors: () =>
-                set((state: useFunStoreInterface) => ({
-                    activeConnectors: state.activeConnectors - 1
-                })),
-            resetActiveConnectors: () => set({ activeConnectors: 0 }),
+            activeConnectors: [],
+            setActiveConnectors: (activeConnectors: ConnectorArray) => set(() => ({ activeConnectors })),
+            updateActiveConnectors: (activeConnectors: ConnectorArray) =>
+                set((state: useFunStoreInterface) => {
+                    const newActiveConnectors = {
+                        ...state.activeConnectors,
+                        ...activeConnectors
+                    }
+                    return { activeConnectors: newActiveConnectors }
+                }),
             index: hookBuildParams.defaultIndex || 0,
+
             setIndex: (newIndex: number) => set(() => ({ index: newIndex })),
             resetIndex: () => set({ index: 0 }),
             FunWallet: null,

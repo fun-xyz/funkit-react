@@ -1,32 +1,20 @@
-import type { Web3ReactHooks } from "@web3-react/core"
-import type { Connector, Web3ReactStore } from "@web3-react/types"
+import { ConnectorArray, ConnectorTupleWithStore } from "../connectors/Connector"
 
-export interface ConnectorTuple {
-    0: Connector
-    1: Web3ReactHooks
-}
-
-export interface ConnectorTupleWithStore extends ConnectorTuple {
-    2: Web3ReactStore
-}
-
-export type ConnectorArray = ConnectorTuple[] | ConnectorTupleWithStore[]
 
 export interface ConnectorStoreInterface {
     connectors: ConnectorArray
+    activeConnectors: ConnectorArray
     groupId: string | null
     setGroupId: (groupId: string) => void
     requiredActiveConnectors: number
     setRequiredActiveConnectors: (requiredActiveConnectors: number) => void
-    activeConnectors: number
-    addActiveConnectors: () => void
-    removeActiveConnectors: () => void
-    resetActiveConnectors: () => void
+    setActiveConnectors: (activeConnectors: ConnectorArray) => void
+    updateActiveConnectors: (activeConnectors: ConnectorArray) => void
 }
 
 // should we automatically build an Eoa for each connetor?
 
-export const initializeConnectors = (connectorFunctions: (() => [Connector, Web3ReactHooks, Web3ReactStore])[]) => {
+export const initializeConnectors = (connectorFunctions: (() => ConnectorTupleWithStore)[]) => {
     const connectors = connectorFunctions.map((connectorFunction) => connectorFunction())
     return connectors
 }
