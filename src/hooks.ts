@@ -16,7 +16,6 @@ export const useFun = createUseFun({
     connectors.Metamask(),
     connectors.CoinbaseWallet(),
     connectors.WalletConnectV2(),
-    connectors.GoogleAuthConnector(),
   ],
   supportedChains: [Goerli, Polygon, Ethereum],
   defaultIndex: 77,

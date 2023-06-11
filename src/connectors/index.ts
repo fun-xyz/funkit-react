@@ -8,7 +8,6 @@ import { WalletConnect as WalletConnectV2 } from '@web3-react/walletconnect-v2'
 
 //
 import CoinbaseWalletConnector from './coinbaseWallet'
-import GoogleAuthConnector from './magicAuthConnector'
 import MetamaskConnector from './metaMask'
 import WalletConnectV2Connector from './walletConnectV2'
 
@@ -37,5 +36,4 @@ export const connectors = {
   CoinbaseWallet: CoinbaseWalletConnector,
   Metamask: MetamaskConnector,
   WalletConnectV2: WalletConnectV2Connector,
-  GoogleAuthConnector,
 }
