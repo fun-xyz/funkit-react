@@ -12,11 +12,7 @@ import { Ethereum, Goerli, Polygon } from './Networks'
 import { createUseFun, createUseFunInterface } from './store'
 
 export const useFun = createUseFun({
-  connectors: [
-    connectors.Metamask(),
-    connectors.CoinbaseWallet(),
-    connectors.WalletConnectV2(),
-  ],
+  connectors: [connectors.Metamask(), connectors.CoinbaseWallet(), connectors.WalletConnectV2()],
   supportedChains: [Goerli, Polygon, Ethereum],
   defaultIndex: 77,
 })
