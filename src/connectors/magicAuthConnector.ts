@@ -1,10 +1,10 @@
 import { initializeConnector } from '@web3-react/core'
 
-import { MagicConnect } from '../magic-auth/MagicAuthConnector'
+import { MagicAuthConnector } from '../magic-auth/MagicAuthConnector'
 
 export const GoogleAuthConnector = () =>
-  initializeConnector<MagicConnect>((actions) => {
-    return new MagicConnect({
+  initializeConnector<MagicAuthConnector>((actions) => {
+    return new MagicAuthConnector({
       actions,
       options: {
         magicAuthApiKey: 'pk_live_846F1095F0E1303C',

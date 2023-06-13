@@ -60,7 +60,7 @@ export const useBuildFunWallet = (build?: createUseFunInterface) => {
         console.log(config)
         await configureEnvironment(config)
         const signer = activeProvider?.getSigner()
-        const ExternalOwnedAccount = new Eoa({ signer })
+        const ExternalOwnedAccount = new Eoa({ provider: signer })
         const generatedUniqueId = await ExternalOwnedAccount.getUniqueId()
         const newFunWallet = new FunWallet({ uniqueId: generatedUniqueId, index })
         const newAccountAddress = await newFunWallet.getAddress()
