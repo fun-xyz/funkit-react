@@ -10,17 +10,17 @@
   "private": true,
   "scripts": {
     "dev": "cd ./example && npm run dev",
-    "build": "rm -r dist && tsc",
+    "build": "rm -rf dist && tsc",
     "update": "./scripts/updateExamplePackage.sh",
     "format": "prettier --write .",
     "lint": "eslint -c .eslintrc.json --ext .ts,.tsx './**/*.{ts,tsx}'",
     "lint:fix": "eslint -c .eslintrc.json --ext .ts,.tsx './**/*.{ts,tsx}' --fix",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "postinstall": "tsc"
   },
   "dependencies": {
     "@coinbase/wallet-sdk": "^3.6.6",
-    "@magic-ext/oauth": "11.3.0",
-    "@magic-sdk/provider": "^17.1.4",
+    "@magic-ext/oauth": "11.0.0",
     "@walletconnect/modal": "^2.4.5",
     "@web3-react/coinbase-wallet": "^8.2.0",
     "@web3-react/core": "^8.2.0",
@@ -34,7 +34,7 @@
     "@web3-react/walletconnect-v2": "^8.3.2",
     "fun-wallet": "^0.3.3",
     "localforage": "^1.10.0",
-    "magic-sdk": "17.1.4",
+    "magic-sdk": "17.0.0",
     "postcss": "^8.4.24",
     "react": "^18.2.0",
     "web3-core": "^4.0.1",

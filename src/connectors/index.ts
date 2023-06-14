@@ -6,36 +6,28 @@ import { Network } from '@web3-react/network'
 import type { Connector } from '@web3-react/types'
 import { WalletConnect as WalletConnectV2 } from '@web3-react/walletconnect-v2'
 
+import { MagicConnect } from '../magic-auth/src'
 //
 import CoinbaseWalletConnector from './coinbaseWallet'
-import GoogleAuthConnector from './magicAuthConnector'
+import MagicAuthConnection from './magicAuthConnector'
 import MetamaskConnector from './metaMask'
 import WalletConnectV2Connector from './walletConnectV2'
 
-export function getName(connector: Connector) {
+export function getName(connector: Connector | MagicConnect) {
   if (connector instanceof MetaMask) return 'MetaMask'
-  if (connector instanceof WalletConnectV2) return 'WalletConnect V2'
+  if (connector instanceof WalletConnectV2) return 'WalletConnect'
   if (connector instanceof CoinbaseWallet) return 'Coinbase Wallet'
   if (connector instanceof Network) return 'Network'
   if (connector instanceof GnosisSafe) return 'Gnosis Safe'
+  if (connector['name']) {
+    return connector['name'].charAt(0).toUpperCase() + connector['name'].slice(1)
+  }
   return 'Unknown'
 }
-
-// interface ConnectorAndChains {
-//   connector: (
-//     RPC_URLs?: string[],
-//     appName?: string
-//   ) =>
-//     | [CoinbaseWallet, Web3ReactHooks]
-//     | [CoinbaseWallet, Web3ReactHooks, Web3ReactStore];
-// }
-// export const BuildConnectorsAndChains = (): ConnectorAndChains => {
-//     return {connector: CoinbaseWalletConnector();}
-// };
 
 export const connectors = {
   CoinbaseWallet: CoinbaseWalletConnector,
   Metamask: MetamaskConnector,
   WalletConnectV2: WalletConnectV2Connector,
-  GoogleAuthConnector,
+  MagicAuthConnection,
 }

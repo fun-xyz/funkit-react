@@ -1,6 +1,6 @@
 // eslint-disable-next-line prettier/prettier
 "use client";
-import { EnvOption, Eoa, FunWallet } from 'fun-wallet'
+import { Eoa, FunWallet } from 'fun-wallet'
 import { Chain } from 'fun-wallet'
 import { create } from 'zustand'
 
@@ -26,14 +26,7 @@ export interface useFunStoreInterface
   setUniqueId: (uniqueId: string) => void
   account: string | null
   setAccount: (account: string) => void
-  setLogin: (
-    config: EnvOption,
-    index: number,
-    account: string,
-    funWallet: FunWallet,
-    eoa: Eoa,
-    uniqueId: string
-  ) => void
+  setLogin: (index: number, account: string, funWallet: FunWallet, eoa: Eoa, uniqueId: string) => void
   ensName: string | null
   setEnsName: (ensName: string) => void
 }
@@ -75,15 +68,8 @@ export const createUseFun = (hookBuildParams: createUseFunInterface) => {
       setUniqueId: (uniqueId: string) => set(() => ({ uniqueId })),
       account: null,
       setAccount: (account: string) => set(() => ({ account })),
-      setLogin: (
-        config: EnvOption,
-        index: number,
-        account: string,
-        funWallet: FunWallet,
-        Eoa: Eoa,
-        uniqueId: string
-      ) => {
-        set(() => ({ config, index, account, FunWallet: funWallet, Eoa, uniqueId }))
+      setLogin: (index: number, account: string, funWallet: FunWallet, Eoa: Eoa, uniqueId: string) => {
+        set(() => ({ index, account, FunWallet: funWallet, Eoa, uniqueId }))
       },
       ensName: null,
       setEnsName: (ensName: string) => set(() => ({ ensName })),

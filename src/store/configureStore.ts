@@ -1,21 +1,24 @@
-import { configureEnvironment, EnvOption } from 'fun-wallet'
+import { configureEnvironment, GlobalEnvOption } from 'fun-wallet'
 
 export interface ConfigureStoreInterface {
-  config: EnvOption | null
-  setConfig: (Config: Partial<EnvOption>) => void
-  updateConfig: (Config: Partial<EnvOption>) => void
+  config: GlobalEnvOption | null
+  setConfig: (Config: Partial<GlobalEnvOption>) => void
+  updateConfig: (Config: Partial<GlobalEnvOption>) => void
 }
 
-export const buildAndUpdateConfig = async (newConfig: Partial<EnvOption>, oldConfig: Partial<EnvOption>) => {
+export const buildAndUpdateConfig = async (
+  newConfig: Partial<GlobalEnvOption>,
+  oldConfig: Partial<GlobalEnvOption>
+) => {
   const finalConfig = {
     ...oldConfig,
     ...newConfig,
   }
-  await configureEnvironment(finalConfig as EnvOption)
+  await configureEnvironment(finalConfig as GlobalEnvOption)
   return { config: finalConfig }
 }
 
-export const setConfig = async (newConfig: Partial<EnvOption>) => {
-  await configureEnvironment(newConfig as EnvOption)
+export const setConfig = async (newConfig: Partial<GlobalEnvOption>) => {
+  await configureEnvironment(newConfig as GlobalEnvOption)
   return { config: newConfig }
 }
