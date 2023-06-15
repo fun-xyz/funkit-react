@@ -3,7 +3,7 @@
 import type { Web3ReactHooks } from '@web3-react/core'
 import { getPriorityConnector } from '@web3-react/core'
 import type { Connector, Web3ReactStore } from '@web3-react/types'
-import { Eoa, FunWallet, GlobalEnvOption } from 'fun-wallet'
+import { configureEnvironment, Eoa, FunWallet, GlobalEnvOption, MultiAuthEoa } from 'fun-wallet'
 import { useCallback, useEffect, useState } from 'react'
 import { shallow } from 'zustand/shallow'
 
@@ -11,7 +11,7 @@ import { connectors } from './connectors'
 import { MISSING_API_KEY, MISSING_CONFIG } from './constants/ErrorMessages'
 import { Ethereum, Goerli, Polygon } from './Networks'
 import { createUseFun } from './store'
-import { convertWeb3ProviderToClient } from './utils'
+import { convertAccountsMultiAuthIds, convertWeb3ProviderToClient } from './utils'
 
 export const useFun = createUseFun({
   connectors: [
@@ -29,20 +29,27 @@ export const useFun = createUseFun({
 
 export const ShallowEqual = shallow
 
-interface buildFunWalletInterface {
+export interface buildFunWalletInterface {
   config: GlobalEnvOption
 }
 
-interface initializeSingleAuthWalletInterface {
+export interface initializeSingleAuthWalletInterface {
   config?: GlobalEnvOption
   index?: number
   connector?: Connector
+}
+
+export interface initializeMultiAuthWalletInterface {
+  config?: GlobalEnvOption
+  index?: number
+  // connector?: Connector[]
 }
 
 // method for getting the Functions only from the useFun Hook to prevent any updating
 export const useBuildFunWallet = (build: buildFunWalletInterface) => {
   const {
     connections,
+    activeConnectors,
     index,
     storedFunWallet,
     Authorizer,
@@ -53,6 +60,7 @@ export const useBuildFunWallet = (build: buildFunWalletInterface) => {
     setLogin,
     setFunError,
     setConfig,
+    updateActiveConnectors,
   } = useFun(
     (state) => ({
       connections: state.connectors,
@@ -67,11 +75,13 @@ export const useBuildFunWallet = (build: buildFunWalletInterface) => {
       setLogin: state.setLogin,
       setFunError: state.setFunError,
       setConfig: state.setConfig,
+      updateActiveConnectors: state.updateActiveConnectors,
     }),
     shallow
   )
 
   const [initializing, setInitializing] = useState(false)
+
   //verify and validate the input params
   useEffect(() => {
     if (!build.config) throw new Error(MISSING_CONFIG)
@@ -86,6 +96,21 @@ export const useBuildFunWallet = (build: buildFunWalletInterface) => {
 
   const activeConnector = usePriorityConnector()
   const activeProvider = useSelectedProvider(activeConnector)
+  // eslint-disable-next-line react-hooks/rules-of-hooks
+  const activeAccountAddresses = connections.map((connector) => connector[1].useAccount())
+
+  const activateConnector = useCallback(
+    async (connector: Connector) => {
+      if (connector == null) return
+      try {
+        await connector.activate()
+        updateActiveConnectors([connector])
+      } catch (err) {
+        console.log(err)
+      }
+    },
+    [updateActiveConnectors]
+  )
 
   const initializeSingleAuthWallet = useCallback(
     async (singleAuthOpts?: initializeSingleAuthWalletInterface) => {
@@ -93,7 +118,7 @@ export const useBuildFunWallet = (build: buildFunWalletInterface) => {
       setInitializing(true)
       if (singleAuthOpts?.connector && !activeProvider)
         throw new Error('No active provider. activate a connector before calling this function')
-      const walletIndex = singleAuthOpts?.index ? index : 0
+      const walletIndex = singleAuthOpts?.index != null ? singleAuthOpts?.index : index
       const clientProvider = singleAuthOpts?.connector?.provider ? singleAuthOpts?.connector.provider : activeProvider
       if (clientProvider == undefined) throw new Error('No provider found')
       const client = convertWeb3ProviderToClient({ provider: clientProvider })
@@ -102,7 +127,10 @@ export const useBuildFunWallet = (build: buildFunWalletInterface) => {
 
         const ExternalOwnedAccount = new Eoa({ client })
         const generatedUniqueId = await ExternalOwnedAccount.getUniqueId()
-        const newFunWallet = new FunWallet({ uniqueId: generatedUniqueId, index: walletIndex })
+        const newFunWallet = new FunWallet({
+          uniqueId: generatedUniqueId,
+          index: walletIndex,
+        })
         const newAccountAddress = await newFunWallet.getAddress()
         setLogin(walletIndex, newAccountAddress, newFunWallet, ExternalOwnedAccount, generatedUniqueId)
         setInitializing(false)
@@ -115,10 +143,48 @@ export const useBuildFunWallet = (build: buildFunWalletInterface) => {
     [initializing, activeProvider, index, setConfig, setLogin, setFunError]
   )
 
+  const initializeMultiAuthWallet = useCallback(
+    async (singleAuthOpts?: initializeSingleAuthWalletInterface) => {
+      if (initializing) return
+      setInitializing(true)
+      if (!activeProvider) throw new Error('No active provider. activate a connector before calling this function')
+      // Validate the input params
+      const walletIndex = singleAuthOpts?.index != null ? singleAuthOpts?.index : index
+      const clientProvider = singleAuthOpts?.connector?.provider ? singleAuthOpts?.connector.provider : activeProvider
+      if (clientProvider == undefined) throw new Error('No provider found')
+      const client = convertWeb3ProviderToClient({ provider: clientProvider })
+      const currentConfig = singleAuthOpts?.config ? singleAuthOpts.config : config
+      try {
+        if (!currentConfig) throw new Error('No config found')
+        if (currentConfig !== config) {
+          setConfig(currentConfig)
+        }
+        await configureEnvironment(currentConfig)
+        const multiAuthIds = (await convertAccountsMultiAuthIds(activeAccountAddresses)) as [] // get this typed better in the SDK
+        // initialize the wallet
+        const ExternalOwnedAccount = new MultiAuthEoa({ client, authIds: multiAuthIds })
+        const generatedUniqueId = await ExternalOwnedAccount.getUniqueId()
+        const newFunWallet = new FunWallet({
+          uniqueId: generatedUniqueId,
+          index: walletIndex,
+        })
+        const newAccountAddress = await newFunWallet.getAddress()
+        setLogin(walletIndex, newAccountAddress, newFunWallet, ExternalOwnedAccount, generatedUniqueId)
+        setInitializing(false)
+      } catch (err) {
+        console.log(err)
+        setFunError({ code: 1, message: 'Failed to configure account', err })
+        setInitializing(false)
+      }
+    },
+    [activeAccountAddresses, activeProvider, config, index, initializing, setConfig, setFunError, setLogin]
+  )
+
   return {
     useFun,
     connectors: connections,
     activeConnector,
+    activeAccountAddresses,
     index,
     FunWallet: storedFunWallet,
     Eoa: Authorizer,
@@ -126,7 +192,9 @@ export const useBuildFunWallet = (build: buildFunWalletInterface) => {
     account,
     error,
     loading: initializing,
+    activateConnector,
     initializeSingleAuthWallet,
+    initializeMultiAuthWallet,
   }
 }
 

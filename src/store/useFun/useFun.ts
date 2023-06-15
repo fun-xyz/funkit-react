@@ -1,5 +1,6 @@
 // eslint-disable-next-line prettier/prettier
 "use client";
+import { Connector } from '@web3-react/types'
 import { Eoa, FunWallet } from 'fun-wallet'
 import { Chain } from 'fun-wallet'
 import { create } from 'zustand'
@@ -47,13 +48,10 @@ export const createUseFun = (hookBuildParams: createUseFunInterface) => {
       requiredActiveConnectors: 0,
       setRequiredActiveConnectors: (requiredActiveConnectors: number) => set(() => ({ requiredActiveConnectors })),
       activeConnectors: [],
-      setActiveConnectors: (activeConnectors: ConnectorArray) => set(() => ({ activeConnectors })),
-      updateActiveConnectors: (activeConnectors: ConnectorArray) =>
+      setActiveConnectors: (activeConnectors: Connector[]) => set(() => ({ activeConnectors })),
+      updateActiveConnectors: (activeConnectors: Connector[]) =>
         set((state: useFunStoreInterface) => {
-          const newActiveConnectors = {
-            ...state.activeConnectors,
-            ...activeConnectors,
-          }
+          const newActiveConnectors = [...state.activeConnectors, ...activeConnectors]
           return { activeConnectors: newActiveConnectors }
         }),
       index: hookBuildParams.defaultIndex || 0,
