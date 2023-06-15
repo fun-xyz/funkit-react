@@ -38,7 +38,6 @@
     "postcss": "^8.4.24",
     "react": "^18.2.0",
     "web3-core": "^4.0.1",
-    "ws": "^8.13.0",
     "zustand": "^4.3.8"
   },
   "devDependencies": {
