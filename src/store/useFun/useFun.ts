@@ -84,10 +84,8 @@ export const createUseFun = (hookBuildParams: createUseFunInterface) => {
           return await buildAndUpdateConfig(newConfig, state.config || {})
         })
       },
-      setConfig: (newConfig: any) => {
-        return set(async () => {
-          return await setConfig(newConfig)
-        })
+      setConfig: async (newConfig: any) => {
+        return set(await setConfig(newConfig))
       },
       error: null,
       errors: [],

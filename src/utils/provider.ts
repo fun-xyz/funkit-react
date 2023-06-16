@@ -14,3 +14,18 @@ export const convertAccountsMultiAuthIds = (accounts: string[]): [string, string
 
   return accountPairs
 }
+
+export function getMatchingHexStrings(hexStrings: (string | undefined)[], indexList?: number[]) {
+  if (indexList === undefined) return hexStrings
+  const result: string[] = []
+
+  for (const index of indexList) {
+    const hexString = hexStrings[index]
+
+    if (hexString !== undefined) {
+      result.push(hexString)
+    }
+  }
+
+  return result
+}

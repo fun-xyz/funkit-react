@@ -37,8 +37,9 @@ export class MagicConnect extends Connector {
 
   constructor({ actions, options, onError }: MagicAuthConstructorArgs) {
     super(actions, onError)
+    console.log('MagicConnect constructor')
     this.options = options
-    this.name = `${options.oAuthProvider as string} Connector`
+    this.name = `${options.oAuthProvider as string}`
     this.magicAuthApiKey = options.magicAuthApiKey || 'pk_live_8DB9921E98B1C9E5'
     this.oAuthProvider = options.oAuthProvider
     this.redirectURI = options.redirectURI
@@ -138,15 +139,6 @@ export class MagicConnect extends Connector {
     return this.authId
   }
 
-  private async checkLoggedInStatus() {
-    try {
-      const isLoggedIn = await this.magic?.user.isLoggedIn()
-      return isLoggedIn
-    } catch (error) {
-      return false
-    }
-  }
-
   /**
    * A function to determine whether or not this code is executing on a server.
    */
@@ -156,7 +148,7 @@ export class MagicConnect extends Connector {
 
   // "autoconnect"
   override async connectEagerly(): Promise<void> {
-    const isLoggedIn = await this.checkLoggedInStatus()
+    const isLoggedIn = await this.isAuthorized()
     if (!isLoggedIn) return
     await this.activate()
   }
@@ -198,7 +190,7 @@ export class MagicConnect extends Connector {
   // "disconnect"
   override async deactivate(): Promise<void> {
     this.actions.resetState()
-    await this.magic?.wallet.disconnect()
+    await this.magic?.user.logout()
     this.removeEventListeners()
   }
 
@@ -219,18 +211,26 @@ export class MagicConnect extends Connector {
     try {
       const magic = this.getMagic()
       if (magic == null) return false
-
       const isLoggedIn = await magic.user.isLoggedIn()
+      // console.log('CHECK Logged in status: ', magic, isLoggedIn)
       if (isLoggedIn) {
         return true
       }
+      // console.log('CHECK OAUTH RESULT: ', this.oAuthResult)
 
       if (this.oAuthResult) {
         return true
       }
       this.oAuthResult = await magic.oauth.getRedirectResult()
-      return this.oAuthResult != null
-    } catch {
+      console.log(
+        'CHECK AUTHORIZATION: ',
+        this.oAuthResult,
+        this.oAuthProvider,
+        this.oAuthResult != null && this.oAuthResult.oauth.provider === this.oAuthProvider
+      )
+      return this.oAuthResult != null && this.oAuthResult.oauth.provider === this.oAuthProvider
+    } catch (err) {
+      console.log('Catching auth error', err)
       return false
     }
   }

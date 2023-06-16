@@ -11,7 +11,7 @@ import { connectors } from './connectors'
 import { MISSING_API_KEY, MISSING_CONFIG } from './constants/ErrorMessages'
 import { Ethereum, Goerli, Polygon } from './Networks'
 import { createUseFun } from './store'
-import { convertAccountsMultiAuthIds, convertWeb3ProviderToClient } from './utils'
+import { convertAccountsMultiAuthIds, convertWeb3ProviderToClient, getMatchingHexStrings } from './utils'
 
 export const useFun = createUseFun({
   connectors: [
@@ -42,14 +42,13 @@ export interface initializeSingleAuthWalletInterface {
 export interface initializeMultiAuthWalletInterface {
   config?: GlobalEnvOption
   index?: number
-  // connector?: Connector[]
+  connectorIndexes?: number[]
 }
 
 // method for getting the Functions only from the useFun Hook to prevent any updating
 export const useBuildFunWallet = (build: buildFunWalletInterface) => {
   const {
     connections,
-    activeConnectors,
     index,
     storedFunWallet,
     Authorizer,
@@ -64,7 +63,6 @@ export const useBuildFunWallet = (build: buildFunWalletInterface) => {
   } = useFun(
     (state) => ({
       connections: state.connectors,
-      activeConnectors: state.activeConnectors,
       index: state.index,
       storedFunWallet: state.FunWallet,
       Authorizer: state.Eoa,
@@ -144,24 +142,29 @@ export const useBuildFunWallet = (build: buildFunWalletInterface) => {
   )
 
   const initializeMultiAuthWallet = useCallback(
-    async (singleAuthOpts?: initializeSingleAuthWalletInterface) => {
+    async (singleAuthOpts?: initializeMultiAuthWalletInterface) => {
       if (initializing) return
       setInitializing(true)
       if (!activeProvider) throw new Error('No active provider. activate a connector before calling this function')
       // Validate the input params
       const walletIndex = singleAuthOpts?.index != null ? singleAuthOpts?.index : index
-      const clientProvider = singleAuthOpts?.connector?.provider ? singleAuthOpts?.connector.provider : activeProvider
+      const clientProvider =
+        singleAuthOpts?.connectorIndexes && singleAuthOpts.connectorIndexes.length > 0
+          ? connections[singleAuthOpts.connectorIndexes[0]][0].provider
+          : activeProvider
       if (clientProvider == undefined) throw new Error('No provider found')
       const client = convertWeb3ProviderToClient({ provider: clientProvider })
       const currentConfig = singleAuthOpts?.config ? singleAuthOpts.config : config
       try {
-        if (!currentConfig) throw new Error('No config found')
+        if (!currentConfig) throw new Error('Environment config not set')
         if (currentConfig !== config) {
           setConfig(currentConfig)
         }
         await configureEnvironment(currentConfig)
-        const multiAuthIds = (await convertAccountsMultiAuthIds(activeAccountAddresses)) as [] // get this typed better in the SDK
+        const accountsToUse = getMatchingHexStrings(activeAccountAddresses, singleAuthOpts?.connectorIndexes)
+        const multiAuthIds = (await convertAccountsMultiAuthIds(accountsToUse as string[])) as [] // get this typed better since i cheated NT
         // initialize the wallet
+        console.log(accountsToUse, multiAuthIds, singleAuthOpts?.connectorIndexes)
         const ExternalOwnedAccount = new MultiAuthEoa({ client, authIds: multiAuthIds })
         const generatedUniqueId = await ExternalOwnedAccount.getUniqueId()
         const newFunWallet = new FunWallet({

@@ -2,7 +2,7 @@
 import { OAuthProvider } from '@magic-ext/oauth'
 import { initializeConnector } from '@web3-react/core'
 
-import { MagicConnect } from '../magic-auth/dist/index'
+import { MagicConnect } from '../magic-auth/src'
 
 const MAGIC_API_KEY = 'pk_live_846F1095F0E1303C'
 const REDIRECT_URI = 'http://localhost:3000'
