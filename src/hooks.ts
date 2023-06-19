@@ -84,7 +84,6 @@ export const useBuildFunWallet = (build: buildFunWalletInterface) => {
     setFunError,
     resetFunError,
     setConfig,
-    updateActiveConnectors,
   } = useFun(
     (state) => ({
       connections: state.connectors,
@@ -100,7 +99,6 @@ export const useBuildFunWallet = (build: buildFunWalletInterface) => {
       setFunError: state.setFunError,
       resetFunError: state.resetFunError,
       setConfig: state.setConfig,
-      updateActiveConnectors: state.updateActiveConnectors,
     }),
     shallow
   )
@@ -132,18 +130,14 @@ export const useBuildFunWallet = (build: buildFunWalletInterface) => {
   // eslint-disable-next-line react-hooks/rules-of-hooks
   const activeAccountAddresses = connections.map((connector) => connector[1].useAccount())
 
-  const activateConnector = useCallback(
-    async (connector: Connector) => {
-      if (connector == null) return
-      try {
-        await connector.activate()
-        updateActiveConnectors([connector])
-      } catch (err) {
-        console.log(err)
-      }
-    },
-    [updateActiveConnectors]
-  )
+  const activateConnector = useCallback(async (connector: Connector) => {
+    if (connector == null) return
+    try {
+      await connector.activate()
+    } catch (err) {
+      console.log(err)
+    }
+  }, [])
 
   const initializeSingleAuthWallet = useCallback(
     async (singleAuthOpts?: initializeSingleAuthWalletInterface) => {

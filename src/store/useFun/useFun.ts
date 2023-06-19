@@ -1,6 +1,5 @@
 // eslint-disable-next-line prettier/prettier
 "use client";
-import { Connector } from '@web3-react/types'
 import { Eoa, FunWallet } from 'fun-wallet'
 import { Chain } from 'fun-wallet'
 import { create } from 'zustand'
