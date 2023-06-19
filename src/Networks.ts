@@ -1,4 +1,4 @@
-import { Chain } from 'fun-wallet/dist/src/data'
+import { Chain } from 'fun-wallet'
 
 export const Ethereum = new Chain({ chainId: '1' })
 export const Goerli = new Chain({ chainId: '5' })
@@ -30,7 +30,8 @@ export const chainNumber = {
 
 export const convertToChain = (chain: string | number): Chain => {
   if (typeof chain === 'string') {
-    return chainNumber[chain]
+    const parsedChain = parseInt(chain)
+    return isNaN(parsedChain) ? chainNumber[chain] : chainName[chain]
   }
   return chainName[chain]
 }
