@@ -16,7 +16,7 @@
     "lint": "eslint -c .eslintrc.json --ext .ts,.tsx './**/*.{ts,tsx}'",
     "lint:fix": "eslint -c .eslintrc.json --ext .ts,.tsx './**/*.{ts,tsx}' --fix",
     "prepare": "husky install",
-    "postinstall": "tsc"
+    "postinstall": "tsc && cd node_modules/@magic-ext/oauth/dist/cjs && touch core.js"
   },
   "dependencies": {
     "@coinbase/wallet-sdk": "^3.6.6",
