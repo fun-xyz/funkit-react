@@ -63,7 +63,7 @@ export class MagicConnect extends Connector {
         rpcUrl: networkOptions.rpcUrl,
       },
       extensions: [new OAuthExtension()],
-    })
+    }) as unknown as InstanceWithExtensions<SDKBase, OAuthExtension[]>
   }
 
   private connectListener = ({ chainId }: ProviderConnectInfo): void => {
