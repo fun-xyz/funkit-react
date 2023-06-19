@@ -41,55 +41,52 @@ export interface createUseFunInterface {
 
 export const createUseFun = (hookBuildParams: createUseFunInterface) => {
   return create(
-    (set: any): useFunStoreInterface => ({
+    (set: any, get: any): useFunStoreInterface => ({
       connectors: hookBuildParams.connectors,
       groupId: null,
       setGroupId: (groupId: string) => set(() => ({ groupId })),
       requiredActiveConnectors: 0,
       setRequiredActiveConnectors: (requiredActiveConnectors: number) => set(() => ({ requiredActiveConnectors })),
-      activeConnectors: [],
-      setActiveConnectors: (activeConnectors: Connector[]) => set(() => ({ activeConnectors })),
-      updateActiveConnectors: (activeConnectors: Connector[]) =>
-        set((state: useFunStoreInterface) => {
-          const newActiveConnectors = [...state.activeConnectors, ...activeConnectors]
-          return { activeConnectors: newActiveConnectors }
-        }),
       index: hookBuildParams.defaultIndex || 0,
-
-      setIndex: (newIndex: number) => set(() => ({ index: newIndex })),
+      setIndex: (newIndex: number) => set({ index: newIndex }),
       resetIndex: () => set({ index: 0 }),
       FunWallet: null,
-      setFunWallet: (FunWallet: FunWallet) => set(() => ({ FunWallet })),
+      setFunWallet: (FunWallet: FunWallet) => set({ FunWallet }),
       Eoa: null,
-      setEoa: (Authorizer: Eoa) => set(() => ({ Eoa: Authorizer })),
+      setEoa: (Authorizer: Eoa) => set({ Eoa: Authorizer }),
       uniqueId: null,
-      setUniqueId: (uniqueId: string) => set(() => ({ uniqueId })),
+      setUniqueId: (uniqueId: string) => set({ uniqueId }),
       account: null,
-      setAccount: (account: string) => set(() => ({ account })),
+      setAccount: (account: string) => set({ account }),
       setLogin: (index: number, account: string, funWallet: FunWallet, Eoa: Eoa, uniqueId: string) => {
-        set(() => ({ index, account, FunWallet: funWallet, Eoa, uniqueId }))
+        set({ index, account, FunWallet: funWallet, Eoa, uniqueId })
       },
       ensName: null,
-      setEnsName: (ensName: string) => set(() => ({ ensName })),
+      setEnsName: (ensName: string) => set({ ensName }),
       chain: null,
       chainId: null,
-      supportedChainIds: hookBuildParams.supportedChains,
-      switchChain: (chainId: number) =>
-        set(async ({ config }: useFunStoreInterface) => {
-          return await handleChainSwitching(chainId, config)
-        }),
+      supportedChains: hookBuildParams.supportedChains,
+      switchChain: async (chainId: number | string) => {
+        const oldConfig = get().config
+        const newState = await handleChainSwitching(chainId, oldConfig)
+        set(newState)
+      },
       config: null,
-      updateConfig: (newConfig: any) => {
-        return set(async (state: useFunStoreInterface) => {
-          return await buildAndUpdateConfig(newConfig, state.config || {})
-        })
+      updateConfig: async (newConfig: any) => {
+        const oldConfig = get().config
+        const update = await buildAndUpdateConfig(newConfig, oldConfig || {})
+        return set(update)
       },
       setConfig: async (newConfig: any) => {
         return set(await setConfig(newConfig))
       },
       error: null,
       errors: [],
-      setFunError: (error: FunError) => set((state) => ({ error, errors: state.errors.concat([error]) })),
+      setFunError: (error: FunError) => {
+        const { errors } = get()
+        if (errors.length === 10) errors.pop()
+        set({ error, errors: [error].concat(errors) })
+      },
       resetFunError: () => set({ error: null }),
       resetFunErrors: () => set({ errors: [] }),
     })

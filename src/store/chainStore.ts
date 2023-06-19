@@ -6,13 +6,15 @@ import { buildAndUpdateConfig } from './configureStore'
 export interface ChainStoreInterface {
   chain: string | null
   chainId: number | null
-  supportedChainIds: Chain[]
-  switchChain: (chain: number) => void
+  supportedChains: Chain[]
+  switchChain: (chain: number | string) => void
 }
 
-export const handleChainSwitching = async (newChain: number, config: Partial<GlobalEnvOption> | null) => {
+export const handleChainSwitching = async (newChain: number | string, oldConfig: Partial<GlobalEnvOption> | null) => {
   const Chain = convertToChain(newChain)
-  await buildAndUpdateConfig({ chain: convertToChain(newChain) }, { ...config })
-
-  return { chain: Chain, chainId: Chain.chainId }
+  if (!Chain) {
+    throw new Error(`Invalid Chain: ${newChain}`)
+  }
+  const { config } = await buildAndUpdateConfig({ chain: Chain }, { ...oldConfig })
+  return { chain: Chain, chainId: Chain.chainId, config }
 }
