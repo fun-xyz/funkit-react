@@ -86,6 +86,12 @@ export const createUseFun = (hookBuildParams: createUseFunInterface) => {
         if (errors.length === 10) errors.pop()
         set({ error, errors: [error].concat(errors) })
       },
+      setTempError: (error: FunError) => {
+        const { errors } = get()
+        if (errors.length === 10) errors.pop()
+        set({ error, errors: [error].concat(errors) })
+        setTimeout(() => set({ error: null }), 5000)
+      },
       resetFunError: () => set({ error: null }),
       resetFunErrors: () => set({ errors: [] }),
     })

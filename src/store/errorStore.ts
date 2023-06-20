@@ -9,6 +9,7 @@ export interface ErrorStoreInterface {
   error: FunError | null
   errors: FunError[]
   setFunError: (error: FunError) => void
+  setTempError: (error: FunError) => void
   resetFunError: () => void
   resetFunErrors: () => void
 }
@@ -34,6 +35,11 @@ export const MissingActiveSigner: FunError = {
   code: 3,
   message: 'No active signer. Activate a connector before calling this function',
   link: 'https://docs.fun.xyz/how-to-guides/configure-account/auth-types',
+}
+
+export const NoMetaMaskError: FunError = {
+  code: 1001,
+  message: 'Metamask or injected connector not installed or disabled',
 }
 
 export const LegacyAuthIdMultiAccountError: FunError = {

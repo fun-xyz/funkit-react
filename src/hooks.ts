@@ -24,6 +24,7 @@ import {
   MissingActiveSigner,
   MissingApiKeyError,
   MissingConfigError,
+  NoMetaMaskError,
 } from './store'
 import { convertAccountsMultiAuthIds, convertWeb3ProviderToClient, getMatchingHexStrings } from './utils'
 
@@ -82,6 +83,7 @@ export const useBuildFunWallet = (build: buildFunWalletInterface) => {
     supportedChains,
     setLogin,
     setFunError,
+    setTempError,
     resetFunError,
     setConfig,
   } = useFun(
@@ -97,6 +99,7 @@ export const useBuildFunWallet = (build: buildFunWalletInterface) => {
       supportedChains: state.supportedChains,
       setLogin: state.setLogin,
       setFunError: state.setFunError,
+      setTempError: state.setTempError,
       resetFunError: state.resetFunError,
       setConfig: state.setConfig,
     }),
@@ -107,10 +110,10 @@ export const useBuildFunWallet = (build: buildFunWalletInterface) => {
 
   const handleBuildError = useCallback(
     (error: FunError) => {
-      setFunError(error)
+      setTempError(error)
       setInitializing(false)
     },
-    [setFunError, setInitializing]
+    [setTempError, setInitializing]
   )
   //verify and validate the input params
   useEffect(() => {
@@ -130,14 +133,18 @@ export const useBuildFunWallet = (build: buildFunWalletInterface) => {
   // eslint-disable-next-line react-hooks/rules-of-hooks
   const activeAccountAddresses = connections.map((connector) => connector[1].useAccount())
 
-  const activateConnector = useCallback(async (connector: Connector) => {
-    if (connector == null) return
-    try {
-      await connector.activate()
-    } catch (err) {
-      console.log(err)
-    }
-  }, [])
+  const activateConnector = useCallback(
+    async (connector: Connector) => {
+      if (connector == null) return
+      try {
+        await connector.activate()
+      } catch (err) {
+        console.log(err)
+        if ((err as any).constructor.name === 'NoMetaMaskError') setTempError(NoMetaMaskError)
+      }
+    },
+    [setTempError]
+  )
 
   const initializeSingleAuthWallet = useCallback(
     async (singleAuthOpts?: initializeSingleAuthWalletInterface) => {
@@ -164,7 +171,7 @@ export const useBuildFunWallet = (build: buildFunWalletInterface) => {
         setLogin(walletIndex, newAccountAddress, newFunWallet, ExternalOwnedAccount, generatedUniqueId)
         setInitializing(false)
       } catch (err) {
-        console.log('Single Signer Error: ', err)
+        console.log('Single Signer Error: ', err, client, singleAuthOpts)
         return handleBuildError({ code: 0, message: 'Failed to configure account', err })
       }
     },
