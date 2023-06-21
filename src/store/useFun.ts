@@ -1,7 +1,6 @@
 // eslint-disable-next-line prettier/prettier
 "use client";
-import { Eoa, FunWallet } from 'fun-wallet'
-import { Chain } from 'fun-wallet'
+import { Eoa, FunWallet, Chain } from '@fun-xyz/core'
 import { create } from 'zustand'
 
 import { ConnectorArray } from '../connectors/types'

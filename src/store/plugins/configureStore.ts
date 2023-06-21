@@ -1,4 +1,4 @@
-import { configureEnvironment, GlobalEnvOption } from 'fun-wallet'
+import { configureEnvironment, GlobalEnvOption } from '@fun-xyz/core'
 
 export interface ConfigureStoreInterface {
   config: GlobalEnvOption | null

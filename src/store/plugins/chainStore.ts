@@ -1,4 +1,4 @@
-import { Chain, GlobalEnvOption } from 'fun-wallet'
+import { Chain, GlobalEnvOption } from '@fun-xyz/core'
 
 import { convertToChain } from '../../network/networks'
 import { buildAndUpdateConfig } from './configureStore'

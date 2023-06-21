@@ -10,7 +10,9 @@
   "files": [
     "dist"
   ],
-  "private": false,
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "dev": "cd ./example && npm run dev",
     "build": "rm -rf dist && tsc",
@@ -35,7 +37,7 @@
     "@web3-react/types": "^8.2.0",
     "@web3-react/url": "^8.2.0",
     "@web3-react/walletconnect-v2": "^8.3.2",
-    "fun-wallet": "^0.3.3",
+    "@fun-xyz/core": "^0.3.5",
     "localforage": "^1.10.0",
     "magic-sdk": "17.0.0",
     "postcss": "^8.4.24",

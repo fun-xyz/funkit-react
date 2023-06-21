@@ -11,7 +11,7 @@ import {
   GlobalEnvOption,
   MultiAuthEoa,
   ParameterFormatError,
-} from 'fun-wallet'
+} from '@fun-xyz/core'
 import { useCallback, useEffect, useState } from 'react'
 import { shallow } from 'zustand/shallow'
 

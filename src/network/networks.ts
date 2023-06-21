@@ -1,4 +1,4 @@
-import { Chain } from 'fun-wallet'
+import { Chain } from '@fun-xyz/core'
 
 export const Ethereum = new Chain({ chainId: '1' })
 export const Goerli = new Chain({ chainId: '5' })
