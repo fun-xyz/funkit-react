@@ -40,7 +40,6 @@
     "@fun-xyz/core": "^0.3.5",
     "localforage": "^1.10.0",
     "magic-sdk": "17.0.0",
-    "postcss": "^8.4.24",
     "react": "^18.2.0",
     "web3-core": "^4.0.1",
     "zustand": "^4.3.8"
@@ -56,6 +55,7 @@
     "autoprefixer": "^10.4.13",
     "eslint": "^8.41.0",
     "husky": "^8.0.3",
+    "postcss": "^8.4.24",
     "prettier": "^2.8.8",
     "typescript": "^5.1.3"
   }
