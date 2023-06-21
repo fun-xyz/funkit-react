@@ -1,5 +1,4 @@
 import { CoinbaseWallet } from '@web3-react/coinbase-wallet'
-import { GnosisSafe } from '@web3-react/gnosis-safe'
 import { MetaMask } from '@web3-react/metamask'
 import { Network } from '@web3-react/network'
 // import type { Web3ReactHooks } from "@web3-react/core";
@@ -18,7 +17,6 @@ export function getName(connector: Connector | MagicAuthConnector) {
   if (connector instanceof WalletConnectV2) return 'WalletConnect'
   if (connector instanceof CoinbaseWallet) return 'Coinbase Wallet'
   if (connector instanceof Network) return 'Network'
-  if (connector instanceof GnosisSafe) return 'Gnosis Safe'
   if (connector['name']) {
     return connector['name'].charAt(0).toUpperCase() + connector['name'].slice(1)
   }
