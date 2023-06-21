@@ -1,6 +1,6 @@
 import { Chain, GlobalEnvOption } from 'fun-wallet'
 
-import { convertToChain } from '../Networks'
+import { convertToChain } from '../../network/networks'
 import { buildAndUpdateConfig } from './configureStore'
 
 export interface ChainStoreInterface {

@@ -4,11 +4,11 @@ import { Eoa, FunWallet } from 'fun-wallet'
 import { Chain } from 'fun-wallet'
 import { create } from 'zustand'
 
-import { ConnectorArray } from '../../connectors/Connector'
-import { ChainStoreInterface, handleChainSwitching } from '../chainStore'
-import { buildAndUpdateConfig, ConfigureStoreInterface, setConfig } from '../configureStore'
-import { ConnectorStoreInterface } from '../connectorStore'
-import { ErrorStoreInterface, FunError } from '../errorStore'
+import { ConnectorArray } from '../connectors/Connector'
+import { ChainStoreInterface, handleChainSwitching } from './plugins/chainStore'
+import { buildAndUpdateConfig, ConfigureStoreInterface, setConfig } from './configureStore'
+import { ConnectorStoreInterface } from './connectorStore'
+import { ErrorStoreInterface, FunError } from './errorStore'
 
 export interface useFunStoreInterface
   extends ConnectorStoreInterface,

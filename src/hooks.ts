@@ -16,7 +16,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { shallow } from 'zustand/shallow'
 
 import { connectors } from './connectors'
-import { Arbitrum, Goerli, Polygon } from './Networks'
+import { Arbitrum, Goerli, Polygon } from './network/networks'
 import {
   createUseFun,
   FunError,
@@ -230,9 +230,7 @@ export const useBuildFunWallet = (build: buildFunWalletInterface) => {
   )
 
   return {
-    useFun,
     connectors: connections,
-    activeConnector,
     activeAccountAddresses,
     index,
     FunWallet: storedFunWallet,

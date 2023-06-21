@@ -1,4 +1,4 @@
 export * from './connectors'
 export * from './hooks'
-export * from './Networks'
-export * from './store/useFun/useFun'
+export * from './network/networks'
+export * from './store/useFun'

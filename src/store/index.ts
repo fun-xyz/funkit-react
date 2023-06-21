@@ -1,5 +1,5 @@
-export * from './chainStore'
+export * from './plugins/chainStore'
 export * from './configureStore'
 export * from './connectorStore'
 export * from './errorStore'
-export * from './useFun/useFun'
+export * from './useFun'
