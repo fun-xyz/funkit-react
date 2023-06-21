@@ -1,5 +1,5 @@
 {
-  "name": "fun-wallet-react",
+  "name": "@fun-xyz/react",
   "version": "0.0.1",
   "description": "React interface for the FunWallet SDK",
   "repository": "git@github.com:TheFunGroup/fun-wallet-react.git",
