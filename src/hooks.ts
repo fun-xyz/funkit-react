@@ -51,7 +51,7 @@ export interface buildFunWalletInterface {
 export interface initializeSingleAuthWalletInterface {
   config?: GlobalEnvOption
   index?: number
-  connector?: Connector
+  connectorIndex?: number
 }
 
 export interface initializeMultiAuthWalletInterface {
@@ -150,8 +150,10 @@ export const useBuildFunWallet = (build: buildFunWalletInterface) => {
     async (singleAuthOpts?: initializeSingleAuthWalletInterface) => {
       if (initializing) return
       setInitializing(true)
-
-      const clientProvider = singleAuthOpts?.connector?.provider || activeProvider
+      const clientProvider =
+        singleAuthOpts?.connectorIndex != null
+          ? connections[singleAuthOpts?.connectorIndex][0].provider
+          : activeProvider
       if (clientProvider == null) return handleBuildError(MissingActiveSigner)
 
       const walletIndex = singleAuthOpts?.index ?? index
@@ -160,60 +162,71 @@ export const useBuildFunWallet = (build: buildFunWalletInterface) => {
       try {
         if (singleAuthOpts?.config) setConfig(singleAuthOpts.config)
 
-        const ExternalOwnedAccount = new Eoa({ client })
-        const generatedUniqueId = await ExternalOwnedAccount.getUniqueId()
+        const externalOwnedAccount = new Eoa({ client })
+        const generatedUniqueId = await externalOwnedAccount.getUniqueId()
         const newFunWallet = new FunWallet({
           uniqueId: generatedUniqueId,
           index: walletIndex,
         })
         const newAccountAddress = await newFunWallet.getAddress()
 
-        setLogin(walletIndex, newAccountAddress, newFunWallet, ExternalOwnedAccount, generatedUniqueId)
+        setLogin(walletIndex, newAccountAddress, newFunWallet, externalOwnedAccount, generatedUniqueId)
         setInitializing(false)
       } catch (err) {
         console.log('Single Signer Error: ', err, client, singleAuthOpts)
-        return handleBuildError({ code: 0, message: 'Failed to configure account', err })
+        return handleBuildError({
+          code: 0,
+          message: 'Failed to configure account',
+          err,
+        })
       }
     },
     [initializing, activeProvider, handleBuildError, index, setConfig, setLogin]
   )
 
   const initializeMultiAuthWallet = useCallback(
-    async (singleAuthOpts?: initializeMultiAuthWalletInterface) => {
+    async (multiAuthInputs?: initializeMultiAuthWalletInterface) => {
       if (initializing) return
       setInitializing(true)
       // Validate the input params
       const clientProvider =
-        singleAuthOpts?.connectorIndexes && singleAuthOpts.connectorIndexes.length > 0
-          ? connections[singleAuthOpts.connectorIndexes[0]][0].provider
+        multiAuthInputs?.connectorIndexes && multiAuthInputs.connectorIndexes.length > 0
+          ? connections[multiAuthInputs.connectorIndexes[0]][0].provider
           : activeProvider
       if (!clientProvider) return handleBuildError(MissingActiveSigner)
 
-      const walletIndex = singleAuthOpts?.index ?? index
+      const walletIndex = multiAuthInputs?.index ?? index
       const client = convertWeb3ProviderToClient({ provider: clientProvider })
       try {
-        const currentConfig = singleAuthOpts?.config ?? config
+        const currentConfig = multiAuthInputs?.config ?? config
         if (!currentConfig) return handleBuildError(MissingConfigError)
         if (currentConfig !== config) setConfig(currentConfig)
         await configureEnvironment(currentConfig)
 
         // get the accounts
-        const accountsToUse = getMatchingHexStrings(activeAccountAddresses, singleAuthOpts?.connectorIndexes)
+        const accountsToUse = getMatchingHexStrings(activeAccountAddresses, multiAuthInputs?.connectorIndexes)
         const multiAuthIds = convertAccountsMultiAuthIds(accountsToUse as string[]) as [] // get this typed better since i cheated NT
         // initialize the wallet
-        const ExternalOwnedAccount = new MultiAuthEoa({ client, authIds: multiAuthIds })
-        const generatedUniqueId = await ExternalOwnedAccount.getUniqueId()
+        const externalOwnedAccount = new MultiAuthEoa({
+          client,
+          authIds: multiAuthIds,
+        })
+        const generatedUniqueId = await externalOwnedAccount.getUniqueId()
         const newFunWallet = new FunWallet({
           uniqueId: generatedUniqueId,
           index: walletIndex,
         })
         const newAccountAddress = await newFunWallet.getAddress()
-        setLogin(walletIndex, newAccountAddress, newFunWallet, ExternalOwnedAccount, generatedUniqueId)
+        setLogin(walletIndex, newAccountAddress, newFunWallet, externalOwnedAccount, generatedUniqueId)
         setInitializing(false)
       } catch (err) {
         console.log('Multi Signer Error: ', err)
         if ((err as object) instanceof ParameterFormatError) return handleBuildError(LegacyAuthIdMultiAccountError)
-        handleBuildError({ code: 0, message: 'Failed to configure account', err })
+        handleBuildError({
+          code: 0,
+          message: 'Failed to configure account',
+          err,
+        })
       }
     },
     [

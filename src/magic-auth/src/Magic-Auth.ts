@@ -23,7 +23,7 @@ export interface MagicAuthConstructorArgs {
   onError?: (error: Error) => void
 }
 
-export class MagicConnect extends Connector {
+export class MagicAuthConnector extends Connector {
   name: string
   authId?: string
   override provider: any

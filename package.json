@@ -2,12 +2,15 @@
   "name": "fun-wallet-react",
   "version": "0.0.1",
   "description": "React interface for the FunWallet SDK",
-  "repository": "git@github.com:TheFunGroup/Fun-Wallet-React.git",
-  "author": "Nighttrek <Daniels@dual4t.com>",
-  "license": "GPL-3.0-or-later",
+  "repository": "git@github.com:TheFunGroup/fun-wallet-react.git",
+  "author": "The Fun Group (https://fun.xyz/)",
+  "license": "ISC",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
-  "private": true,
+  "files": [
+    "dist"
+  ],
+  "private": false,
   "scripts": {
     "dev": "cd ./example && npm run dev",
     "build": "rm -rf dist && tsc",

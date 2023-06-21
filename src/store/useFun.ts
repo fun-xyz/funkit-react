@@ -4,11 +4,11 @@ import { Eoa, FunWallet } from 'fun-wallet'
 import { Chain } from 'fun-wallet'
 import { create } from 'zustand'
 
-import { ConnectorArray } from '../connectors/Connector'
+import { ConnectorArray } from '../connectors/types'
 import { ChainStoreInterface, handleChainSwitching } from './plugins/chainStore'
-import { buildAndUpdateConfig, ConfigureStoreInterface, setConfig } from './configureStore'
-import { ConnectorStoreInterface } from './connectorStore'
-import { ErrorStoreInterface, FunError } from './errorStore'
+import { buildAndUpdateConfig, ConfigureStoreInterface, setConfig } from './plugins/configureStore'
+import { ConnectorStoreInterface } from './plugins/connectorStore'
+import { ErrorStoreInterface, FunError } from './plugins/errorStore'
 
 export interface useFunStoreInterface
   extends ConnectorStoreInterface,
@@ -95,12 +95,5 @@ export const createUseFun = (hookBuildParams: createUseFunInterface) => {
       resetFunError: () => set({ error: null }),
       resetFunErrors: () => set({ errors: [] }),
     })
-    // persist(
-    //     ,
-    //     {
-    //         name: "fun-web-cache",
-    //         storage: createJSONStorage(() => sessionStorage)
-    //     }
-    // )
   )
 }

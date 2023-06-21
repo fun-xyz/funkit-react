@@ -1,2 +1,2 @@
-export * from './provider'
+export * from './multiAuth'
 export * from './viem'

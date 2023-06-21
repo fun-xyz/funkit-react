@@ -6,14 +6,14 @@ import { Network } from '@web3-react/network'
 import type { Connector } from '@web3-react/types'
 import { WalletConnect as WalletConnectV2 } from '@web3-react/walletconnect-v2'
 
-import { MagicConnect } from '../magic-auth/src'
+import { MagicAuthConnector } from '../magic-auth/src/Magic-Auth'
 //
 import CoinbaseWalletConnector from './coinbaseWallet'
 import MagicAuthConnection from './magicAuthConnector'
 import MetamaskConnector from './metaMask'
 import WalletConnectV2Connector from './walletConnectV2'
 
-export function getName(connector: Connector | MagicConnect) {
+export function getName(connector: Connector | MagicAuthConnector) {
   if (connector instanceof MetaMask) return 'MetaMask'
   if (connector instanceof WalletConnectV2) return 'WalletConnect'
   if (connector instanceof CoinbaseWallet) return 'Coinbase Wallet'
