@@ -1,6 +1,6 @@
 {
   "name": "@fun-xyz/react",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "React interface for the FunWallet SDK",
   "repository": "git@github.com:TheFunGroup/fun-wallet-react.git",
   "author": "The Fun Group (https://fun.xyz/)",
@@ -21,7 +21,8 @@
     "lint": "eslint -c .eslintrc.json --ext .ts,.tsx './**/*.{ts,tsx}'",
     "lint:fix": "eslint -c .eslintrc.json --ext .ts,.tsx './**/*.{ts,tsx}' --fix",
     "prepare": "husky install",
-    "postinstall": "cd ../../@magic-ext/oauth/dist/cjs && touch core.js"
+    "postinstall": "cd ../../@magic-ext/oauth/dist/cjs && touch core.js",
+    "local install": "cd ./node_modules/@magic-ext/oauth/dist/cjs  && touch core.js"
   },
   "dependencies": {
     "@coinbase/wallet-sdk": "^3.6.6",
@@ -34,7 +35,6 @@
     "@web3-react/types": "^8.2.0",
     "@web3-react/walletconnect-v2": "^8.3.2",
     "@fun-xyz/core": "^0.3.5",
-    "localforage": "^1.10.0",
     "magic-sdk": "17.0.0",
     "react": "^18.2.0",
     "web3-core": "^4.0.1",
