@@ -37,7 +37,6 @@ export class MagicAuthConnector extends Connector {
 
   constructor({ actions, options, onError }: MagicAuthConstructorArgs) {
     super(actions, onError)
-    console.log('MagicConnect constructor')
     this.options = options
     this.name = `${options.oAuthProvider as string}`
     this.magicAuthApiKey = options.magicAuthApiKey || 'pk_live_8DB9921E98B1C9E5'
@@ -212,22 +211,14 @@ export class MagicAuthConnector extends Connector {
       const magic = this.getMagic()
       if (magic == null) return false
       const isLoggedIn = await magic.user.isLoggedIn()
-      // console.log('CHECK Logged in status: ', magic, isLoggedIn)
       if (isLoggedIn) {
         return true
       }
-      // console.log('CHECK OAUTH RESULT: ', this.oAuthResult)
 
       if (this.oAuthResult) {
         return true
       }
       this.oAuthResult = await magic.oauth.getRedirectResult()
-      console.log(
-        'CHECK AUTHORIZATION: ',
-        this.oAuthResult,
-        this.oAuthProvider,
-        this.oAuthResult != null && this.oAuthResult.oauth.provider === this.oAuthProvider
-      )
       return this.oAuthResult != null && this.oAuthResult.oauth.provider === this.oAuthProvider
     } catch (err) {
       console.log('Catching auth error', err)
