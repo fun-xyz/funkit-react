@@ -22,8 +22,10 @@ export const chainNumber = {
   Ethereum,
   Binance,
   Polygon,
+  polygon: Polygon,
   Avalanche,
   Arbitrum,
+  arbitrum: Arbitrum,
   Optimism,
   Goerli,
 }

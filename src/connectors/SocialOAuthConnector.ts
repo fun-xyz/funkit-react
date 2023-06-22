@@ -9,8 +9,8 @@ const REDIRECT_URI = 'http://localhost:3000'
 const DEFAULT_RPC = 'https://cloudflare-eth.com' //'https://rpc-mainnet.maticvigil.com'
 const DEFAULT_CHAIN_ID = 1
 
-export const MagicAuthConnection = (
-  oAuthProvider: OAuthProvider,
+export const SocialOauthConnector = (
+  supportedAuthProviders: OAuthProvider[],
   redirectUri?: string,
   networkOpts?: { rpcUrl: string; chainId: number }
 ) =>
@@ -19,11 +19,11 @@ export const MagicAuthConnection = (
       actions,
       options: {
         magicAuthApiKey: MAGIC_API_KEY,
-        oAuthProvider,
+        supportedAuthProviders,
         redirectURI: redirectUri ?? REDIRECT_URI,
         networkOptions: networkOpts ?? { rpcUrl: DEFAULT_RPC, chainId: DEFAULT_CHAIN_ID },
       },
     })
   })
 
-export default MagicAuthConnection
+export default SocialOauthConnector

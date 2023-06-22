@@ -1,8 +1,5 @@
 // eslint-disable-next-line prettier/prettier
 "use client";
-import type { Web3ReactHooks } from '@web3-react/core'
-import { getPriorityConnector } from '@web3-react/core'
-import type { Connector, Web3ReactStore } from '@web3-react/types'
 import {
   Chain,
   configureEnvironment,
@@ -12,6 +9,10 @@ import {
   MultiAuthEoa,
   ParameterFormatError,
 } from '@fun-xyz/core'
+import { OAuthProvider } from '@magic-ext/oauth'
+import type { Web3ReactHooks } from '@web3-react/core'
+import { getPriorityConnector } from '@web3-react/core'
+import type { Connector, Web3ReactStore } from '@web3-react/types'
 import { useCallback, useEffect, useState } from 'react'
 import { shallow } from 'zustand/shallow'
 
@@ -33,10 +34,7 @@ export const useFun = createUseFun({
     connectors.Metamask(),
     connectors.CoinbaseWallet(),
     connectors.WalletConnectV2(),
-    connectors.MagicAuthConnection('google'),
-    connectors.MagicAuthConnection('twitter'),
-    connectors.MagicAuthConnection('apple'),
-    connectors.MagicAuthConnection('discord'),
+    connectors.SocialOauthConnector(['google', 'twitter', 'apple', 'discord']),
   ],
   supportedChains: [Goerli, Polygon, Arbitrum],
   defaultIndex: 0,
@@ -134,10 +132,11 @@ export const useBuildFunWallet = (build: buildFunWalletInterface) => {
   const activeAccountAddresses = connections.map((connector) => connector[1].useAccount())
 
   const activateConnector = useCallback(
-    async (connector: Connector) => {
+    async (connector: Connector, oAuthProvider?: OAuthProvider) => {
       if (connector == null) return
       try {
-        await connector.activate()
+        if (oAuthProvider) await connector.activate({ oAuthProvider })
+        else await connector.activate()
       } catch (err) {
         console.log(err)
         if ((err as any).constructor.name === 'NoMetaMaskError') setTempError(NoMetaMaskError)
@@ -181,7 +180,7 @@ export const useBuildFunWallet = (build: buildFunWalletInterface) => {
         })
       }
     },
-    [initializing, activeProvider, handleBuildError, index, setConfig, setLogin]
+    [initializing, connections, activeProvider, handleBuildError, index, setConfig, setLogin]
   )
 
   const initializeMultiAuthWallet = useCallback(
