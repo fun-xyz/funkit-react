@@ -17,6 +17,7 @@ export interface MagicAuthSDKOptions extends MagicSDKAdditionalConfiguration {
   }
 }
 
+
 export interface MagicAuthConstructorArgs {
   actions: Actions
   options: MagicAuthSDKOptions
