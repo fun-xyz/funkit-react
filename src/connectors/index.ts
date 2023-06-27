@@ -22,7 +22,7 @@ export const useGetName = (connector: ConnectorType): string => {
   if (connector instanceof CoinbaseWallet) return 'Coinbase Wallet'
 
   if (connector instanceof MagicAuthConnector) {
-    if (!mounted) return 'MagicAuth'
+    if (!mounted) return '0Auth'
     const name = connector.getName()
     return name.charAt(0).toUpperCase() + name.slice(1)
   }
