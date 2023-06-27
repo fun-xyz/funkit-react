@@ -1,17 +1,27 @@
+export interface FunErrorData {
+  amount?: number | bigint
+  token?: string
+  [key: string]: any
+}
+
 export interface FunError {
   code: number // easy access code
   message: string // description with resolution
+  data?: FunErrorData // any data that might be needed
   link?: string // link to documentation if it exists
   err?: Error | unknown // the error object if needed
 }
 
 export interface ErrorStoreInterface {
+  txError: FunError | null
   error: FunError | null
   errors: FunError[]
   setFunError: (error: FunError) => void
   setTempError: (error: FunError) => void
+  setTxError: (error: FunError) => void
   resetFunError: () => void
   resetFunErrors: () => void
+  resetTxError: () => void
 }
 
 export const GeneralFunError: FunError = {
@@ -46,4 +56,59 @@ export const LegacyAuthIdMultiAccountError: FunError = {
   code: 3000,
   message:
     'One or more authId is already linked to a different FunWallet. Disconnect the account which has already been linked and try again.',
+}
+
+export const TransactionErrorCatch: FunError = {
+  code: 4000,
+  message: 'Unable to validate transaction. Caught error',
+  data: {
+    location: '',
+  },
+}
+
+export const TransactionErrorLowFunWalletBalance: FunError = {
+  code: 4001,
+  message: 'Insufficient balance in FunWallet to complete transaction',
+  data: {
+    amount: 0,
+  },
+}
+
+export const TransactionErrorInsufficientPaymasterAllowance: FunError = {
+  code: 4002,
+  message: 'Token paymaster is not approved to spend the required amount of tokens',
+  data: {
+    allowance: 0,
+  },
+}
+
+export const TransactionErrorGasSponsorBlacklist: FunError = {
+  code: 4003,
+  message: 'Gas Sponsor has blacklisted your address',
+  data: {
+    sponsorAddress: '',
+    walletAddress: '',
+  },
+}
+
+export const TransactionErrorGasSponsorWhitelist: FunError = {
+  code: 4004,
+  message: 'Gas Sponsor has not whitelisted your address',
+  data: {
+    sponsorAddress: '',
+    walletAddress: '',
+  },
+}
+export const TransactionErrorMissingOrIncorrectFields: FunError = {
+  code: 4005,
+  message: 'Missing required fields or incorrect types',
+  data: {},
+}
+
+export const generateTransactionError = (error: FunError, data: FunErrorData, err?: unknown): FunError => {
+  return {
+    ...error,
+    ...data,
+    err,
+  }
 }
