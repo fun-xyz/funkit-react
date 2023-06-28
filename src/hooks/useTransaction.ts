@@ -84,8 +84,9 @@ export const useTransaction = (build: transactionArgsInterface) => {
   const prevType = usePrevious(build.type)
   const prevTxParams = usePrevious(build.txParams)
   const prevTxOptions = usePrevious(build.txOptions)
-  const { Eoa, FunWallet, error, config, setTxError, setTempError, resetTxError } = useFun(
+  const { account, Eoa, FunWallet, error, config, setTxError, setTempError, resetTxError } = useFun(
     (state: useFunStoreInterface) => ({
+      account: state.account,
       Eoa: state.Eoa,
       FunWallet: state.FunWallet,
       index: state.index,
@@ -98,6 +99,7 @@ export const useTransaction = (build: transactionArgsInterface) => {
     })
   )
   const prevGlobalConfig = usePrevious(config)
+  const prevAccount = usePrevious(account)
 
   const [loading, setLoading] = useState(false)
   const [validTx, setValidTx] = useState(true)
@@ -113,8 +115,6 @@ export const useTransaction = (build: transactionArgsInterface) => {
         setTxError(TransactionErrorMissingOrIncorrectFields)
         setValidTx(false)
         return
-      } else {
-        if (error) resetTxError()
       }
     }
     let interval: ReturnType<typeof setInterval> | null = null
@@ -123,11 +123,13 @@ export const useTransaction = (build: transactionArgsInterface) => {
       const currentConfig = build.txOptions || (config as EnvOption)
       try {
         const res = await validateGasBehavior(currentConfig, FunWallet)
+        console.log('tx validation res', res)
         if (!res.valid && res.error) {
           setTxError(res.error)
           if (validTx) setValidTx(false)
           if (validateWallet) setValidateWallet(false)
         } else {
+          console.log('removing error tx valid', res)
           if (res.valid !== validTx) setValidTx(res.valid)
           if (interval) clearInterval(interval)
           if (validateWallet) setValidateWallet(false)
@@ -142,8 +144,17 @@ export const useTransaction = (build: transactionArgsInterface) => {
     }
 
     // Set up interval if there's an error or config changed
-    if (validateWallet || error || prevGlobalConfig !== config || prevTxOptions !== build.txOptions) {
-      if (validateWallet) checkGasBehavior()
+    // console.log('did config change: ', prevGlobalConfig !== config, config, prevGlobalConfig)
+    // console.log('did account change: ', prevAccount !== account, account, prevAccount)
+    if (
+      validateWallet ||
+      error ||
+      prevAccount !== account ||
+      prevGlobalConfig !== config ||
+      prevTxOptions !== build.txOptions
+    ) {
+      if (validateWallet || prevAccount !== account || prevGlobalConfig !== config || prevTxOptions !== build.txOptions)
+        checkGasBehavior()
       interval = setInterval(checkGasBehavior, 15000) // Check every 30 seconds
     }
 
@@ -163,6 +174,8 @@ export const useTransaction = (build: transactionArgsInterface) => {
     validateWallet,
     error,
     resetTxError,
+    prevAccount,
+    account,
   ])
 
   const sendTransaction = useCallback(() => {
@@ -192,6 +205,7 @@ export const useTransaction = (build: transactionArgsInterface) => {
         })
       })
   }, [Eoa, FunWallet, build.estimateGas, build.txOptions, build.txParams, build.type, loading, setTempError, validTx])
+
   // console.log({ valid: validTx, loading, data: txHash, error })
   return { valid: validTx, loading, data: txHash, error, sendTransaction }
 }

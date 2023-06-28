@@ -7,6 +7,7 @@ export const Polygon = new Chain({ chainId: '137' })
 export const Avalanche = new Chain({ chainId: '43114' })
 export const Binance = new Chain({ chainId: '56' })
 export const Optimism = new Chain({ chainId: '10' })
+export const OptimismGoerli = new Chain({ chainId: '420' })
 
 export const chainName = {
   '1': Ethereum,
@@ -15,6 +16,7 @@ export const chainName = {
   '43114': Avalanche,
   '42161': Arbitrum,
   '10': Optimism,
+  '420': OptimismGoerli,
   '5': Goerli,
 }
 
@@ -27,6 +29,7 @@ export const chainNumber = {
   Arbitrum,
   arbitrum: Arbitrum,
   Optimism,
+  OptimismGoerli,
   Goerli,
 }
 

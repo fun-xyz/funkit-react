@@ -50,6 +50,7 @@ export const validateAndPrepareTransaction = async (build: any, Eoa: Eoa, wallet
 
 export const validateGasBehavior = async (config: EnvOption, wallet: FunWallet): Promise<GasValidationResponse> => {
   try {
+    debugger
     const walletAddress = await wallet.getAddress()
     let currentChain = config.chain as Chain
     if (typeof config.chain === 'string' || typeof config.chain === 'number')
@@ -60,6 +61,7 @@ export const validateGasBehavior = async (config: EnvOption, wallet: FunWallet):
       // we know that its set to either gassless or a gas sponsor
       if (config.gasSponsor.token) {
         // erc20 Token sponsor
+        console.log('erc20 Token sponsor')
         const gasSponsor = new TokenSponsor()
         const paymasterAddress = await gasSponsor.getPaymasterAddress()
         const ERC20Contract = new ContractInterface(ERC20_ALLOWANCE)
@@ -83,6 +85,7 @@ export const validateGasBehavior = async (config: EnvOption, wallet: FunWallet):
         return { valid: true, allowance }
       } else {
         // gassless sponsor
+        console.log('gassless sponsor')
         const gasSponsor = new GaslessSponsor()
         const gasValidation = await validateGasSponsorMode(
           gasSponsor,
@@ -94,9 +97,11 @@ export const validateGasBehavior = async (config: EnvOption, wallet: FunWallet):
         return { valid: true }
       }
     } else {
+      console.log("No sponsor, let's check the wallet balance")
       const etherBalance = await client.getBalance({ address: walletAddress })
       if (etherBalance === 0n) return { valid: false, error: TransactionErrorLowFunWalletBalance }
       const gasPrice = await client.getGasPrice()
+      console.log('etherBalance', etherBalance, gasPrice)
       if (etherBalance < gasPrice * 100000n)
         return {
           valid: false,
