@@ -65,9 +65,13 @@ export const createUseFun = (hookBuildParams: createUseFunInterface) => {
       chainId: null,
       supportedChains: hookBuildParams.supportedChains,
       switchChain: async (chainId: number | string) => {
-        const oldConfig = get().config
+        const { config: oldConfig, account: oldAccount, FunWallet: funWallet } = get()
         const newState = await handleChainSwitching(chainId, oldConfig)
         set(newState)
+        const newAccount = funWallet?.getAddress()
+        if (oldAccount !== newAccount) {
+          set({ account: newAccount })
+        }
       },
       config: null,
       updateConfig: async (newConfig: any) => {

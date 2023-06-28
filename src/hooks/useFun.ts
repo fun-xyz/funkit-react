@@ -1,7 +1,7 @@
 import { shallow } from 'zustand/shallow'
 
 import { connectors } from '../connectors'
-import { Arbitrum, Goerli, Polygon } from '../network/networks'
+import { Goerli, OptimismGoerli } from '../network/networks'
 import { createUseFun } from '../store'
 export const useFun = createUseFun({
   connectors: [
@@ -10,7 +10,7 @@ export const useFun = createUseFun({
     connectors.WalletConnectV2(),
     connectors.SocialOauthConnector(['google', 'twitter', 'apple', 'discord']),
   ],
-  supportedChains: [Goerli, Polygon, Arbitrum],
+  supportedChains: [Goerli, OptimismGoerli],
   defaultIndex: 0,
 })
 

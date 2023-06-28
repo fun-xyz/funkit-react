@@ -16,5 +16,6 @@ export const handleChainSwitching = async (newChain: number | string, oldConfig:
     throw new Error(`Invalid Chain: ${newChain}`)
   }
   const { config } = await buildAndUpdateConfig({ chain: Chain }, { ...oldConfig })
+
   return { chain: Chain, chainId: Chain.chainId, config }
 }
