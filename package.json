@@ -1,6 +1,6 @@
 {
   "name": "@fun-xyz/react",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "React interface for the FunWallet SDK",
   "repository": "git@github.com:TheFunGroup/fun-wallet-react.git",
   "author": "The Fun Group (https://fun.xyz/)",
@@ -18,9 +18,8 @@
     "dev": "cd ./example && npm run dev",
     "build": "rm -rf dist && tsc",
     "update": "./scripts/updateExamplePackage.sh",
-    "format": "prettier --write .",
-    "lint": "eslint -c .eslintrc.json --ext .ts,.tsx './**/*.{ts,tsx}'",
-    "lint:fix": "eslint -c .eslintrc.json --ext .ts,.tsx './**/*.{ts,tsx}' --fix",
+    "lint": "eslint --ext .ts,.tsx './**/*.{ts,tsx}'",
+    "lint:fix": "eslint --ext .ts,.tsx './**/*.{ts,tsx}' --fix",
     "prepare": "husky install",
     "postinstall": "./handleOauth.sh",
     "local install": "cd ./node_modules/@magic-ext/oauth/dist/cjs  && touch core.js"

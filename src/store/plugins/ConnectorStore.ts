@@ -1,4 +1,4 @@
-import { ConnectorArray } from '../../connectors/types'
+import { ConnectorArray } from '../../connectors/Types'
 
 export interface ConnectorStoreInterface {
   connectors: ConnectorArray
