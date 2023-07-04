@@ -7,6 +7,7 @@ export const Polygon = new Chain({ chainId: '137' })
 export const Avalanche = new Chain({ chainId: '43114' })
 export const Binance = new Chain({ chainId: '56' })
 export const Optimism = new Chain({ chainId: '10' })
+export const OptimismGoerli = new Chain({ chainId: '420' })
 
 export const FunNetwork = new Chain({
   rpcUrl: 'https://rpc.vnet.tenderly.co/devnet/bundler-test/55eff413-d465-4d63-8d98-7da15c63ed96',
@@ -19,8 +20,9 @@ export const chainName = {
   '43114': Avalanche,
   '42161': Arbitrum,
   '10': Optimism,
+  '420': OptimismGoerli,
   '5': Goerli,
-  '3663': FunNetwork,
+  '36865': FunNetwork,
 }
 
 export const chainNumber = {
@@ -32,6 +34,7 @@ export const chainNumber = {
   Arbitrum,
   arbitrum: Arbitrum,
   Optimism,
+  OptimismGoerli,
   Goerli,
   FunNetwork,
 }

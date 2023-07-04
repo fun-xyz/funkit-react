@@ -1,5 +1,3 @@
-// eslint-disable-next-line prettier/prettier
-"use client";
 import {
   Chain,
   configureEnvironment,
@@ -16,31 +14,16 @@ import type { Connector, Web3ReactStore } from '@web3-react/types'
 import { useCallback, useEffect, useState } from 'react'
 import { shallow } from 'zustand/shallow'
 
-import { connectors } from './connectors'
-import { FunNetwork, Goerli } from './network/networks'
 import {
-  createUseFun,
   FunError,
   LegacyAuthIdMultiAccountError,
   MissingActiveSigner,
   MissingApiKeyError,
   MissingConfigError,
   NoMetaMaskError,
-} from './store'
-import { convertAccountsMultiAuthIds, convertWeb3ProviderToClient, getMatchingHexStrings } from './utils'
-
-export const useFun = createUseFun({
-  connectors: [
-    connectors.Metamask(),
-    connectors.CoinbaseWallet(),
-    connectors.WalletConnectV2(),
-    connectors.SocialOauthConnector(['google', 'twitter', 'apple', 'discord']),
-  ],
-  supportedChains: [Goerli],
-  defaultIndex: 0,
-})
-
-export const ShallowEqual = shallow
+} from '../store'
+import { convertAccountsMultiAuthIds, convertWeb3ProviderToClient, getMatchingHexStrings } from '../utils'
+import { useFun } from './index'
 
 export interface buildFunWalletInterface {
   config: GlobalEnvOption
@@ -118,7 +101,7 @@ export const useBuildFunWallet = (build: buildFunWalletInterface) => {
     if (!build.config) handleBuildError(MissingConfigError)
     if (build.config.apiKey === null || build.config.apiKey === '') handleBuildError(MissingApiKeyError)
     if (config) return
-    initializeSupportedChains(build.config, supportedChains)
+    initializeSupportedChains(build.config, supportedChains) // TODO analyze the cost of building the supported chains rather then just the one we are using
     setConfig(build.config)
   }, [config, build, setConfig, handleBuildError, supportedChains])
 
