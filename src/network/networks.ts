@@ -26,24 +26,22 @@ export const chainName = {
 }
 
 export const chainNumber = {
-  Ethereum,
-  Binance,
-  Polygon,
+  ethereum: Ethereum,
+  binance: Binance,
   polygon: Polygon,
-  Avalanche,
-  Arbitrum,
+  avalanche: Avalanche,
   arbitrum: Arbitrum,
-  Optimism,
-  OptimismGoerli,
-  Goerli,
-  FunTestnet,
+  optimism: Optimism,
+  optimismGoerli: OptimismGoerli,
+  goerli: Goerli,
+  funTestnet: FunTestnet,
 }
 
 export const convertToChain = (chain: string | number): Chain => {
   if (typeof chain === 'string') {
     const parsedChain = parseInt(chain)
     return isNaN(parsedChain)
-      ? chainNumber[chain as keyof typeof chainNumber]
+      ? chainNumber[chain.toLowerCase() as keyof typeof chainNumber]
       : chainName[chain as keyof typeof chainName]
   }
   return chainName[`${chain}` as keyof typeof chainName]
