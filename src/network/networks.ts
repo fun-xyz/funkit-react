@@ -42,7 +42,9 @@ export const chainNumber = {
 export const convertToChain = (chain: string | number): Chain => {
   if (typeof chain === 'string') {
     const parsedChain = parseInt(chain)
-    return isNaN(parsedChain) ? chainNumber[chain] : chainName[chain]
+    return isNaN(parsedChain)
+      ? chainNumber[chain as keyof typeof chainNumber]
+      : chainName[chain as keyof typeof chainName]
   }
-  return chainName[chain]
+  return chainName[`${chain}` as keyof typeof chainName]
 }

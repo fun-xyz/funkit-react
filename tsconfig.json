@@ -1,21 +1,23 @@
 {
     "compilerOptions": {
         "jsx": "react",
-        "baseUrl": "./",
         "outDir": "dist",
         "target": "es2020",
         "module": "commonjs",
-        "allowJs": true,
+        "allowJs": false,
         "declaration": true,
         "sourceMap": true,
         "alwaysStrict": true,
         "strict": true,
-        "noUnusedLocals": false,
-        "noImplicitAny": false,
+        "removeComments": true,
+
+        "noUnusedLocals": true,
+        "noImplicitAny": true,
         "noImplicitThis": false,
         "noImplicitOverride": true,
         "noUnusedParameters": false,
         "noImplicitReturns": true,
+        
         "noFallthroughCasesInSwitch": true,
         "strictNullChecks": true,
         "strictFunctionTypes": true,
@@ -26,7 +28,11 @@
         "resolveJsonModule": true,
         "skipLibCheck": true,
         "moduleResolution": "node",
-        "esModuleInterop": true
+        "esModuleInterop": true,
+        "baseUrl": ".",
+        "paths": {
+        "@/*": ["./src/*"]
+        }
     },
     "include": ["./**/*", "../example", "../../Web3-reactFork"],
     "exclude": ["node_modules", "dist", "../../Web3-reactFork", "../example"]
