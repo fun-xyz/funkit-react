@@ -46,3 +46,8 @@ export const convertToChain = (chain: string | number): Chain => {
   }
   return chainName[`${chain}` as keyof typeof chainName]
 }
+
+export const getPublicClient = (chainId: string | number) => {
+  const Chain = convertToChain(chainId)
+  return Chain.getClient()
+}
