@@ -1,39 +1,39 @@
 {
-    "compilerOptions": {
-        "jsx": "react",
-        "outDir": "dist",
-        "target": "es2020",
-        "module": "commonjs",
-        "allowJs": false,
-        "declaration": true,
-        "sourceMap": true,
-        "alwaysStrict": true,
-        "strict": true,
-        "removeComments": true,
+  "compilerOptions": {
+    "jsx": "react",
+    "outDir": "dist",
+    "target": "es2020",
+    "module": "commonjs",
+    "allowJs": false,
+    "declaration": true,
+    "sourceMap": true,
+    "alwaysStrict": true,
+    "strict": true,
+    "removeComments": true,
 
-        "noUnusedLocals": true,
-        "noImplicitAny": true,
-        "noImplicitThis": false,
-        "noImplicitOverride": true,
-        "noUnusedParameters": false,
-        "noImplicitReturns": true,
-        
-        "noFallthroughCasesInSwitch": true,
-        "strictNullChecks": true,
-        "strictFunctionTypes": true,
-        "strictBindCallApply": true,
-        "strictPropertyInitialization": true,
-        "allowSyntheticDefaultImports": true,
-        "forceConsistentCasingInFileNames": true,
-        "resolveJsonModule": true,
-        "skipLibCheck": true,
-        "moduleResolution": "node",
-        "esModuleInterop": true,
-        "baseUrl": ".",
-        "paths": {
-        "@/*": ["./src/*"]
-        }
-    },
-    "include": ["./**/*", "../example", "../../Web3-reactFork"],
-    "exclude": ["node_modules", "dist", "../../Web3-reactFork", "../example"]
+    "noUnusedLocals": true,
+    "noImplicitAny": true,
+    "noImplicitThis": false,
+    "noImplicitOverride": true,
+    "noUnusedParameters": false,
+    "noImplicitReturns": true,
+
+    "noFallthroughCasesInSwitch": true,
+    "strictNullChecks": true,
+    "strictFunctionTypes": true,
+    "strictBindCallApply": true,
+    "strictPropertyInitialization": true,
+    "allowSyntheticDefaultImports": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "skipLibCheck": true,
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"]
+    }
+  },
+  "include": ["./**/*", "../example", "../../Web3-reactFork"],
+  "exclude": ["node_modules", "dist", "../../Web3-reactFork", "../example"]
 }

@@ -7,6 +7,6 @@ export {
   useGetName,
 } from './connectors'
 export * from './hooks'
-export { MagicAuthConnector as SocialLoginConnector } from './magic-auth/src/Magic-Auth'
-export * from './network/networks'
-export * from './store/useFun'
+export { MagicAuthConnector as SocialLoginConnector } from './magicAuth/src/MagicAuth'
+export * from './network/Networks'
+export * from './store/CreateUseFun'

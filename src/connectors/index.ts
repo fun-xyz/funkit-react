@@ -3,13 +3,13 @@ import { MetaMask } from '@web3-react/metamask'
 import { WalletConnect as WalletConnectV2 } from '@web3-react/walletconnect-v2'
 import { useEffect, useState } from 'react'
 
-import { MagicAuthConnector } from '../magic-auth/src/Magic-Auth'
+import { MagicAuthConnector } from '../magicAuth/src/MagicAuth'
 //
-import CoinbaseWalletConnector from './coinbaseWallet'
-import MetamaskConnector from './metaMask'
+import CoinbaseWalletConnector from './CoinbaseWallet'
+import MetamaskConnector from './MetaMask'
 import SocialOauthConnector from './SocialOAuthConnector'
-import { ConnectorType } from './types'
-import WalletConnectV2Connector from './walletConnectV2'
+import { ConnectorType } from './Types'
+import WalletConnectV2Connector from './WalletConnectV2'
 
 export const useGetName = (connector: ConnectorType): string => {
   const [mounted, setMounted] = useState(false)
@@ -22,7 +22,7 @@ export const useGetName = (connector: ConnectorType): string => {
   if (connector instanceof CoinbaseWallet) return 'Coinbase Wallet'
 
   if (connector instanceof MagicAuthConnector) {
-    if (!mounted) return '0Auth'
+    if (!mounted) return 'OAuth'
     const name = connector.getName()
     return name.charAt(0).toUpperCase() + name.slice(1)
   }
@@ -36,4 +36,4 @@ export const connectors = {
   SocialOauthConnector,
 }
 
-export * from './types'
+export * from './Types'

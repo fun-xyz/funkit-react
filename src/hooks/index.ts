@@ -1,2 +1,2 @@
-export * from './useBuildFunWallet'
-export * from './useFun'
+export * from './UseCreateFun'
+export * from './UseFun'

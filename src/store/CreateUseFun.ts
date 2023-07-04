@@ -3,11 +3,11 @@
 import { Chain, Eoa, FunWallet } from '@fun-xyz/core'
 import { create } from 'zustand'
 
-import { ConnectorArray } from '../connectors/types'
-import { ChainStoreInterface, handleChainSwitching } from './plugins/chainStore'
-import { buildAndUpdateConfig, ConfigureStoreInterface, setConfig } from './plugins/configureStore'
-import { ConnectorStoreInterface } from './plugins/connectorStore'
-import { ErrorStoreInterface, FunError } from './plugins/errorStore'
+import { ConnectorArray } from '../connectors/Types'
+import { ChainStoreInterface, handleChainSwitching } from './plugins/ChainStore'
+import { buildAndUpdateConfig, ConfigureStoreInterface, setConfig } from './plugins/ConfigureStore'
+import { ConnectorStoreInterface } from './plugins/ConnectorStore'
+import { ErrorStoreInterface, FunError } from './plugins/ErrorStore'
 
 export interface useFunStoreInterface
   extends ConnectorStoreInterface,

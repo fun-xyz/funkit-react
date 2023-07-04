@@ -18,9 +18,8 @@
     "dev": "cd ./example && npm run dev",
     "build": "rm -rf dist && tsc",
     "update": "./scripts/updateExamplePackage.sh",
-    "format": "prettier --write .",
-    "lint": "eslint -c .eslintrc.json --ext .ts,.tsx './**/*.{ts,tsx}'",
-    "lint:fix": "eslint -c .eslintrc.json --ext .ts,.tsx './**/*.{ts,tsx}' --fix",
+    "lint": "eslint --ext .ts,.tsx './**/*.{ts,tsx}'",
+    "lint:fix": "eslint --ext .ts,.tsx './**/*.{ts,tsx}' --fix",
     "prepare": "husky install",
     "postinstall": "./handleOauth.sh",
     "local install": "cd ./node_modules/@magic-ext/oauth/dist/cjs  && touch core.js"
