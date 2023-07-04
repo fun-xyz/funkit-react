@@ -8,6 +8,10 @@ export const Avalanche = new Chain({ chainId: '43114' })
 export const Binance = new Chain({ chainId: '56' })
 export const Optimism = new Chain({ chainId: '10' })
 
+export const FunNetwork = new Chain({
+  rpcUrl: 'https://rpc.vnet.tenderly.co/devnet/bundler-test/55eff413-d465-4d63-8d98-7da15c63ed96',
+})
+
 export const chainName = {
   '1': Ethereum,
   '56': Binance,
@@ -16,6 +20,7 @@ export const chainName = {
   '42161': Arbitrum,
   '10': Optimism,
   '5': Goerli,
+  '3663': FunNetwork,
 }
 
 export const chainNumber = {
@@ -28,6 +33,7 @@ export const chainNumber = {
   arbitrum: Arbitrum,
   Optimism,
   Goerli,
+  FunNetwork,
 }
 
 export const convertToChain = (chain: string | number): Chain => {

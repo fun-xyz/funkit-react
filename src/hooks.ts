@@ -17,7 +17,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { shallow } from 'zustand/shallow'
 
 import { connectors } from './connectors'
-import { Arbitrum, Goerli, Polygon } from './network/networks'
+import { FunNetwork, Goerli } from './network/networks'
 import {
   createUseFun,
   FunError,
@@ -36,7 +36,7 @@ export const useFun = createUseFun({
     connectors.WalletConnectV2(),
     connectors.SocialOauthConnector(['google', 'twitter', 'apple', 'discord']),
   ],
-  supportedChains: [Goerli, Polygon, Arbitrum],
+  supportedChains: [Goerli],
   defaultIndex: 0,
 })
 
