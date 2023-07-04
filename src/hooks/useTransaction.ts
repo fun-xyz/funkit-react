@@ -123,7 +123,6 @@ export const useTransaction = (build: transactionArgsInterface) => {
       const currentConfig = build.txOptions || (config as EnvOption)
       try {
         const res = await validateGasBehavior(currentConfig, FunWallet)
-        console.log('tx validation res', res)
         if (!res.valid && res.error) {
           setTxError(res.error)
           if (validTx) setValidTx(false)
@@ -144,8 +143,14 @@ export const useTransaction = (build: transactionArgsInterface) => {
     }
 
     // Set up interval if there's an error or config changed
-    // console.log('did config change: ', prevGlobalConfig !== config, config, prevGlobalConfig)
-    // console.log('did account change: ', prevAccount !== account, account, prevAccount)
+    console.log(
+      'checking gas behavior',
+      validateWallet,
+      error,
+      prevAccount !== account,
+      prevGlobalConfig !== config,
+      prevTxOptions !== build.txOptions
+    )
     if (
       validateWallet ||
       error ||

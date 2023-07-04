@@ -48,6 +48,12 @@ export const validateAndPrepareTransaction = async (build: any, Eoa: Eoa, wallet
   }
 }
 
+// TODO allowance should be looked into for permit
+// ask caleb how to validate
+// validate allowance when needed on error
+// deposit tokens directly into paymaster
+// do they have enough balance to pay for tokens
+// can we simulate locally
 export const validateGasBehavior = async (config: EnvOption, wallet: FunWallet): Promise<GasValidationResponse> => {
   try {
     debugger
