@@ -25,7 +25,7 @@ import {
   TransactionErrorGasSponsorWhitelist,
   TransactionErrorInsufficientPaymasterAllowance,
   TransactionErrorLowFunWalletBalance,
-} from '../store/plugins/errorStore'
+} from '../store/plugins/ErrorStore'
 import ERC20_ALLOWANCE from './miniAbi/ERC20Allowance'
 
 export interface GasValidationResponse {

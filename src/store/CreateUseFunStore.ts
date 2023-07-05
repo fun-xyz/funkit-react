@@ -37,7 +37,7 @@ export interface createUseFunInterface {
   connectEagerly?: boolean
 }
 
-export const createUseFun = (hookBuildParams: createUseFunInterface) => {
+export const createUseFunStore = (hookBuildParams: createUseFunInterface) => {
   return create(
     (set: any, get: any): useFunStoreInterface => ({
       connectors: hookBuildParams.connectors,

@@ -12,23 +12,24 @@ import {
 } from '@fun-xyz/core'
 import { useCallback, useEffect, useState } from 'react'
 
-import { useFunStoreInterface } from '../store/funStore'
-import { TransactionErrorCatch, TransactionErrorMissingOrIncorrectFields } from '../store/plugins/errorStore'
+import { useFunStoreInterface } from '../store/CreateUseFunStore'
+import { TransactionErrorCatch, TransactionErrorMissingOrIncorrectFields } from '../store/plugins/ErrorStore'
 import { validateGasBehavior } from '../utils/Transactions'
-import { useFun } from './useFun'
+import { useFun } from './UseFun'
 import { usePrevious } from './UsePrevious'
 export type transactionTypes = 'transfer' | 'approve' | 'swap' | 'stake' | 'unstake' | 'create' | 'execRawTx'
+export type transactionParams =
+  | TransferParams
+  | ApproveParams
+  | SwapParams
+  | StakeParams
+  | RequestUnstakeParams
+  | FinishUnstakeParams
+  | TransactionData
 
 export interface transactionArgsInterface {
   type: transactionTypes
-  txParams:
-    | TransferParams
-    | ApproveParams
-    | SwapParams
-    | StakeParams
-    | RequestUnstakeParams
-    | FinishUnstakeParams
-    | TransactionData
+  txParams: transactionParams
   txOptions?: (EnvOption & false) | (EnvOption & true)
   estimateGas?: boolean
 }

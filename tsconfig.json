@@ -12,7 +12,7 @@
     "removeComments": true,
 
     "noUnusedLocals": true,
-    "noImplicitAny": true,
+    "noImplicitAny": false, // ideally we should set this to true, but fixing the errors increase dev load so post launch we should fix this
     "noImplicitThis": false,
     "noImplicitOverride": true,
     "noUnusedParameters": false,

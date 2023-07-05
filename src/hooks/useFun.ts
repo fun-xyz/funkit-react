@@ -2,7 +2,7 @@ import { shallow } from 'zustand/shallow'
 
 import { connectors } from '../connectors'
 import { FunTestnet, Goerli, OptimismGoerli } from '../network/Networks'
-import { createUseFun } from '../store'
+import { createUseFunStore } from '../store'
 
 const CONNECTORS = [
   connectors.Metamask(),
@@ -11,7 +11,7 @@ const CONNECTORS = [
   connectors.SocialOauthConnector(['google', 'twitter', 'apple', 'discord']),
 ]
 
-export const useFun = createUseFun({
+export const useFun = createUseFunStore({
   connectors: CONNECTORS,
   supportedChains: [Goerli, FunTestnet, OptimismGoerli],
   defaultIndex: 0,

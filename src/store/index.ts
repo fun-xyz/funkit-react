@@ -1,4 +1,4 @@
-export * from './CreateUseFun'
+export * from './CreateUseFunStore'
 export * from './plugins/ChainStore'
 export * from './plugins/ConfigureStore'
 export * from './plugins/ConnectorStore'

@@ -9,4 +9,4 @@ export {
 export * from './hooks'
 export { MagicAuthConnector as SocialLoginConnector } from './magicAuth/src/MagicAuth'
 export * from './network/Networks'
-export * from './store/CreateUseFun'
+export * from './store/CreateUseFunStore'

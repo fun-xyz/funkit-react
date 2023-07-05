@@ -9,7 +9,6 @@ export const Binance = new Chain({ chainId: '56' })
 export const Optimism = new Chain({ chainId: '10' })
 export const OptimismGoerli = new Chain({ chainId: '420' })
 
-
 export const FunTestnet = new Chain({
   rpcUrl: 'https://rpc.vnet.tenderly.co/devnet/bundler-test/55eff413-d465-4d63-8d98-7da15c63ed96',
 })
