@@ -1,7 +1,7 @@
 import { Chain, GlobalEnvOption } from '@fun-xyz/core'
 
-import { convertToChain } from '../../network/networks'
-import { buildAndUpdateConfig } from './configureStore'
+import { convertToChain } from '../../network/Networks'
+import { buildAndUpdateConfig } from './ConfigureStore'
 
 export interface ChainStoreInterface {
   chain: string | null

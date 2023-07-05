@@ -1,9 +1,10 @@
 import { useCallback } from 'react'
 
 import { useFunStoreInterface } from '../store/funStore'
-import { useFun } from './useFun'
+import { useFun } from './UseFun'
 
-export const useCreateNewFunWallet = (build) => {
+// TODO WIP
+export const useCreateNewFunWallet = (build: any) => {
   const { FunWallet, index, error, setIndex, setTempError } = useFun((state: useFunStoreInterface) => ({
     FunWallet: state.FunWallet,
     index: state.index,

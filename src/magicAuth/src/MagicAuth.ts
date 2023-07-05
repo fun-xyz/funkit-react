@@ -1,6 +1,6 @@
 import { OAuthExtension, OAuthProvider, OAuthRedirectResult } from '@magic-ext/oauth'
 import { InstanceWithExtensions, SDKBase } from '@magic-sdk/provider'
-import { Actions, AddEthereumChainParameter, Connector, ProviderConnectInfo, ProviderRpcError } from '@web3-react/types'
+import { Actions, Connector, ProviderConnectInfo, ProviderRpcError } from '@web3-react/types'
 import { Magic, MagicSDKAdditionalConfiguration } from 'magic-sdk'
 
 function parseChainId(chainId: string | number) {
@@ -10,7 +10,7 @@ function parseChainId(chainId: string | number) {
 export interface MagicAuthSDKOptions extends MagicSDKAdditionalConfiguration {
   magicAuthApiKey: string
   redirectURI: string
-  oAuthProvider: OAuthProvider
+  supportedAuthProviders: OAuthProvider[]
   networkOptions: {
     rpcUrl: string
     chainId: number
@@ -23,6 +23,15 @@ export interface MagicAuthConstructorArgs {
   onError?: (error: Error) => void
 }
 
+export interface MagicAuthActivateArgs {
+  oAuthProvider: OAuthProvider
+  chainId?: number
+}
+
+export interface MagicAuthActivateFunction {
+  (args: MagicAuthActivateArgs): Promise<void>
+}
+
 export class MagicAuthConnector extends Connector {
   name: string
   authId?: string
@@ -32,17 +41,21 @@ export class MagicAuthConnector extends Connector {
   magicAuthApiKey: string
   redirectURI: string
   oAuthProvider: OAuthProvider
+  supportedAuthProviders: OAuthProvider[]
   oAuthResult: OAuthRedirectResult | null
   private readonly options: MagicAuthSDKOptions
 
   constructor({ actions, options, onError }: MagicAuthConstructorArgs) {
     super(actions, onError)
     this.options = options
-    this.name = `${options.oAuthProvider as string}`
-    this.magicAuthApiKey = options.magicAuthApiKey || 'pk_live_8DB9921E98B1C9E5'
-    this.oAuthProvider = options.oAuthProvider
+    this.name = `Not Connected`
+    this.magicAuthApiKey = options.magicAuthApiKey
+    this.supportedAuthProviders = options.supportedAuthProviders
+    if (options.supportedAuthProviders.length === 0)
+      throw new Error('No supported OAuth providers were passed to the connector')
+    this.oAuthProvider = options.supportedAuthProviders[0]
     this.redirectURI = options.redirectURI
-    if (!this.serverSide && window.location.href) this.redirectURI = window.location.href
+    if (!this.serverSide && window.location.href) this.redirectURI = window.location.href // TODO is this actually a good idea seems like it will totally invalidate the redirectURI option
     this.oAuthResult = null
     const { magic, chainId, provider } = this.initializeMagicInstance()
     this.magic = magic
@@ -62,7 +75,18 @@ export class MagicAuthConnector extends Connector {
         rpcUrl: networkOptions.rpcUrl,
       },
       extensions: [new OAuthExtension()],
-    }) as unknown as InstanceWithExtensions<SDKBase, OAuthExtension[]>
+    })
+  }
+
+  getName(): string {
+    if (this.serverSide) return this.name
+    const oauth = window.localStorage.getItem('oAuthProvider')
+    if (oauth && oauth !== this.name) this.name = JSON.parse(oauth)
+    return this.name
+  }
+
+  getSupportedAuthProviders(): OAuthProvider[] {
+    return this.supportedAuthProviders
   }
 
   private connectListener = ({ chainId }: ProviderConnectInfo): void => {
@@ -104,7 +128,7 @@ export class MagicAuthConnector extends Connector {
     }
   }
 
-  private initializeMagicInstance(desiredChainIdOrChainParameters?: AddEthereumChainParameter) {
+  private initializeMagicInstance(activationArgs?: MagicAuthActivateArgs) {
     // Extract apiKey and networkOptions from options
     const { networkOptions } = this.options
     if (this.serverSide) return { magic: null, chainId: networkOptions.chainId, provider: null }
@@ -117,7 +141,7 @@ export class MagicAuthConnector extends Connector {
     const provider = magic?.rpcProvider
 
     // Set the chainId. If no chainId was passed as a parameter, use the chainId from networkOptions
-    const chainId = desiredChainIdOrChainParameters?.chainId || networkOptions.chainId
+    const chainId = activationArgs?.chainId || networkOptions.chainId
     this.isAuthorized().then((isAuthorized) => {
       if (isAuthorized) this.completeActivation()
     })
@@ -147,31 +171,35 @@ export class MagicAuthConnector extends Connector {
 
   // "autoconnect"
   override async connectEagerly(): Promise<void> {
+    const cancelActivation = this.actions.startActivation()
     const isLoggedIn = await this.isAuthorized()
-    if (!isLoggedIn) return
-    await this.activate()
+    if (!isLoggedIn) {
+      cancelActivation()
+      return
+    }
+    this.completeActivation()
   }
 
   // "connect"
-  async activate(desiredChainIdOrChainParameters?: AddEthereumChainParameter): Promise<void> {
+  async activate(activateArgs: MagicAuthActivateArgs): Promise<void> {
     const cancelActivation = this.actions.startActivation()
     try {
       // Initialize the magic instance
-      if (await this.isAuthorized()) {
+      if (activateArgs.oAuthProvider == this.oAuthProvider && (await this.isAuthorized())) {
         this.completeActivation()
         return
       }
 
       // if it failed to be initialized during construction due to server side rendering, initialize it now
       if (this.magic == null || this.provider == null) {
-        const { magic, chainId: networkId, provider } = this.initializeMagicInstance(desiredChainIdOrChainParameters)
+        const { magic, chainId: networkId, provider } = this.initializeMagicInstance(activateArgs)
         this.magic = magic
         this.chainId = networkId
         this.provider = provider
       }
 
       await this.magic?.oauth.loginWithRedirect({
-        provider: this.oAuthProvider,
+        provider: activateArgs?.oAuthProvider,
         redirectURI: this.redirectURI,
       })
 
@@ -189,6 +217,7 @@ export class MagicAuthConnector extends Connector {
   // "disconnect"
   override async deactivate(): Promise<void> {
     this.actions.resetState()
+    // await this.magic?.wallet.disconnect()
     await this.magic?.user.logout()
     this.removeEventListeners()
   }
@@ -211,6 +240,9 @@ export class MagicAuthConnector extends Connector {
       const magic = this.getMagic()
       if (magic == null) return false
       const isLoggedIn = await magic.user.isLoggedIn()
+      const oauth = window.localStorage.getItem('oAuthProvider')
+      this.oAuthProvider = oauth ? JSON.parse(oauth) : this.oAuthProvider
+
       if (isLoggedIn) {
         return true
       }
@@ -219,7 +251,13 @@ export class MagicAuthConnector extends Connector {
         return true
       }
       this.oAuthResult = await magic.oauth.getRedirectResult()
-      return this.oAuthResult != null && this.oAuthResult.oauth.provider === this.oAuthProvider
+
+      if (this.oAuthResult != null) {
+        window.localStorage.setItem('oAuthProvider', JSON.stringify(this.oAuthResult.oauth.provider))
+        return true
+      } else {
+        return false
+      }
     } catch (err) {
       console.log('Catching auth error', err)
       return false

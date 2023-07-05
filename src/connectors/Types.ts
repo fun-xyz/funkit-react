@@ -3,7 +3,8 @@ import type { Web3ReactHooks } from '@web3-react/core'
 import { MetaMask } from '@web3-react/metamask'
 import type { Connector, Web3ReactStore } from '@web3-react/types'
 import { WalletConnect } from '@web3-react/walletconnect-v2'
-import { MagicAuthConnector } from 'src/magic-auth/src/Magic-Auth'
+
+import { MagicAuthConnector } from '@/magicAuth/src/MagicAuth'
 
 export { OAuthProvider } from '@magic-ext/oauth'
 

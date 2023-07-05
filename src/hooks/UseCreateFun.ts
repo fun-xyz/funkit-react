@@ -50,8 +50,13 @@ const initializeSupportedChains = async (config: GlobalEnvOption, supportedChain
   }
 }
 
-// method for getting the Functions only from the useFun Hook to prevent any updating
-export const useBuildFunWallet = (build: buildFunWalletInterface) => {
+/**
+ *
+ * @param build
+ * @param build.config GlobalEnvOption
+ * @returns { connectors, activeAccountAddresses, index, FunWallet, Eoa, uniqueId, account, chainId, error, loading, resetFunError, activateConnector, initializeSingleAuthWallet, initializeMultiAuthWallet }
+ */
+export const useCreateFun = (build: buildFunWalletInterface) => {
   const {
     connections,
     index,
@@ -63,7 +68,6 @@ export const useBuildFunWallet = (build: buildFunWalletInterface) => {
     config,
     supportedChains,
     setLogin,
-    setFunError,
     setTempError,
     resetFunError,
     setConfig,
@@ -79,7 +83,6 @@ export const useBuildFunWallet = (build: buildFunWalletInterface) => {
       config: state.config,
       supportedChains: state.supportedChains,
       setLogin: state.setLogin,
-      setFunError: state.setFunError,
       setTempError: state.setTempError,
       resetFunError: state.resetFunError,
       setConfig: state.setConfig,
@@ -114,6 +117,11 @@ export const useBuildFunWallet = (build: buildFunWalletInterface) => {
   // eslint-disable-next-line react-hooks/rules-of-hooks
   const activeAccountAddresses = connections.map((connector) => connector[1].useAccount())
 
+  /**
+   * Activates a connector.
+   * @param connector - The connector to activate.
+   * @param oAuthProvider - An optional OAuth provider. string value of 'google' | 'twitter' | 'apple' | 'discord'
+   */
   const activateConnector = useCallback(
     async (connector: Connector, oAuthProvider?: OAuthProvider) => {
       if (connector == null) return
@@ -128,6 +136,15 @@ export const useBuildFunWallet = (build: buildFunWalletInterface) => {
     [setTempError]
   )
 
+  /**
+   * Initializes a single auth wallet. using the connectorIndex will use the connector at that index in the connections array.
+   * Connector indexes are deterministic and should not change. Use the connectorIndexUtil to get the index of a connector from its name.
+   * @param singleAuthOpts - An optional object containing the connectorIndex and/or the index of the wallet to initialize.
+   * @param singleAuthOpts.connectorIndex - The index of the connector to use. if none is provided it will use the first active connector starting from 0.
+   * @param singleAuthOpts.index - The index of the wallet to initialize. default is 0.
+   * @param singleAuthOpts.config - An optional config to use for this wallet.
+   * @returns Can only return errors. Typically results are read from the async funStore.
+   */
   const initializeSingleAuthWallet = useCallback(
     async (singleAuthOpts?: initializeSingleAuthWalletInterface) => {
       if (initializing) return
@@ -166,6 +183,15 @@ export const useBuildFunWallet = (build: buildFunWalletInterface) => {
     [initializing, connections, activeProvider, handleBuildError, index, setConfig, setLogin]
   )
 
+  /**
+   * Initializes a multi auth wallet. using the connectorIndexes will use the connectors at those indexes in the connections array.
+   * Connector indexes are deterministic and should not change. Use the connectorIndexUtil to get the index of a connector from its name.
+   * @param multiAuthInputs - An optional object containing the connectorIndexes and/or the index of the wallet to initialize.
+   * @param multiAuthInputs.connectorIndexes - The indexes of the connectors to use. if none are provided it will use the first active connector starting from 0.
+   * @param multiAuthInputs.index - The index of the wallet to initialize. default is 0.
+   * @param multiAuthInputs.config - An optional config to use for this wallet.
+   * @returns Can only return errors. Typically results are read from the async funStore.
+   */
   const initializeMultiAuthWallet = useCallback(
     async (multiAuthInputs?: initializeMultiAuthWalletInterface) => {
       if (initializing) return

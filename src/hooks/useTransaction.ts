@@ -14,9 +14,9 @@ import { useCallback, useEffect, useState } from 'react'
 
 import { useFunStoreInterface } from '../store/funStore'
 import { TransactionErrorCatch, TransactionErrorMissingOrIncorrectFields } from '../store/plugins/errorStore'
-import { validateGasBehavior } from '../utils/transactions'
+import { validateGasBehavior } from '../utils/Transactions'
 import { useFun } from './useFun'
-import { usePrevious } from './usePrevious'
+import { usePrevious } from './UsePrevious'
 export type transactionTypes = 'transfer' | 'approve' | 'swap' | 'stake' | 'unstake' | 'create' | 'execRawTx'
 
 export interface transactionArgsInterface {
