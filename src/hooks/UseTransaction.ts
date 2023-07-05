@@ -81,6 +81,17 @@ function checkTransactionType(txArgs: transactionArgsInterface): boolean {
   }
 }
 
+/**
+ * This hook is used to validate and send transactions to the blockchain.
+ * It takes a `build` object as input
+ * @param build contains the transaction type, parameters, options, and gas estimation.
+ * It returns an object with the following properties:
+ * @returns `valid`: a boolean indicating whether the transaction is valid or not.
+ * @returns `loading`: a boolean indicating whether the transaction is currently being processed or not.
+ * @returns `data`: the transaction hash or receipt if the transaction was successful, otherwise null.
+ * @returns `error`: an error object if the transaction failed, otherwise null.
+ * @returns `sendTransaction`: a function that sends the transaction to the blockchain.
+ */
 export const useTransaction = (build: transactionArgsInterface) => {
   const prevType = usePrevious(build.type)
   const prevTxParams = usePrevious(build.txParams)
@@ -102,7 +113,7 @@ export const useTransaction = (build: transactionArgsInterface) => {
   const prevGlobalConfig = usePrevious(config)
   const prevAccount = usePrevious(account)
 
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(true)
   const [validTx, setValidTx] = useState(true)
   const [txHash, setTxHash] = useState<bigint | UserOp | ExecutionReceipt | null>(null)
   const [validateWallet, setValidateWallet] = useState(true)
@@ -121,6 +132,7 @@ export const useTransaction = (build: transactionArgsInterface) => {
     let interval: ReturnType<typeof setInterval> | null = null
 
     const checkGasBehavior = async () => {
+      setLoading(true)
       const currentConfig = build.txOptions || (config as EnvOption)
       try {
         const res = await validateGasBehavior(currentConfig, FunWallet)
@@ -144,14 +156,14 @@ export const useTransaction = (build: transactionArgsInterface) => {
     }
 
     // Set up interval if there's an error or config changed
-    console.log(
-      'checking gas behavior',
-      validateWallet,
-      error,
-      prevAccount !== account,
-      prevGlobalConfig !== config,
-      prevTxOptions !== build.txOptions
-    )
+    // console.log(
+    //   'checking gas behavior',
+    //   validateWallet,
+    //   error,
+    //   prevAccount !== account,
+    //   prevGlobalConfig !== config,
+    //   prevTxOptions !== build.txOptions
+    // )
     if (
       validateWallet ||
       error ||
@@ -162,6 +174,8 @@ export const useTransaction = (build: transactionArgsInterface) => {
       if (validateWallet || prevAccount !== account || prevGlobalConfig !== config || prevTxOptions !== build.txOptions)
         checkGasBehavior()
       interval = setInterval(checkGasBehavior, 15000) // Check every 30 seconds
+    } else {
+      if (loading) setLoading(false)
     }
 
     return () => {
@@ -182,6 +196,7 @@ export const useTransaction = (build: transactionArgsInterface) => {
     resetTxError,
     prevAccount,
     account,
+    loading,
   ])
 
   const sendTransaction = useCallback(() => {

@@ -34,6 +34,13 @@ export interface GasValidationResponse {
   allowance?: bigint
 }
 
+/**
+ * Validates and prepares a transaction for execution.
+ * @param build - The transaction build object.
+ * @param Eoa - The Eoa object.
+ * @param wallet - The FunWallet object.
+ * @returns An object containing a boolean indicating whether the validation was successful, and the prepared transaction if successful.
+ */
 export const validateAndPrepareTransaction = async (build: any, Eoa: Eoa, wallet: FunWallet) => {
   try {
     const preparedTransaction = await prepareTransaction(build, Eoa, wallet)
@@ -54,9 +61,16 @@ export const validateAndPrepareTransaction = async (build: any, Eoa: Eoa, wallet
 // deposit tokens directly into paymaster
 // do they have enough balance to pay for tokens
 // can we simulate locally
+
+/**
+ * Validates the gas behavior of a transaction and prepares it for execution.
+ * @param config - The environment configuration object.
+ * @param wallet - The FunWallet object.
+ * @returns An object containing a boolean indicating whether the validation was successful, the allowance if applicable, and an error object if the validation failed.
+ */
 export const validateGasBehavior = async (config: EnvOption, wallet: FunWallet): Promise<GasValidationResponse> => {
   try {
-    debugger
+    // debugger
     const walletAddress = await wallet.getAddress()
     let currentChain = config.chain as Chain
     if (typeof config.chain === 'string' || typeof config.chain === 'number')
@@ -68,7 +82,7 @@ export const validateGasBehavior = async (config: EnvOption, wallet: FunWallet):
       if (config.gasSponsor.token) {
         // erc20 Token sponsor
         console.log('erc20 Token sponsor')
-        const gasSponsor = new TokenSponsor()
+        const gasSponsor = new TokenSponsor(config)
         const paymasterAddress = await gasSponsor.getPaymasterAddress()
         const ERC20Contract = new ContractInterface(ERC20_ALLOWANCE)
         const allowance: bigint = await ERC20Contract.readFromChain(
@@ -91,23 +105,25 @@ export const validateGasBehavior = async (config: EnvOption, wallet: FunWallet):
         return { valid: true, allowance }
       } else {
         // gassless sponsor
-        console.log('gassless sponsor')
         const gasSponsor = new GaslessSponsor()
-        const gasValidation = await validateGasSponsorMode(
-          gasSponsor,
-          config.gasSponsor.sponsorAddress as string,
-          walletAddress
-        )
-        if (!gasValidation.valid) return gasValidation
-        // check if the sponsor has enough ether?
-        return { valid: true }
+        try {
+          const gasValidation = await validateGasSponsorMode(
+            gasSponsor,
+            config.gasSponsor.sponsorAddress as string,
+            walletAddress
+          )
+          if (!gasValidation.valid) return gasValidation
+          // check if the sponsor has enough ether?
+          return { valid: true }
+        } catch (err) {
+          console.log('gasValidation ERROR gassless', err)
+          return { valid: false }
+        }
       }
     } else {
-      console.log("No sponsor, let's check the wallet balance")
       const etherBalance = await client.getBalance({ address: walletAddress })
       if (etherBalance === 0n) return { valid: false, error: TransactionErrorLowFunWalletBalance }
       const gasPrice = await client.getGasPrice()
-      console.log('etherBalance', etherBalance, gasPrice)
       if (etherBalance < gasPrice * 100000n)
         return {
           valid: false,
@@ -128,6 +144,13 @@ export const validateGasBehavior = async (config: EnvOption, wallet: FunWallet):
   }
 }
 
+/**
+ * Validates the gas sponsor mode of a transaction and prepares it for execution.
+ * @param gasSponsor - The gas sponsor object.
+ * @param sponsorAddress - The address of the gas sponsor.
+ * @param walletAddress - The address of the wallet.
+ * @returns An object containing a boolean indicating whether the validation was successful, and an error object if the validation failed.
+ */
 export const validateGasSponsorMode = async (
   gasSponsor: TokenSponsor | GaslessSponsor,
   sponsorAddress: string,
@@ -135,9 +158,11 @@ export const validateGasSponsorMode = async (
 ): Promise<GasValidationResponse> => {
   const getBlackListedFunc = gasSponsor[`getSpenderBlacklisted`] ?? gasSponsor[`getSpenderBlacklistMode`]
   const getWhiteListedFunc = gasSponsor[`getSpenderWhitelisted`] ?? gasSponsor[`getSpenderWhitelistMode`]
+  console.log('Gas Sponsor Mode Validation: ', gasSponsor)
   if (getBlackListedFunc == null || getWhiteListedFunc == null)
     return { valid: false, error: { code: 0, message: 'Gas Sponsor undefined' } }
   try {
+    
     if (await gasSponsor.getListMode(sponsorAddress)) {
       // check if the sponsor is in the blacklist
       const isBlackListed = await getBlackListedFunc(walletAddress, sponsorAddress)
@@ -159,6 +184,7 @@ export const validateGasSponsorMode = async (
       valid: true,
     }
   } catch (err) {
+    console.log('Error Validating fetching sponsor mode Validation status', err)
     return {
       valid: false,
       error: { code: 0, message: 'Error Validating fetching sponsor mode Validation status', err },
@@ -166,7 +192,13 @@ export const validateGasSponsorMode = async (
   }
 }
 
-// quick helper function which takes a build and returns a transactionOpts object
+/**
+ * Prepares a transaction for execution.
+ * @param build - The transaction build object.
+ * @param Eoa - The Eoa object.
+ * @param wallet - The FunWallet object.
+ * @returns A promise that resolves with a UserOp object representing the prepared transaction, or rejects with an error message.
+ */
 export const prepareTransaction = async (build: any, Eoa: Eoa, wallet: FunWallet): Promise<UserOp> => {
   return new Promise((resolve, reject) => {
     if (!build.type) reject('No type specified')
@@ -190,7 +222,12 @@ export const prepareTransaction = async (build: any, Eoa: Eoa, wallet: FunWallet
   })
 }
 
-// function which takes a userOp and executes it
+/**
+ * Executes a prepared transaction.
+ * @param preparedTx - The prepared transaction to execute.
+ * @param wallet - The FunWallet object.
+ * @returns A promise that resolves with the execution receipt, or rejects with an error message.
+ */
 export const executePreparedTransaction = async (preparedTx: UserOp, wallet: FunWallet): Promise<ExecutionReceipt> => {
   return new Promise((resolve, reject) => {
     wallet
