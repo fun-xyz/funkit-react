@@ -26,6 +26,7 @@
   },
   "dependencies": {
     "@coinbase/wallet-sdk": "^3.6.6",
+    "@fun-xyz/core": "^0.3.5",
     "@magic-ext/oauth": "11.0.0",
     "@walletconnect/modal": "^2.4.5",
     "@web3-react/coinbase-wallet": "^8.2.0",
@@ -34,7 +35,6 @@
     "@web3-react/metamask": "^8.2.1",
     "@web3-react/types": "^8.2.0",
     "@web3-react/walletconnect-v2": "^8.3.2",
-    "@fun-xyz/core": "^0.3.5",
     "magic-sdk": "17.0.0",
     "react": "^18.2.0",
     "web3-core": "^4.0.1",
@@ -53,6 +53,7 @@
     "husky": "^8.0.3",
     "postcss": "^8.4.24",
     "prettier": "^2.8.8",
+    "typedoc": "^0.24.8",
     "typescript": "^5.1.3"
   }
 }
