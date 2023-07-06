@@ -11,7 +11,7 @@
     "strict": true,
     "removeComments": true,
 
-    "noUnusedLocals": true,
+    "noUnusedLocals": false, // also should be true for production build
     "noImplicitAny": false, // ideally we should set this to true, but fixing the errors increase dev load so post launch we should fix this
     "noImplicitThis": false,
     "noImplicitOverride": true,

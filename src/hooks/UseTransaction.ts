@@ -13,7 +13,7 @@ import {
 import { useCallback, useEffect, useState } from 'react'
 
 import { useFunStoreInterface } from '../store/CreateUseFunStore'
-import { TransactionErrorCatch, TransactionErrorMissingOrIncorrectFields } from '../store/plugins/ErrorStore'
+import { FunError, TransactionErrorCatch, TransactionErrorMissingOrIncorrectFields } from '../store/plugins/ErrorStore'
 import { validateGasBehavior } from '../utils/Transactions'
 import { useFun } from './UseFun'
 import { usePrevious } from './UsePrevious'
@@ -33,7 +33,13 @@ export interface transactionArgsInterface {
   txOptions?: (EnvOption & false) | (EnvOption & true)
   estimateGas?: boolean
 }
-
+const shallowCompare = (obj1: Record<string, any> | null | undefined, obj2: Record<string, any>): boolean => {
+  if (obj1 == null) return false
+  return (
+    Object.keys(obj1).length === Object.keys(obj2).length &&
+    Object.keys(obj1).every((key) => Object.prototype.hasOwnProperty.call(obj2, key) && obj1[key] === obj2[key])
+  )
+}
 function checkTransactionType(txArgs: transactionArgsInterface): boolean {
   switch (txArgs.type) {
     case 'transfer':
@@ -96,7 +102,7 @@ export const useTransaction = (build: transactionArgsInterface) => {
   const prevType = usePrevious(build.type)
   const prevTxParams = usePrevious(build.txParams)
   const prevTxOptions = usePrevious(build.txOptions)
-  const { account, Eoa, FunWallet, error, config, setTxError, setTempError, resetTxError } = useFun(
+  const { account, Eoa, FunWallet, error, config, setTempError, resetTxError } = useFun(
     (state: useFunStoreInterface) => ({
       account: state.account,
       Eoa: state.Eoa,
@@ -117,22 +123,24 @@ export const useTransaction = (build: transactionArgsInterface) => {
   const [validTx, setValidTx] = useState(true)
   const [txHash, setTxHash] = useState<bigint | UserOp | ExecutionReceipt | null>(null)
   const [validateWallet, setValidateWallet] = useState(true)
+  const [txError, setTxError] = useState<FunError | null>(null)
 
-  // Validate the transaction any time it changes
   useEffect(() => {
     // console.log('Validating transaction opts: ', build)
     if (FunWallet == null) return
-    if (prevType !== build.type || prevTxParams !== build.txParams) {
+    if (txError == TransactionErrorMissingOrIncorrectFields) return
+    if (prevType !== build.type || !shallowCompare(prevTxParams, build.txParams)) {
       if (!checkTransactionType(build) && validTx) {
         setTxError(TransactionErrorMissingOrIncorrectFields)
         setValidTx(false)
         return
+      } else if (txError == TransactionErrorMissingOrIncorrectFields) {
+        setTxError(null)
       }
     }
     let interval: ReturnType<typeof setInterval> | null = null
 
     const checkGasBehavior = async () => {
-      setLoading(true)
       const currentConfig = build.txOptions || (config as EnvOption)
       try {
         const res = await validateGasBehavior(currentConfig, FunWallet)
@@ -141,7 +149,6 @@ export const useTransaction = (build: transactionArgsInterface) => {
           if (validTx) setValidTx(false)
           if (validateWallet) setValidateWallet(false)
         } else {
-          console.log('removing error tx valid', res)
           if (res.valid !== validTx) setValidTx(res.valid)
           if (interval) clearInterval(interval)
           if (validateWallet) setValidateWallet(false)
@@ -159,14 +166,14 @@ export const useTransaction = (build: transactionArgsInterface) => {
     // console.log(
     //   'checking gas behavior',
     //   validateWallet,
-    //   error,
+    //   txError,
     //   prevAccount !== account,
     //   prevGlobalConfig !== config,
     //   prevTxOptions !== build.txOptions
     // )
     if (
       validateWallet ||
-      error ||
+      txError ||
       prevAccount !== account ||
       prevGlobalConfig !== config ||
       prevTxOptions !== build.txOptions
@@ -192,11 +199,12 @@ export const useTransaction = (build: transactionArgsInterface) => {
     config,
     setTxError,
     validateWallet,
-    error,
+    txError,
     resetTxError,
     prevAccount,
     account,
     loading,
+    error,
   ])
 
   const sendTransaction = useCallback(() => {
@@ -228,5 +236,5 @@ export const useTransaction = (build: transactionArgsInterface) => {
   }, [Eoa, FunWallet, build.estimateGas, build.txOptions, build.txParams, build.type, loading, setTempError, validTx])
 
   // console.log({ valid: validTx, loading, data: txHash, error })
-  return { valid: validTx, loading, data: txHash, error, sendTransaction }
+  return { valid: validTx, loading, data: txHash, error: txError, sendTransaction }
 }

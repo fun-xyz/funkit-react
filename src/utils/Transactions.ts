@@ -26,7 +26,7 @@ import {
   TransactionErrorInsufficientPaymasterAllowance,
   TransactionErrorLowFunWalletBalance,
 } from '../store/plugins/ErrorStore'
-import ERC20_ALLOWANCE from './miniAbi/ERC20Allowance'
+import ERC20_ALLOWANCE_BALANCE from './miniAbi/ERC20AllowanceBalance'
 
 export interface GasValidationResponse {
   valid: boolean
@@ -81,20 +81,34 @@ export const validateGasBehavior = async (config: EnvOption, wallet: FunWallet):
       // we know that its set to either gassless or a gas sponsor
       if (config.gasSponsor.token) {
         // erc20 Token sponsor
-        console.log('erc20 Token sponsor')
         const gasSponsor = new TokenSponsor(config)
         const paymasterAddress = await gasSponsor.getPaymasterAddress()
-        const ERC20Contract = new ContractInterface(ERC20_ALLOWANCE)
-        const allowance: bigint = await ERC20Contract.readFromChain(
-          config.gasSponsor.token as `0x${string}`,
-          'allowance',
-          [walletAddress, paymasterAddress],
-          client
-        )
+        const ERC20Contract = new ContractInterface(ERC20_ALLOWANCE_BALANCE)
+
+        const [allowance, balance]: bigint[] = await Promise.all([
+          ERC20Contract.readFromChain(
+            config.gasSponsor.token as `0x${string}`,
+            'allowance',
+            [walletAddress, paymasterAddress],
+            client
+          ),
+          ERC20Contract.readFromChain(config.gasSponsor.token as `0x${string}`, 'balanceOf', [walletAddress], client),
+        ])
         if (allowance === 0n)
           return {
             valid: false,
-            error: generateTransactionError(TransactionErrorInsufficientPaymasterAllowance, { allowance }),
+            error: generateTransactionError(TransactionErrorInsufficientPaymasterAllowance, {
+              allowance,
+              paymasterAddress,
+            }),
+          }
+
+        if (balance === 0n)
+          return {
+            valid: false,
+            error: generateTransactionError(TransactionErrorLowFunWalletBalance, {
+              balance,
+            }),
           }
         const gasValidation = await validateGasSponsorMode(
           gasSponsor,
@@ -116,7 +130,6 @@ export const validateGasBehavior = async (config: EnvOption, wallet: FunWallet):
           // check if the sponsor has enough ether?
           return { valid: true }
         } catch (err) {
-          console.log('gasValidation ERROR gassless', err)
           return { valid: false }
         }
       }
@@ -137,6 +150,7 @@ export const validateGasBehavior = async (config: EnvOption, wallet: FunWallet):
       return { valid: true }
     }
   } catch (err) {
+    console.log('========= Error:', err)
     return {
       valid: false,
       error: { code: 0, message: 'Error Validating fetching sponsor Validation status', err },
@@ -156,38 +170,52 @@ export const validateGasSponsorMode = async (
   sponsorAddress: string,
   walletAddress: string
 ): Promise<GasValidationResponse> => {
-  const getBlackListedFunc = gasSponsor[`getSpenderBlacklisted`] ?? gasSponsor[`getSpenderBlacklistMode`]
-  const getWhiteListedFunc = gasSponsor[`getSpenderWhitelisted`] ?? gasSponsor[`getSpenderWhitelistMode`]
-  console.log('Gas Sponsor Mode Validation: ', gasSponsor)
-  if (getBlackListedFunc == null || getWhiteListedFunc == null)
-    return { valid: false, error: { code: 0, message: 'Gas Sponsor undefined' } }
+  let getBlackListedPromise: Promise<boolean>
+  let getWhiteListedPromise: Promise<boolean>
+
+  if (gasSponsor instanceof GaslessSponsor) {
+    getBlackListedPromise = gasSponsor.getSpenderBlacklistMode(walletAddress, sponsorAddress)
+    getWhiteListedPromise = gasSponsor.getSpenderWhitelistMode(walletAddress, sponsorAddress)
+  } else if (gasSponsor instanceof TokenSponsor) {
+    getBlackListedPromise = gasSponsor.getSpenderBlacklisted(walletAddress, sponsorAddress)
+    getWhiteListedPromise = gasSponsor.getSpenderWhitelisted(walletAddress, sponsorAddress)
+  } else {
+    return {
+      valid: false,
+      error: { code: 0, message: 'Gas Sponsor undefined' },
+    }
+  }
+
   try {
-    
-    if (await gasSponsor.getListMode(sponsorAddress)) {
-      // check if the sponsor is in the blacklist
-      const isBlackListed = await getBlackListedFunc(walletAddress, sponsorAddress)
-      if (isBlackListed)
+    const listMode = await gasSponsor.getListMode(sponsorAddress)
+
+    const isBlackListed = await getBlackListedPromise
+    const isWhiteListed = await getWhiteListedPromise
+
+    if (listMode) {
+      if (isBlackListed) {
         return {
           valid: false,
           error: generateTransactionError(TransactionErrorGasSponsorBlacklist, { sponsorAddress, walletAddress }),
         }
+      }
     } else {
-      // check if the sponsor is in the whitelist
-      const isWhiteListed = await getWhiteListedFunc(walletAddress, sponsorAddress)
-      if (!isWhiteListed)
+      if (!isWhiteListed) {
         return {
           valid: false,
           error: generateTransactionError(TransactionErrorGasSponsorWhitelist, { sponsorAddress, walletAddress }),
         }
+      }
     }
+
     return {
       valid: true,
     }
   } catch (err) {
-    console.log('Error Validating fetching sponsor mode Validation status', err)
+    console.log('Error:', err)
     return {
       valid: false,
-      error: { code: 0, message: 'Error Validating fetching sponsor mode Validation status', err },
+      error: { code: 0, message: 'Error validating fetching sponsor mode validation status', err },
     }
   }
 }
