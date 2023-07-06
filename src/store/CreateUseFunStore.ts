@@ -8,7 +8,6 @@ import { ChainStoreInterface, handleChainSwitching } from './plugins/ChainStore'
 import { buildAndUpdateConfig, ConfigureStoreInterface, setConfig } from './plugins/ConfigureStore'
 import { ConnectorStoreInterface } from './plugins/ConnectorStore'
 import { ErrorStoreInterface, FunError } from './plugins/ErrorStore'
-
 export interface useFunStoreInterface
   extends ConnectorStoreInterface,
     ChainStoreInterface,
@@ -28,6 +27,8 @@ export interface useFunStoreInterface
   setLogin: (index: number, account: string, funWallet: FunWallet, eoa: Eoa, uniqueId: string) => void
   ensName: string | null
   setEnsName: (ensName: string) => void
+  setAssets: (assets: object) => void
+  assets: object | null
 }
 
 export interface createUseFunInterface {
@@ -100,6 +101,8 @@ export const createUseFunStore = (hookBuildParams: createUseFunInterface) => {
       resetFunError: () => set({ error: null }),
       resetFunErrors: () => set({ errors: [] }),
       resetTxError: () => set({ txError: null }),
+      setAssets: (assets) => set({ assets }),
+      assets: null,
     })
   )
 }

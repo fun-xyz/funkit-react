@@ -104,6 +104,11 @@ export const TransactionErrorMissingOrIncorrectFields: FunError = {
   message: 'Missing required fields or incorrect types',
   data: {},
 }
+export const GetAssetsError: FunError = {
+  code: 4006,
+  message: 'Failed to get assets of FunWallet.',
+  data: {},
+}
 
 export const generateTransactionError = (error: FunError, data: FunErrorData, err?: unknown): FunError => {
   return {
