@@ -1,8 +1,7 @@
 import { useCallback, useState } from 'react'
 import { shallow } from 'zustand/shallow'
 
-import { GetAssetsError } from '@/store'
-
+import { GetAssetsError } from '../store'
 import { useFunStoreInterface } from '../store/CreateUseFunStore'
 import { useFun } from './UseFun'
 
