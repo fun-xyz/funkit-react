@@ -28,6 +28,8 @@
     "@coinbase/wallet-sdk": "^3.6.6",
     "@fun-xyz/core": "^0.3.5",
     "@magic-ext/oauth": "11.0.0",
+    "@magic-sdk/commons": "^14.2.1",
+    "@magic-sdk/provider": "^18.2.1",
     "@walletconnect/modal": "^2.4.5",
     "@web3-react/coinbase-wallet": "^8.2.0",
     "@web3-react/core": "^8.2.0",
@@ -35,7 +37,7 @@
     "@web3-react/metamask": "^8.2.1",
     "@web3-react/types": "^8.2.0",
     "@web3-react/walletconnect-v2": "^8.3.2",
-    "magic-sdk": "17.0.0",
+    "magic-sdk": "18.2.1",
     "react": "^18.2.0",
     "web3-core": "^4.0.1",
     "zustand": "^4.3.8"

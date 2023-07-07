@@ -34,6 +34,6 @@
       "@/*": ["./src/*"]
     }
   },
-  "include": ["./**/*", "../example", "../../Web3-reactFork"],
-  "exclude": ["node_modules", "dist", "../../Web3-reactFork", "../example"]
+  "include": ["./**/*"],
+  "exclude": ["node_modules", "dist", "docs", "../example"]
 }

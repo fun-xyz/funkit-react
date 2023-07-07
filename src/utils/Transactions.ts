@@ -26,7 +26,71 @@ import {
   TransactionErrorInsufficientPaymasterAllowance,
   TransactionErrorLowFunWalletBalance,
 } from '../store/plugins/ErrorStore'
-import ERC20_ALLOWANCE_BALANCE from './miniAbi/ERC20AllowanceBalance'
+import ERC20_ALLOWANCE_BALANCE from './miniAbi/ERC20AllowanceBalance.json'
+
+export type transactionTypes = 'transfer' | 'approve' | 'swap' | 'stake' | 'unstake' | 'create' | 'execRawTx'
+export type transactionParams =
+  | TransferParams
+  | ApproveParams
+  | SwapParams
+  | StakeParams
+  | RequestUnstakeParams
+  | FinishUnstakeParams
+  | TransactionData
+
+export interface transactionArgsInterface {
+  type: transactionTypes
+  txParams: transactionParams
+  txOptions?: (EnvOption & false) | (EnvOption & true)
+  estimateGas?: boolean
+}
+
+export function checkTransactionType(txArgs: transactionArgsInterface): boolean {
+  switch (txArgs.type) {
+    case 'transfer':
+      if (
+        (txArgs.txParams['to'] && txArgs.txParams['amount']) || // NATIVE TRANSFER
+        (txArgs.txParams['to'] && txArgs.txParams['amount'] && txArgs.txParams['token']) || // ERC20 Transfer
+        (txArgs.txParams['to'] && txArgs.txParams['tokenId'] && txArgs.txParams['token']) // ERC721 Transfer
+      )
+        return true
+      return false
+    case 'approve':
+      if (
+        (txArgs.txParams['spender'] && txArgs.txParams['token'] && txArgs.txParams['amount']) || // ERC20 Approve
+        (txArgs.txParams['spender'] && txArgs.txParams['token'] && txArgs.txParams['tokenId']) // ERC721 Approve
+      )
+        return true
+      return false
+    case 'swap':
+      if (txArgs.txParams['in'] && txArgs.txParams['out'] && txArgs.txParams['amount']) return true
+      return false
+    case 'stake':
+      if (
+        txArgs.txParams['amount'] &&
+        !txArgs.txParams['in'] &&
+        !txArgs.txParams['token'] &&
+        !txArgs.txParams['spender']
+      )
+        return true
+      return false
+    case 'unstake':
+      if (
+        txArgs.txParams['recipient'] &&
+        !txArgs.txParams['in'] &&
+        !txArgs.txParams['token'] &&
+        !txArgs.txParams['spender']
+      )
+        return true
+      return false
+    case 'execRawTx':
+      if (txArgs.txParams['to'] && !txArgs.txParams['in'] && !txArgs.txParams['token'] && !txArgs.txParams['spender'])
+        return true
+      return false
+    default:
+      return false
+  }
+}
 
 export interface GasValidationResponse {
   valid: boolean
@@ -83,7 +147,7 @@ export const validateGasBehavior = async (config: EnvOption, wallet: FunWallet):
         // erc20 Token sponsor
         const gasSponsor = new TokenSponsor(config)
         const paymasterAddress = await gasSponsor.getPaymasterAddress()
-        const ERC20Contract = new ContractInterface(ERC20_ALLOWANCE_BALANCE)
+        const ERC20Contract = new ContractInterface(ERC20_ALLOWANCE_BALANCE.abi)
 
         const [allowance, balance]: bigint[] = await Promise.all([
           ERC20Contract.readFromChain(

@@ -1,6 +1,6 @@
 // eslint-disable-next-line prettier/prettier
 "use client";
-import { Chain, Eoa, FunWallet } from '@fun-xyz/core'
+import { Chain, Eoa, ExecutionReceipt, FunWallet } from '@fun-xyz/core'
 import { create } from 'zustand'
 
 import { ConnectorArray } from '../connectors/Types'
@@ -8,10 +8,12 @@ import { ChainStoreInterface, handleChainSwitching } from './plugins/ChainStore'
 import { buildAndUpdateConfig, ConfigureStoreInterface, setConfig } from './plugins/ConfigureStore'
 import { ConnectorStoreInterface } from './plugins/ConnectorStore'
 import { ErrorStoreInterface, FunError } from './plugins/ErrorStore'
+import { addNewTransaction, TransactionStoreState } from './plugins/TransactionStore'
 export interface useFunStoreInterface
   extends ConnectorStoreInterface,
     ChainStoreInterface,
     ConfigureStoreInterface,
+    TransactionStoreState,
     ErrorStoreInterface {
   index: number
   setIndex: (index: number) => void
@@ -62,6 +64,7 @@ export const createUseFunStore = (hookBuildParams: createUseFunInterface) => {
       },
       ensName: null,
       setEnsName: (ensName: string) => set({ ensName }),
+      // CHAIN STORE
       chain: null,
       chainId: null,
       supportedChains: hookBuildParams.supportedChains,
@@ -74,6 +77,8 @@ export const createUseFunStore = (hookBuildParams: createUseFunInterface) => {
           set({ account: newAccount })
         }
       },
+
+      // CONFIG STORE
       config: null,
       updateConfig: async (newConfig: any) => {
         const oldConfig = get().config
@@ -83,6 +88,13 @@ export const createUseFunStore = (hookBuildParams: createUseFunInterface) => {
       setConfig: async (newConfig: any) => {
         return set(await setConfig(newConfig))
       },
+
+      //TRANSACTION STORE
+      transactions: [],
+      lastTransaction: null,
+      addTransaction: (newTransaction: ExecutionReceipt) => addNewTransaction(newTransaction, get, set),
+
+      // ERROR STORE
       error: null,
       errors: [],
       txError: null,
