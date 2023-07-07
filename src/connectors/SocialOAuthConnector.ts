@@ -8,6 +8,7 @@ const MAGIC_API_KEY = 'pk_live_846F1095F0E1303C'
 const REDIRECT_URI = 'http://localhost:3000'
 const DEFAULT_RPC = 'https://cloudflare-eth.com' //'https://rpc-mainnet.maticvigil.com'
 const DEFAULT_CHAIN_ID = 1
+const SUPPORTED_OAUTH_PROVIDERS: OAuthProvider[] = ['google', 'twitter', 'apple', 'discord']
 
 export const SocialOauthConnector = (
   supportedAuthProviders: OAuthProvider[],
@@ -19,7 +20,7 @@ export const SocialOauthConnector = (
       actions,
       options: {
         magicAuthApiKey: MAGIC_API_KEY,
-        supportedAuthProviders,
+        supportedAuthProviders: SUPPORTED_OAUTH_PROVIDERS || supportedAuthProviders,
         redirectURI: redirectUri ?? REDIRECT_URI,
         networkOptions: networkOpts ?? {
           rpcUrl: DEFAULT_RPC,

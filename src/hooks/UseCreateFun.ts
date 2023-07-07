@@ -11,9 +11,10 @@ import { OAuthProvider } from '@magic-ext/oauth'
 import type { Web3ReactHooks } from '@web3-react/core'
 import { getPriorityConnector } from '@web3-react/core'
 import type { Connector, Web3ReactStore } from '@web3-react/types'
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { shallow } from 'zustand/shallow'
 
+import { ConnectorArray } from '..'
 import {
   FunError,
   LegacyAuthIdMultiAccountError,
@@ -25,6 +26,32 @@ import {
 import { convertAccountsMultiAuthIds, convertWeb3ProviderToClient, getMatchingHexStrings } from '../utils'
 import { useFun } from './index'
 
+export function useTraceUpdate(props: any, name = 'useTraceUpdate') {
+  const prev = useRef(props)
+  useEffect(() => {
+    const changedProps = Object.entries(props).reduce((ps: any, [k, v]) => {
+      if (prev.current[k] !== v) {
+        ps[k] = [prev.current[k], v]
+      }
+      return ps
+    }, {})
+    if (Object.keys(changedProps).length > 0) {
+      console.log(`${name} | Changed props:`, changedProps)
+    }
+    prev.current = props
+  })
+}
+
+const useActiveAccounts = (connections: ConnectorArray): string[] | null => {
+  const activeAccountAddresses = connections
+    .map((connector) => {
+      return connector[1].useAccount()
+    })
+    .filter((address) => address !== undefined)
+
+  if (activeAccountAddresses.length === 0) return null
+  return activeAccountAddresses as string[]
+}
 export interface buildFunWalletInterface {
   config: GlobalEnvOption
 }
@@ -66,7 +93,6 @@ export const useCreateFun = (build: buildFunWalletInterface) => {
     account,
     error,
     config,
-    supportedChains,
     setLogin,
     setTempError,
     resetFunError,
@@ -81,7 +107,6 @@ export const useCreateFun = (build: buildFunWalletInterface) => {
       account: state.account,
       error: state.error,
       config: state.config,
-      supportedChains: state.supportedChains,
       setLogin: state.setLogin,
       setTempError: state.setTempError,
       resetFunError: state.resetFunError,
@@ -104,9 +129,9 @@ export const useCreateFun = (build: buildFunWalletInterface) => {
     if (!build.config) handleBuildError(MissingConfigError)
     if (build.config.apiKey === null || build.config.apiKey === '') handleBuildError(MissingApiKeyError)
     if (config) return
-    initializeSupportedChains(build.config, supportedChains) // TODO analyze the cost of building the supported chains rather then just the one we are using
+    // initializeSupportedChains(build.config, supportedChains) // TODO analyze the cost of building the supported chains rather then just the one we are using
     setConfig(build.config)
-  }, [config, build, setConfig, handleBuildError, supportedChains])
+  }, [config, build, setConfig, handleBuildError])
 
   const { usePriorityConnector, useSelectedProvider } = getPriorityConnector(
     ...(connections as [Connector, Web3ReactHooks][] | [Connector, Web3ReactHooks, Web3ReactStore][])
@@ -114,8 +139,7 @@ export const useCreateFun = (build: buildFunWalletInterface) => {
 
   const activeConnector = usePriorityConnector()
   const activeProvider = useSelectedProvider(activeConnector)
-  // eslint-disable-next-line react-hooks/rules-of-hooks
-  const activeAccountAddresses = connections.map((connector) => connector[1].useAccount())
+  const activeAccountAddresses = useActiveAccounts(connections)
 
   /**
    * Activates a connector.
@@ -195,6 +219,7 @@ export const useCreateFun = (build: buildFunWalletInterface) => {
   const initializeMultiAuthWallet = useCallback(
     async (multiAuthInputs?: initializeMultiAuthWalletInterface) => {
       if (initializing) return
+      if (activeAccountAddresses == null) return handleBuildError(MissingActiveSigner)
       setInitializing(true)
       // Validate the input params
       const clientProvider =
@@ -249,7 +274,18 @@ export const useCreateFun = (build: buildFunWalletInterface) => {
       setLogin,
     ]
   )
-
+  useTraceUpdate(
+    {
+      initializing,
+      connections,
+      activeProvider,
+      handleBuildError,
+      index,
+      setConfig,
+      setLogin,
+    },
+    'CreateFun'
+  )
   return {
     connectors: connections,
     activeAccountAddresses,

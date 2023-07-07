@@ -35,5 +35,5 @@ export const connectors = {
   WalletConnectV2: WalletConnectV2Connector,
   SocialOauthConnector,
 }
-
 export * from './Types'
+export { OAuthProvider } from '@magic-ext/oauth'

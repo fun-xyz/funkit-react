@@ -1,7 +1,8 @@
 import { OAuthExtension, OAuthProvider, OAuthRedirectResult } from '@magic-ext/oauth'
+import { MagicSDKAdditionalConfiguration } from '@magic-sdk/commons'
 import { InstanceWithExtensions, SDKBase } from '@magic-sdk/provider'
 import { Actions, Connector, ProviderConnectInfo, ProviderRpcError } from '@web3-react/types'
-import { Magic, MagicSDKAdditionalConfiguration } from 'magic-sdk'
+import { Magic } from 'magic-sdk'
 
 function parseChainId(chainId: string | number) {
   return typeof chainId === 'number' ? chainId : Number.parseInt(chainId, chainId.startsWith('0x') ? 16 : 10)
@@ -172,19 +173,33 @@ export class MagicAuthConnector extends Connector {
   // "autoconnect"
   override async connectEagerly(): Promise<void> {
     const cancelActivation = this.actions.startActivation()
-    const isLoggedIn = await this.isAuthorized()
-    if (!isLoggedIn) {
+    const resetTimeout = setTimeout(cancelActivation, 5000)
+    try {
+      console.log('connecting eagerly Magic Auth')
+      const isLoggedIn = await this.isAuthorized()
+      console.log('isLoggedIN: ', isLoggedIn)
+      if (!isLoggedIn) {
+        console.log('not logged in')
+        cancelActivation()
+        return
+      }
+      console.log('logged in')
+      this.completeActivation()
+    } catch (err) {
+      console.log('cancelActivation')
       cancelActivation()
-      return
+    } finally {
+      clearTimeout(resetTimeout)
     }
-    this.completeActivation()
   }
 
   // "connect"
   async activate(activateArgs: MagicAuthActivateArgs): Promise<void> {
     const cancelActivation = this.actions.startActivation()
+    const resetTimeout = setTimeout(cancelActivation, 5000)
     try {
       // Initialize the magic instance
+      console.log('activating Magic Auth')
       if (activateArgs.oAuthProvider == this.oAuthProvider && (await this.isAuthorized())) {
         this.completeActivation()
         return
@@ -211,6 +226,8 @@ export class MagicAuthConnector extends Connector {
       }
     } catch (error) {
       cancelActivation()
+    } finally {
+      clearTimeout(resetTimeout)
     }
   }
 
@@ -235,14 +252,29 @@ export class MagicAuthConnector extends Connector {
     this.authId = this.getAuthId()
   }
 
+  // async postRedirectHandler(): Promise<boolean> {
+  //   try {
+  //     const magic = this.getMagic()
+  //     if (magic == null) return false
+
+  //   } catch (err) {
+  //     console.log('Error in postRedirectHandler', err)
+  //     return false
+  //   }
+
+  // }
+
   async isAuthorized() {
     try {
       const magic = this.getMagic()
+      console.log('IsMagicNull', magic == null)
       if (magic == null) return false
+      console.log('before is logged in', magic.user)
       const isLoggedIn = await magic.user.isLoggedIn()
+      console.log('isLoggedIn /auth ', isLoggedIn, this.oAuthResult)
+
       const oauth = window.localStorage.getItem('oAuthProvider')
       this.oAuthProvider = oauth ? JSON.parse(oauth) : this.oAuthProvider
-
       if (isLoggedIn) {
         return true
       }

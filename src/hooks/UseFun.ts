@@ -5,9 +5,9 @@ import { FunTestnet, Goerli, OptimismGoerli } from '../network/Networks'
 import { createUseFunStore } from '../store'
 
 const CONNECTORS = [
-  connectors.Metamask(),
-  connectors.CoinbaseWallet(),
-  connectors.WalletConnectV2(),
+  // connectors.Metamask(),
+  // connectors.CoinbaseWallet(),
+  // connectors.WalletConnectV2(),
   connectors.SocialOauthConnector(['google', 'twitter', 'apple', 'discord']),
 ]
 
