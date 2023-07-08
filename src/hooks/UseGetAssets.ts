@@ -1,3 +1,4 @@
+import { FunWallet } from '@fun-xyz/core'
 import { useCallback, useState } from 'react'
 import { shallow } from 'zustand/shallow'
 
@@ -5,30 +6,36 @@ import { GetAssetsError } from '../store'
 import { useFunStoreInterface } from '../store/CreateUseFunStore'
 import { useFun } from './UseFun'
 
-export const useGetAssets = (build: any) => {
-  const { FunWallet, setAssets, assets, setTempError } = useFun(
+export interface assetRequest {
+  address: string
+}
+
+export const useGetAssets = (req: assetRequest) => {
+  const { userWallet, setAssets, assets, error, setTempError } = useFun(
     (state: useFunStoreInterface) => ({
-      FunWallet: state.FunWallet,
+      userWallet: state.FunWallet,
       setAssets: state.setAssets,
       assets: state.assets,
+      error: state.error,
       setTempError: state.setTempError,
     }),
     shallow
   )
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(false)
 
   const getAssets = useCallback(async () => {
-    if (!FunWallet) return
     setLoading(true)
     try {
-      const getAssetResult = await FunWallet.getAssets()
+      let wallet = userWallet
+      if (!wallet) wallet = new FunWallet({ uniqueId: '0x00' })
+      const getAssetResult = await wallet.getAssets()
       setAssets(getAssetResult)
       setLoading(false)
     } catch (e) {
       setTempError(GetAssetsError)
     }
     setLoading(false)
-  }, [assets, FunWallet])
+  }, [setAssets, setTempError, userWallet])
 
-  return { getAssets, loading }
+  return { assets, getAssets, loading, error }
 }
