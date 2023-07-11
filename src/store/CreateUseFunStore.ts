@@ -1,6 +1,6 @@
 // eslint-disable-next-line prettier/prettier
 "use client";
-import { Chain, Eoa, ExecutionReceipt, FunWallet } from '@fun-xyz/core'
+import { Chain, ExecutionReceipt } from '@fun-xyz/core'
 import { create } from 'zustand'
 
 import { ConnectorArray } from '../connectors/Types'
@@ -8,27 +8,16 @@ import { ChainStoreInterface, handleChainSwitching } from './plugins/ChainStore'
 import { buildAndUpdateConfig, ConfigureStoreInterface, setConfig } from './plugins/ConfigureStore'
 import { ConnectorStoreInterface } from './plugins/ConnectorStore'
 import { ErrorStoreInterface, FunError } from './plugins/ErrorStore'
+import { configureFunAccountStore, FunAccountStoreInterface } from './plugins/FunAccountStore'
 import { addNewTransaction, TransactionStoreState } from './plugins/TransactionStore'
+
 export interface useFunStoreInterface
-  extends ConnectorStoreInterface,
+  extends FunAccountStoreInterface,
+    ConnectorStoreInterface,
     ChainStoreInterface,
     ConfigureStoreInterface,
     TransactionStoreState,
     ErrorStoreInterface {
-  index: number
-  setIndex: (index: number) => void
-  resetIndex: () => void
-  FunWallet: FunWallet | null
-  setFunWallet: (FunWallet: FunWallet) => void
-  Eoa: Eoa | null
-  setEoa: (Authorizer: Eoa) => void
-  uniqueId: string | null
-  setUniqueId: (uniqueId: string) => void
-  account: string | null
-  setAccount: (account: string) => void
-  setLogin: (index: number, account: string, funWallet: FunWallet, eoa: Eoa, uniqueId: string) => void
-  ensName: string | null
-  setEnsName: (ensName: string) => void
   setAssets: (assets: object) => void
   assets: object | null
 }
@@ -48,22 +37,8 @@ export const createUseFunStore = (hookBuildParams: createUseFunInterface) => {
       setGroupId: (groupId: string) => set(() => ({ groupId })),
       requiredActiveConnectors: 0,
       setRequiredActiveConnectors: (requiredActiveConnectors: number) => set(() => ({ requiredActiveConnectors })),
-      index: hookBuildParams.defaultIndex || 0,
-      setIndex: (newIndex: number) => set({ index: newIndex }),
-      resetIndex: () => set({ index: 0 }),
-      FunWallet: null,
-      setFunWallet: (FunWallet: FunWallet) => set({ FunWallet }),
-      Eoa: null,
-      setEoa: (Authorizer: Eoa) => set({ Eoa: Authorizer }),
-      uniqueId: null,
-      setUniqueId: (uniqueId: string) => set({ uniqueId }),
-      account: null,
-      setAccount: (account: string) => set({ account }),
-      setLogin: (index: number, account: string, funWallet: FunWallet, Eoa: Eoa, uniqueId: string) => {
-        set({ index, account, FunWallet: funWallet, Eoa, uniqueId })
-      },
-      ensName: null,
-      setEnsName: (ensName: string) => set({ ensName }),
+      // FunAccount Store
+      ...configureFunAccountStore(hookBuildParams.defaultIndex, get, set),
       // CHAIN STORE
       chain: null,
       chainId: null,
