@@ -22,3 +22,5 @@ export const setConfig = async (newConfig: Partial<GlobalEnvOption>) => {
   await configureEnvironment(newConfig as GlobalEnvOption)
   return { config: newConfig }
 }
+
+// TODO add checking to the update config or set Config to verify that the chain is valid and synchronized with the state.
