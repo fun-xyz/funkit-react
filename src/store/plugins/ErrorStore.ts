@@ -125,8 +125,13 @@ export const TransactionErrorMissingOrIncorrectFields: FunError = {
   message: 'Missing required fields or incorrect types',
   data: {},
 }
-export const GetAssetsError: FunError = {
+export const TransactionErrorEstimateGasFailed: FunError = {
   code: 4006,
+  message: 'Gas estimation failed for transaction type',
+  data: {},
+}
+export const GetAssetsError: FunError = {
+  code: 4007,
   message: 'Failed to get assets of FunWallet.',
   data: {},
 }

@@ -332,3 +332,25 @@ export const executePreparedTransaction = async (preparedTx: UserOp, wallet: Fun
       })
   })
 }
+
+export const estimateGas = async (build: transactionArgsInterface, Eoa: Eoa, wallet: FunWallet) => {
+  return new Promise((resolve, reject) => {
+    if (Eoa == null) reject('No Eoa')
+    if (wallet == null) reject('No wallet')
+    FunWallet[build.type](
+      Eoa,
+      build.txParams as (((((TransferParams & ApproveParams) & SwapParams) & StakeParams) &
+        (RequestUnstakeParams | FinishUnstakeParams)) &
+        (EnvOption | undefined)) &
+        TransactionData,
+      build.txOptions,
+      true // estimateGas
+    )
+      .then((res) => {
+        resolve(res)
+      })
+      .catch((err) => {
+        console.log('GasEstimationError Error: ', err)
+      })
+  })
+}
