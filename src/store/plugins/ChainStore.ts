@@ -7,6 +7,7 @@ export interface ChainStoreInterface {
   chain: string | null
   chainId: number | null
   supportedChains: Chain[]
+  setSupportedChains: (chains: Chain[]) => void
   switchChain: (chain: number | string) => void
 }
 
@@ -24,6 +25,7 @@ export const configureChainStore = (supportedChains: Chain[], get: any, set: any
   chain: null,
   chainId: null,
   supportedChains,
+  setSupportedChains: (chains: Chain[]) => set({ supportedChains: chains }),
   switchChain: async (chainId: number | string) => {
     const { config: oldConfig, account: oldAccount, FunWallet: funWallet } = get()
     const newState = await handleChainSwitching(chainId, oldConfig)
