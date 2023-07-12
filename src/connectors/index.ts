@@ -36,4 +36,5 @@ export const connectors = {
   SocialOauthConnector,
 }
 export { CoinbaseWalletConnector, MetamaskConnector, SocialOauthConnector, WalletConnectV2Connector }
+export * from './Types'
 export { OAuthProvider } from '@magic-ext/oauth'
