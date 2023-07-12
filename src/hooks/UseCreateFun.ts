@@ -68,15 +68,6 @@ export interface initializeMultiAuthWalletInterface {
   connectorIndexes?: number[]
 }
 
-const initializeSupportedChains = async (config: GlobalEnvOption, supportedChains: Chain[]) => {
-  try {
-    await configureEnvironment(config)
-    supportedChains.forEach(async (chain) => await chain.init())
-  } catch (error) {
-    console.log(error)
-  }
-}
-
 /**
  *
  * @param build
@@ -159,6 +150,15 @@ export const useCreateFun = (build: buildFunWalletInterface) => {
     },
     [setTempError]
   )
+
+  const deactivateConnector = useCallback(async (connector: Connector) => {
+    if (connector == null) return
+    if (connector?.deactivate) {
+      void connector.deactivate()
+    } else {
+      void connector.resetState()
+    }
+  }, [])
 
   /**
    * Initializes a single auth wallet. using the connectorIndex will use the connector at that index in the connections array.
@@ -299,6 +299,7 @@ export const useCreateFun = (build: buildFunWalletInterface) => {
     loading: initializing,
     resetFunError,
     activateConnector,
+    deactivateConnector,
     initializeSingleAuthWallet,
     initializeMultiAuthWallet,
   }
