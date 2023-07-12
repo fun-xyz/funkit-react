@@ -19,3 +19,18 @@ export const handleChainSwitching = async (newChain: number | string, oldConfig:
 
   return { chain: Chain, chainId: Chain.chainId, config }
 }
+
+export const configureChainStore = (supportedChains: Chain[], get: any, set: any): ChainStoreInterface => ({
+  chain: null,
+  chainId: null,
+  supportedChains,
+  switchChain: async (chainId: number | string) => {
+    const { config: oldConfig, account: oldAccount, FunWallet: funWallet } = get()
+    const newState = await handleChainSwitching(chainId, oldConfig)
+    set(newState)
+    const newAccount = funWallet?.getAddress()
+    if (oldAccount !== newAccount) {
+      set({ account: newAccount })
+    }
+  },
+})

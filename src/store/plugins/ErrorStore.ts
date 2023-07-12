@@ -24,6 +24,27 @@ export interface ErrorStoreInterface {
   resetTxError: () => void
 }
 
+export const configureErrorStore = (get: any, set: any): ErrorStoreInterface => ({
+  error: null,
+  errors: [],
+  txError: null,
+  setFunError: (error: FunError) => {
+    const { errors } = get()
+    if (errors.length === 10) errors.pop()
+    set({ error, errors: [error].concat(errors) })
+  },
+  setTempError: (error: FunError) => {
+    const { errors } = get()
+    if (errors.length === 10) errors.pop()
+    set({ error, errors: [error].concat(errors) })
+    setTimeout(() => set({ error: null }), 5000)
+  },
+  setTxError: (txError: FunError) => set({ txError }),
+  resetFunError: () => set({ error: null }),
+  resetFunErrors: () => set({ errors: [] }),
+  resetTxError: () => set({ txError: null }),
+})
+
 export const GeneralFunError: FunError = {
   code: 0,
   message: 'Error',

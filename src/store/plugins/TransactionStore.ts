@@ -22,3 +22,8 @@ export const addNewTransaction = (
   })
 }
 
+export const configureTransactionStore = (get: () => TransactionStoreState, set: (TransactionStoreState) => void) => ({
+  transactions: [],
+  lastTransaction: null,
+  addTransaction: (newTransaction: ExecutionReceipt) => addNewTransaction(newTransaction, get, set),
+})
