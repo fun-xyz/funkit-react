@@ -1,4 +1,5 @@
 import { Chain } from '@fun-xyz/core'
+import { PublicClient } from 'viem'
 
 export const Ethereum = new Chain({ chainId: '1' })
 export const Goerli = new Chain({ chainId: '5' })
@@ -47,7 +48,7 @@ export const convertToChain = (chain: string | number): Chain => {
   return chainName[`${chain}` as keyof typeof chainName]
 }
 
-export const getPublicClient = (chainId: string | number) => {
+export const getPublicClient = async (chainId: string | number): Promise<PublicClient> => {
   const Chain = convertToChain(chainId)
   return Chain.getClient()
 }
