@@ -9,10 +9,12 @@ import { configureConfigurationStore, ConfigureStoreInterface } from './plugins/
 import { configureConnectorStore, ConnectorStoreInterface } from './plugins/ConnectorStore'
 import { configureErrorStore, ErrorStoreInterface } from './plugins/ErrorStore'
 import { configureFunAccountStore, FunAccountStoreInterface } from './plugins/FunAccountStore'
+import { configureAuthStore, IFunAuthStore } from './plugins/FunAuthStore'
 import { configureTransactionStore, TransactionStoreState } from './plugins/TransactionStore'
 
 export interface useFunStoreInterface
   extends FunAccountStoreInterface,
+    IFunAuthStore,
     ConnectorStoreInterface,
     ChainStoreInterface,
     ConfigureStoreInterface,
@@ -35,6 +37,8 @@ export const createUseFunStore = (hookBuildParams: createUseFunInterface) => {
       ...configureConnectorStore(hookBuildParams.connectors, get, set),
       // FunAccount Store
       ...configureFunAccountStore(hookBuildParams.defaultIndex, get, set),
+      // FunAuth Store
+      ...configureAuthStore(get, set),
       // CHAIN STORE
       ...configureChainStore(hookBuildParams.supportedChains, get, set),
       // CONFIG STORE
