@@ -1,11 +1,13 @@
 import { OAuthProvider } from '@magic-ext/oauth'
 import type { Web3ReactHooks } from '@web3-react/core'
 import type { Connector } from '@web3-react/types'
-import { useCallback } from 'react'
+import { useCallback, useEffect,  useState } from 'react'
 import { shallow } from 'zustand/shallow'
 
+import { useGetName } from '..'
 import { ConnectorArray, ConnectorTuple } from '../connectors/Types'
 import { NoMetaMaskError } from '../store'
+import { FunError } from '../store/plugins/ErrorStore'
 import { useFun } from './index'
 import { useActiveAccounts } from './UseActiveAccounts'
 
@@ -15,15 +17,15 @@ export const WALLET_CONNECT = 2
 export const OAUTH = 3
 
 const activateConnector = async (
-  connector: Connector | ConnectorTuple,
+  connector: Connector,
   handleError: (FunError) => void,
   oAuthProvider?: OAuthProvider
 ) => {
+  console.log('activateConnector', connector)
   if (connector == null) return
-  const activateFunction = connector['activate'] ?? connector[0].activate
   try {
-    if (oAuthProvider) await activateFunction({ oAuthProvider })
-    else await activateFunction()
+    if (oAuthProvider) await connector.activate({ oAuthProvider })
+    else await connector.activate()
   } catch (err) {
     console.log(err)
     if ((err as any).constructor.name === 'NoMetaMaskError') handleError(NoMetaMaskError)
@@ -54,54 +56,82 @@ const deactivateAllConnectors = async (connectors: ConnectorArray) => {
 
 interface IUseConnector {
   index: number // optional index value if passed will only show changes for connectors at that index
+  autoConnect?: boolean // optional if true the connector will try and automatically activate. default is false
 }
 
 interface IUseConnectorReturn {
   connector: Connector
+  connectorName: string
   hooks: Web3ReactHooks
   active: boolean
   activating: boolean
   account: string | undefined
-  ensName: string | null | undefined
+  chainId: number | undefined
+  ensNames: undefined[] | (string | null)[]
+  provider: any
+  error: FunError | null
+  setError: (error: FunError | null) => void
   activate: (connector: Connector | ConnectorTuple, oAuthProvider?: OAuthProvider) => void
   deactivate: (connector: Connector | ConnectorTuple) => void
   deactivateAll: () => void
 }
 
 export const useConnector = (args: IUseConnector): IUseConnectorReturn => {
-  const { connector, connectors, setTempError } = useFun((state) => {
+  const { connector, connectors } = useFun((state) => {
     return {
       connector: state.connectors[args.index],
       connectors: state.connectors,
-      setTempError: state.setTempError,
     }
   }, shallow)
 
-  const { useIsActive, useIsActivating, useAccount, useENSName } = connector[1]
+  const { useIsActive, useIsActivating, useAccount, useProvider, useENSNames, useChainId } = connector[1]
 
   const isActive = useIsActive()
   const isActivating = useIsActivating()
+  const chainId = useChainId()
   const account = useAccount()
-  const ensName = useENSName()
+  const provider = useProvider()
+  const ENSNames = useENSNames(provider)
+  const connectorName = useGetName(connector[0])
+
+  const [error, setError] = useState<FunError | null>(null)
+
+  useEffect(() => {
+    if (!args.autoConnect) return
+    if (!connector || !connector[0].connectEagerly) return
+    console.log('connecting eagerly')
+    const connectPromise = connector[0].connectEagerly()
+    if (connectPromise && typeof connectPromise.catch === 'function') {
+      connectPromise.catch(() => {
+        console.debug(`Failed to connect eagerly to ${connectorName}`)
+      })
+    }
+  }, [args.autoConnect, connector, connectorName])
+
   /**
    * Activates a connector.
    * @param connector - The connector to activate.
    * @param oAuthProvider - An optional OAuth provider. string value of 'google' | 'twitter' | 'apple' | 'discord'
    */
   const activateConnectorNow = useCallback(
-    (connector, oAuthProvider) => activateConnector(connector, setTempError, oAuthProvider),
-    [setTempError]
+    (connector, oAuthProvider) => activateConnector(connector, setError, oAuthProvider),
+    []
   )
 
-  const deactivateAllConnectorsNow = useCallback(() => deactivateAllConnectors(connectors), [connectors])
+  const deactivateAllConnectorsNow = useCallback(() =>  (connectors), [connectors])
 
   return {
     connector: connector[0],
+    connectorName,
     hooks: connector[1],
     active: isActive,
     activating: isActivating,
+    chainId,
     account,
-    ensName,
+    ensNames: ENSNames,
+    provider,
+    error,
+    setError,
     activate: activateConnectorNow,
     deactivate: deactivateConnector,
     deactivateAll: deactivateAllConnectorsNow,
