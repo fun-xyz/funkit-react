@@ -1,7 +1,8 @@
 import { OAuthProvider } from '@magic-ext/oauth'
 import type { Web3ReactHooks } from '@web3-react/core'
-import type { Connector } from '@web3-react/types'
-import { useCallback, useEffect,  useState } from 'react'
+import { getPriorityConnector } from '@web3-react/core'
+import type { Connector, Web3ReactStore } from '@web3-react/types'
+import { useCallback, useEffect, useState } from 'react'
 import { shallow } from 'zustand/shallow'
 
 import { useGetName } from '..'
@@ -9,19 +10,19 @@ import { ConnectorArray, ConnectorTuple } from '../connectors/Types'
 import { NoMetaMaskError } from '../store'
 import { FunError } from '../store/plugins/ErrorStore'
 import { useFun } from './index'
-import { useActiveAccounts } from './UseActiveAccounts'
 
-export const METAMASK = 0
-export const COINBASE = 1
-export const WALLET_CONNECT = 2
-export const OAUTH = 3
+export enum CONNECTOR_BY_NAME {
+  METAMASK = 0,
+  COINBASE = 1,
+  WALLET_CONNECT = 2,
+  OAUTH = 3,
+}
 
 const activateConnector = async (
   connector: Connector,
   handleError: (FunError) => void,
   oAuthProvider?: OAuthProvider
 ) => {
-  console.log('activateConnector', connector)
   if (connector == null) return
   try {
     if (oAuthProvider) await connector.activate({ oAuthProvider })
@@ -73,14 +74,12 @@ interface IUseConnectorReturn {
   setError: (error: FunError | null) => void
   activate: (connector: Connector | ConnectorTuple, oAuthProvider?: OAuthProvider) => void
   deactivate: (connector: Connector | ConnectorTuple) => void
-  deactivateAll: () => void
 }
 
 export const useConnector = (args: IUseConnector): IUseConnectorReturn => {
-  const { connector, connectors } = useFun((state) => {
+  const { connector } = useFun((state) => {
     return {
       connector: state.connectors[args.index],
-      connectors: state.connectors,
     }
   }, shallow)
 
@@ -118,8 +117,6 @@ export const useConnector = (args: IUseConnector): IUseConnectorReturn => {
     []
   )
 
-  const deactivateAllConnectorsNow = useCallback(() =>  (connectors), [connectors])
-
   return {
     connector: connector[0],
     connectorName,
@@ -134,11 +131,19 @@ export const useConnector = (args: IUseConnector): IUseConnectorReturn => {
     setError,
     activate: activateConnectorNow,
     deactivate: deactivateConnector,
-    deactivateAll: deactivateAllConnectorsNow,
   }
 }
 
-export const useConnectors = () => {
+interface IUseConnectorsReturn {
+  connectors: ConnectorArray
+  activeConnectors: { active: boolean; name: string; account: string | undefined }[]
+  primaryConnector: Connector
+  activate: (connector: Connector | ConnectorTuple, oAuthProvider?: OAuthProvider) => void
+  deactivate: (connector: Connector | ConnectorTuple) => void
+  deactivateAll: () => void
+}
+
+export const useConnectors = (): IUseConnectorsReturn => {
   const { connectors, setTempError } = useFun((state) => {
     return {
       connectors: state.connectors,
@@ -146,7 +151,19 @@ export const useConnectors = () => {
     }
   }, shallow)
 
-  const activeAccounts = useActiveAccounts(connectors)
+  const { usePriorityConnector } = getPriorityConnector(
+    ...(connectors as [Connector, Web3ReactHooks][] | [Connector, Web3ReactHooks, Web3ReactStore][])
+  )
+
+  const activeConnector = usePriorityConnector()
+
+  const activeConnectors = connectors.map((connector) => {
+    const active = connector[1].useIsActive()
+    const account = connector[1].useAccount()
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    const name = useGetName(connector[0])
+    return { active, name, account }
+  })
 
   const activateConnectorNow = useCallback(
     (connector, oAuthProvider) => activateConnector(connector, setTempError, oAuthProvider),
@@ -156,7 +173,8 @@ export const useConnectors = () => {
 
   return {
     connectors,
-    activeAccounts,
+    activeConnectors,
+    primaryConnector: activeConnector,
     activate: activateConnectorNow,
     deactivate: deactivateConnector,
     deactivateAll: deactivateAllConnectorsNow,
