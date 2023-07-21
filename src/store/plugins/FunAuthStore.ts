@@ -1,35 +1,38 @@
-import { Auth } from '@fun-xyz/core'
+import { Auth, Wallet } from '@fun-xyz/core'
 
-type ActiveAuthAccountAddr = string
-type FunWalletAccountAddr = string
+export interface IActiveAuthList {
+  active: boolean
+  name: string
+  account: string
+  provider: any
+  userId: string
+}
+
 // should create a set opf FunWalletAccount Addresses and the connectors they come from. Then i can just sort by number of connections greatest to smallest.
 export interface IFunAuthStore {
   Auth: Auth | null // the primary auth provider
   setAuth: (Authorizer: Auth) => void
-  FunGroupAccounts: {
-    [key: ActiveAuthAccountAddr]: FunWalletAccountAddr[]
-  }
-  addFunGroupAccount: (newActiveAccount: ActiveAuthAccountAddr) => void
-  removeFunGroupAccount: (oldActiveAccount: ActiveAuthAccountAddr) => void
+  activeAuthClients: IActiveAuthList[]
+  setActiveAuthClients: (newActiveAuthClients: IActiveAuthList[]) => void
+  activeClientSubscriber: number | null
+  setActiveClientSubscriber: (newActiveClientSubscriber: number | null) => void
+  FunGroupAccounts: Wallet[]
+  setFunGroupAccounts: (newGroupAccounts: Wallet[]) => void
 }
 
 export const configureAuthStore = (get: any, set: any): IFunAuthStore => ({
   Auth: null,
   setAuth: (Authorizer: Auth) => set({ Auth: Authorizer }),
-  FunGroupAccounts: {},
-  addFunGroupAccount: (newActiveAccount: ActiveAuthAccountAddr) => {
-    const { FunGroupAccounts } = get()
-    try {
-      // async fetch group accounts call
-      set({ FunGroupAccounts: { ...FunGroupAccounts, [newActiveAccount]: newActiveAccount } })
-    } catch (error) {
-      console.error(error)
-    }
+  activeAuthClients: [],
+  setActiveAuthClients: (newActiveAuthClients: IActiveAuthList[]) => {
+    set({ activeAuthClients: newActiveAuthClients })
   },
-  removeFunGroupAccount: (oldActiveAccount: ActiveAuthAccountAddr) => {
-    const { FunGroupAccounts } = get()
-    const newObj = Object.assign({}, FunGroupAccounts)
-    delete newObj[oldActiveAccount]
-    set({ FunGroupAccounts: newObj })
+  activeClientSubscriber: null,
+  setActiveClientSubscriber: (newActiveClientSubscriber: number | null) => {
+    set({ activeClientSubscriber: newActiveClientSubscriber })
+  },
+  FunGroupAccounts: [],
+  setFunGroupAccounts: (newGroupAccounts: Wallet[]) => {
+    set({ FunGroupAccounts: newGroupAccounts })
   },
 })

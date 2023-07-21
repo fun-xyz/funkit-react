@@ -73,11 +73,23 @@ export const NoMetaMaskError: FunError = {
   message: 'Metamask or injected connector not installed or disabled',
 }
 
-export const LegacyAuthIdMultiAccountError: FunError = {
-  code: 3000,
-  message:
-    'One or more authId is already linked to a different FunWallet. Disconnect the account which has already been linked and try again.',
+export const FailedToInitializeFunAccount: FunError = {
+  code: 1002,
+  message: 'Failed to initialize Fun Account',
 }
+
+export const MissingInitializationArgs: FunError = {
+  code: 1003,
+  message: 'Missing initialization arguments',
+  data: {},
+}
+
+export const SwitchChainError: FunError = {
+  code: 2004,
+  message: 'Failed to switch chain',
+  data: {},
+}
+
 
 export const TransactionErrorCatch: FunError = {
   code: 4000,

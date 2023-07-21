@@ -5,7 +5,7 @@ export interface ConnectorStoreInterface {
   initializeConnectors: (connectors: ConnectorArray) => void
 }
 
-export const configureConnectorStore = (connectors: ConnectorArray, get: any, set: any): ConnectorStoreInterface => ({
-  connectors,
+export const configureConnectorStore = (get: any, set: any): ConnectorStoreInterface => ({
+  connectors: [],
   initializeConnectors: (connectors: ConnectorArray) => set({ connectors }),
 })

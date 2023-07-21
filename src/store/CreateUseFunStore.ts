@@ -1,9 +1,7 @@
 // eslint-disable-next-line prettier/prettier
 "use client";
-import { Chain } from '@fun-xyz/core'
 import { create } from 'zustand'
 
-import { ConnectorArray } from '../connectors/Types'
 import { ChainStoreInterface, configureChainStore } from './plugins/ChainStore'
 import { configureConfigurationStore, ConfigureStoreInterface } from './plugins/ConfigureStore'
 import { configureConnectorStore, ConnectorStoreInterface } from './plugins/ConnectorStore'
@@ -25,8 +23,6 @@ export interface useFunStoreInterface
 }
 
 export interface createUseFunInterface {
-  connectors: ConnectorArray
-  supportedChains: Chain[]
   defaultIndex?: number
   connectEagerly?: boolean
 }
@@ -34,13 +30,13 @@ export interface createUseFunInterface {
 export const createUseFunStore = (hookBuildParams: createUseFunInterface) => {
   return create(
     (set: any, get: any): useFunStoreInterface => ({
-      ...configureConnectorStore(hookBuildParams.connectors, get, set),
+      ...configureConnectorStore(get, set),
       // FunAccount Store
-      ...configureFunAccountStore(hookBuildParams.defaultIndex, get, set),
+      ...configureFunAccountStore(get, set),
       // FunAuth Store
       ...configureAuthStore(get, set),
       // CHAIN STORE
-      ...configureChainStore(hookBuildParams.supportedChains, get, set),
+      ...configureChainStore(get, set),
       // CONFIG STORE
       ...configureConfigurationStore(get, set),
       //TRANSACTION STORE
