@@ -1,5 +1,5 @@
+export * from './UseAuth'
 export * from './UseConfig'
-export * from './UseConfigureFun'
 export * from './UseConnector'
 export * from './UseCreateFun'
 export * from './UseFun'

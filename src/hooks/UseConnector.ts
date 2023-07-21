@@ -151,11 +151,7 @@ export const useConnectors = (): IUseConnectorsReturn => {
     }
   }, shallow)
 
-  const { usePriorityConnector } = getPriorityConnector(
-    ...(connectors as [Connector, Web3ReactHooks][] | [Connector, Web3ReactHooks, Web3ReactStore][])
-  )
-
-  const activeConnector = usePriorityConnector()
+  const activeConnector = usePrimaryConnector()
 
   const activeConnectors = connectors.map((connector) => {
     const active = connector[1].useIsActive()
@@ -174,9 +170,26 @@ export const useConnectors = (): IUseConnectorsReturn => {
   return {
     connectors,
     activeConnectors,
-    primaryConnector: activeConnector,
+    primaryConnector: activeConnector.connector,
     activate: activateConnectorNow,
     deactivate: deactivateConnector,
     deactivateAll: deactivateAllConnectorsNow,
+  }
+}
+
+export const usePrimaryConnector = () => {
+  const { connectors } = useFun((state) => {
+    return {
+      connectors: state.connectors,
+    }
+  }, shallow)
+
+  const { usePriorityConnector, usePriorityProvider } = getPriorityConnector(
+    ...(connectors as [Connector, Web3ReactHooks][] | [Connector, Web3ReactHooks, Web3ReactStore][])
+  )
+
+  return {
+    connector: usePriorityConnector(),
+    provider: usePriorityProvider(),
   }
 }
