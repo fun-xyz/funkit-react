@@ -175,18 +175,13 @@ export class MagicAuthConnector extends Connector {
     const cancelActivation = this.actions.startActivation()
     const resetTimeout = setTimeout(cancelActivation, 5000)
     try {
-      console.log('connecting eagerly Magic Auth')
       const isLoggedIn = await this.isAuthorized()
-      console.log('isLoggedIN: ', isLoggedIn)
       if (!isLoggedIn) {
-        console.log('not logged in')
         cancelActivation()
         return
       }
-      console.log('logged in')
       this.completeActivation()
     } catch (err) {
-      console.log('cancelActivation')
       cancelActivation()
     } finally {
       clearTimeout(resetTimeout)
@@ -199,7 +194,6 @@ export class MagicAuthConnector extends Connector {
     const resetTimeout = setTimeout(cancelActivation, 5000)
     try {
       // Initialize the magic instance
-      console.log('activating Magic Auth')
       if (activateArgs.oAuthProvider == this.oAuthProvider && (await this.isAuthorized())) {
         this.completeActivation()
         return
@@ -267,11 +261,8 @@ export class MagicAuthConnector extends Connector {
   async isAuthorized() {
     try {
       const magic = this.getMagic()
-      console.log('IsMagicNull', magic == null)
       if (magic == null) return false
-      console.log('before is logged in', magic.user)
       const isLoggedIn = await magic.user.isLoggedIn()
-      console.log('isLoggedIn /auth ', isLoggedIn, this.oAuthResult)
 
       const oauth = window.localStorage.getItem('oAuthProvider')
       this.oAuthProvider = oauth ? JSON.parse(oauth) : this.oAuthProvider
