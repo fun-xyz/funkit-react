@@ -3,7 +3,7 @@ import {
   Chain,
   ContractInterface,
   EnvOption,
-  Eoa,
+  Auth,
   ExecutionReceipt,
   FinishUnstakeParams,
   FunWallet,
@@ -11,11 +11,11 @@ import {
   isContract,
   RequestUnstakeParams,
   StakeParams,
-  SwapParams,
+  SwapParam,
   TokenSponsor,
   TransactionData,
   TransferParams,
-  UserOp,
+  UserOperation,
 } from '@fun-xyz/core'
 
 import {
@@ -32,7 +32,7 @@ export type transactionTypes = 'transfer' | 'approve' | 'swap' | 'stake' | 'unst
 export type transactionParams =
   | TransferParams
   | ApproveParams
-  | SwapParams
+  | SwapParam
   | StakeParams
   | RequestUnstakeParams
   | FinishUnstakeParams
@@ -101,13 +101,13 @@ export interface GasValidationResponse {
 /**
  * Validates and prepares a transaction for execution.
  * @param build - The transaction build object.
- * @param Eoa - The Eoa object.
+ * @param Auth - The Auth object.
  * @param wallet - The FunWallet object.
  * @returns An object containing a boolean indicating whether the validation was successful, and the prepared transaction if successful.
  */
-export const validateAndPrepareTransaction = async (build: any, Eoa: Eoa, wallet: FunWallet) => {
+export const validateAndPrepareTransaction = async (build: any, Auth: Auth, wallet: FunWallet) => {
   try {
-    const preparedTransaction = await prepareTransaction(build, Eoa, wallet)
+    const preparedTransaction = await prepareTransaction(build, Auth, wallet)
     console.log('preparedTx', preparedTransaction)
     return { valid: true, preparedTransaction }
   } catch (err) {
@@ -287,18 +287,18 @@ export const validateGasSponsorMode = async (
 /**
  * Prepares a transaction for execution.
  * @param build - The transaction build object.
- * @param Eoa - The Eoa object.
+ * @param Auth - The Auth object.
  * @param wallet - The FunWallet object.
- * @returns A promise that resolves with a UserOp object representing the prepared transaction, or rejects with an error message.
+ * @returns A promise that resolves with a UserOperation object representing the prepared transaction, or rejects with an error message.
  */
-export const prepareTransaction = async (build: any, Eoa: Eoa, wallet: FunWallet): Promise<UserOp> => {
+export const prepareTransaction = async (build: any, Auth: Auth, wallet: FunWallet): Promise<UserOperation> => {
   return new Promise((resolve, reject) => {
     if (!build.type) reject('No type specified')
     if (!wallet[build.type]) reject('Invalid type')
     if (!build.txParams) reject('No txParams specified')
     wallet[build.type](
-      Eoa,
-      build.txParams as (((((TransferParams & ApproveParams) & SwapParams) & StakeParams) &
+      Auth,
+      build.txParams as (((((TransferParams & ApproveParams) & SwapParam) & StakeParams) &
         (RequestUnstakeParams | FinishUnstakeParams)) &
         (EnvOption | undefined)) &
         TransactionData,
@@ -314,32 +314,32 @@ export const prepareTransaction = async (build: any, Eoa: Eoa, wallet: FunWallet
   })
 }
 
-/**
- * Executes a prepared transaction.
- * @param preparedTx - The prepared transaction to execute.
- * @param wallet - The FunWallet object.
- * @returns A promise that resolves with the execution receipt, or rejects with an error message.
- */
-export const executePreparedTransaction = async (preparedTx: UserOp, wallet: FunWallet): Promise<ExecutionReceipt> => {
-  return new Promise((resolve, reject) => {
-    wallet
-      .sendTx(preparedTx)
-      .then((txReceipt) => {
-        resolve(txReceipt)
-      })
-      .catch((err) => {
-        reject(err)
-      })
-  })
-}
+// /**
+//  * Executes a prepared transaction.
+//  * @param preparedTx - The prepared transaction to execute.
+//  * @param wallet - The FunWallet object.
+//  * @returns A promise that resolves with the execution receipt, or rejects with an error message.
+//  */
+// export const executePreparedTransaction = async (preparedTx: UserOperation, wallet: FunWallet): Promise<ExecutionReceipt> => {
+//   return new Promise((resolve, reject) => {
+//     wallet
+//       .sendTx(preparedTx)
+//       .then((txReceipt) => {
+//         resolve(txReceipt)
+//       })
+//       .catch((err) => {
+//         reject(err)
+//       })
+//   })
+// }
 
-export const estimateGas = async (build: transactionArgsInterface, Eoa: Eoa, wallet: FunWallet) => {
+export const estimateGas = async (build: transactionArgsInterface, Auth: Auth, wallet: FunWallet) => {
   return new Promise((resolve, reject) => {
-    if (Eoa == null) reject('No Eoa')
+    if (Auth == null) reject('No Auth')
     if (wallet == null) reject('No wallet')
     FunWallet[build.type](
-      Eoa,
-      build.txParams as (((((TransferParams & ApproveParams) & SwapParams) & StakeParams) &
+      Auth,
+      build.txParams as (((((TransferParams & ApproveParams) & SwapParam) & StakeParams) &
         (RequestUnstakeParams | FinishUnstakeParams)) &
         (EnvOption | undefined)) &
         TransactionData,
