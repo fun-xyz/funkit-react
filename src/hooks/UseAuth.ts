@@ -100,18 +100,21 @@ export const useAuth = (): IUseAuthReturn => {
     const updateWalletList = async () => {
       try {
         console.log('updating wallet list')
-        const existingWalletPromises: Promise<Wallet[]>[] = []
+        const wallets: Wallet[][] = []
         for (let i = 0; i < activeClients.length; i++) {
           const currentClient = activeClients[i]
           if (!currentClient.active) continue
           const currentAuth = new Auth({ provider: currentClient.provider })
-          existingWalletPromises.push(currentAuth.getWallets(`${chainId}`))
+          try {
+            wallets.push(await currentAuth.getWallets(`${chainId}`))
+          } catch (error) {
+            console.error(error)
+          }
         }
-        const wallets = await Promise.all(existingWalletPromises)
+
         if (wallets.flat().length === 0) return { sortedFunWallets: [] }
         // sort the wallets
         const WalletSet: { [account: string]: { wallet: Wallet; count: number } } = {}
-        console.log('Wallets', wallets)
         wallets
           .concat()
           .flat()

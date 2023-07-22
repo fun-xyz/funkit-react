@@ -1,4 +1,4 @@
-import { Operation } from '@fun-xyz/core'
+import { Operation, OperationStatus } from '@fun-xyz/core'
 import { useCallback, useEffect, useState } from 'react'
 import { shallow } from 'zustand/shallow'
 
@@ -17,16 +17,19 @@ export const useOperationStatus = () => {
   const [fetching, setFetching] = useState(false)
   const [fetched, setFetched] = useState(false)
 
-  const fetchOperations = useCallback(async () => {
-    console.log('fetching operations', funWallet, fetching)
-    if (funWallet == null) return
-    if (fetching) return
+  const fetchOperations = useCallback(
+    async (status: OperationStatus = OperationStatus.ALL) => {
+      console.log('fetching operations', funWallet, fetching)
+      if (funWallet == null) return
+      if (fetching) return
 
-    setFetching(true)
-    const operations = await funWallet.getOperations()
-    setOperationStatuses(operations)
-    setFetching(false)
-  }, [fetching, funWallet])
+      setFetching(true)
+      const operations = await funWallet.getOperations(status)
+      setOperationStatuses(operations)
+      setFetching(false)
+    },
+    [fetching, funWallet]
+  )
 
   useEffect(() => {
     console.log('should fetch operations', operationStatuses.length, fetched)
