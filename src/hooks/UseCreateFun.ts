@@ -15,8 +15,6 @@ export interface initializeFunAccount extends FunWalletParams {
   index?: number
 }
 
-
-
 /**
  * Custom hook that provides functionality to create a new Fun wallet account.
  * @returns An object containing the created Fun wallet account, the account address, the chain ID, any errors that occurred, a boolean indicating whether the account is being initialized, a function to reset any errors, and a function to initialize a new Fun wallet account.

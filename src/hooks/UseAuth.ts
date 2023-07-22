@@ -111,6 +111,7 @@ export const useAuth = (): IUseAuthReturn => {
         if (wallets.flat().length === 0) return { sortedFunWallets: [] }
         // sort the wallets
         const WalletSet: { [account: string]: { wallet: Wallet; count: number } } = {}
+        console.log('Wallets', wallets)
         wallets
           .concat()
           .flat()

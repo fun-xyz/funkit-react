@@ -16,7 +16,7 @@ export { MagicAuthConnector as SocialLoginConnector } from './magicAuth/src/Magi
 export * from './network/Networks'
 export * from './store/CreateUseFunStore'
 export { GasValidationResponse, transactionArgsInterface, transactionParams, transactionTypes } from './utils'
-export { Chain, ExecutionReceipt, GlobalEnvOption, User } from '@fun-xyz/core'
+export { Auth, Chain, configureEnvironment, ExecutionReceipt, GlobalEnvOption, User } from '@fun-xyz/core'
 declare global {
   interface Window {
     globalEnvOption: GlobalEnvOption
