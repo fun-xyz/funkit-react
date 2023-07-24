@@ -142,6 +142,12 @@ export const TransactionErrorEstimateGasFailed: FunError = {
   message: 'Gas estimation failed for transaction type',
   data: {},
 }
+
+export const TransactionErrorMissingWallet: FunError = {
+  code: 4007,
+  message: 'FunWallet object undefined or missing',
+  data: {},
+}
 export const GetAssetsError: FunError = {
   code: 4007,
   message: 'Failed to get assets of FunWallet.',
