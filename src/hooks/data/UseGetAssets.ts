@@ -2,9 +2,9 @@ import { FunWallet } from '@fun-xyz/core'
 import { useCallback, useState } from 'react'
 import { shallow } from 'zustand/shallow'
 
-import { GetAssetsError } from '../store'
-import { useFunStoreInterface } from '../store/CreateUseFunStore'
-import { useFun } from './UseFun'
+import { GetAssetsError } from '../../store'
+import { useFunStoreInterface } from '../../store/CreateUseFunStore'
+import { useFun } from '../UseFun'
 
 export interface assetRequest {
   address: string

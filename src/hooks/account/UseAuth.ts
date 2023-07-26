@@ -2,9 +2,9 @@ import { Auth, Wallet } from '@fun-xyz/core'
 import { useEffect } from 'react'
 import { shallow } from 'zustand/shallow'
 
-import { useFunStoreInterface } from '..'
-import { useFun } from './UseFun'
-import { useActiveClients, usePrimaryAuth, useTraceUpdate } from './util'
+import { useFunStoreInterface } from '../..'
+import { useFun } from '../UseFun'
+import { useActiveClients, usePrimaryAuth, useTraceUpdate } from '../util'
 
 interface IUseAuthReturn {
   activeClients: {
@@ -31,7 +31,7 @@ export const useAuth = (): IUseAuthReturn => {
   const activeClients = useActiveClients()
   const PrimaryAuth = usePrimaryAuth()
 
-  useTraceUpdate({ activeClients, PrimaryAuth, chainId, setFunGroupAccounts })
+  // useTraceUpdate({ activeClients, PrimaryAuth, chainId, setFunGroupAccounts })
 
   useEffect(() => {
     /* TODO this function will fetch the same data multiple times if there are multiple connectors. We should cache the results by Account address
@@ -39,7 +39,7 @@ export const useAuth = (): IUseAuthReturn => {
      */
     const updateWalletList = async () => {
       try {
-        console.log('updating wallet list')
+        // console.log('updating wallet list')
         const wallets: Wallet[][] = []
         for (let i = 0; i < activeClients.length; i++) {
           const currentClient = activeClients[i]

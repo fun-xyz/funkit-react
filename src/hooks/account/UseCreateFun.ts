@@ -8,9 +8,9 @@ import {
   MissingActiveSigner,
   MissingConfigError,
   MissingInitializationArgs,
-} from '../store'
-import { useFun } from './index'
-import { usePrimaryAuth } from './util'
+} from '../../store'
+import { useFun } from '../index'
+import { usePrimaryAuth } from '../util'
 
 export interface initializeFunAccount extends FunWalletParams {
   index?: number
@@ -70,7 +70,6 @@ export const useCreateFun = () => {
         // explicitly defined User array
         if (args.users) {
           const WALLET_UNIQUE_ID = await auth.getWalletUniqueId(chainId.toString(), args.index ?? 0)
-          console.log('wallet unique id ', WALLET_UNIQUE_ID)
           const newFunWallet = new FunWallet({
             users: args.users,
             uniqueId: WALLET_UNIQUE_ID,

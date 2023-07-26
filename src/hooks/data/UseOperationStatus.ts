@@ -2,8 +2,8 @@ import { Operation, OperationStatus } from '@fun-xyz/core'
 import { useCallback, useEffect, useState } from 'react'
 import { shallow } from 'zustand/shallow'
 
-import { useFunStoreInterface } from '..'
-import { useFun } from './UseFun'
+import { useFunStoreInterface } from '../..'
+import { useFun } from '../UseFun'
 
 export const useOperationStatus = () => {
   const { funWallet } = useFun(

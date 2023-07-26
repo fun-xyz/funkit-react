@@ -1,5 +1,5 @@
-import { useFunStoreInterface } from '../store'
-import { ShallowEqual, useFun } from './UseFun'
+import { useFunStoreInterface } from '../../store'
+import { ShallowEqual, useFun } from '../UseFun'
 
 export const useConfig = () => {
   const { config, setConfig, updateConfig } = useFun(

@@ -90,7 +90,6 @@ export const SwitchChainError: FunError = {
   data: {},
 }
 
-
 export const TransactionErrorCatch: FunError = {
   code: 4000,
   message: 'Unable to validate transaction. Caught error',
@@ -148,6 +147,34 @@ export const TransactionErrorMissingWallet: FunError = {
   message: 'FunWallet object undefined or missing',
   data: {},
 }
+
+export const TransactionErrorFailedToSign: FunError = {
+  code: 4008,
+  message: 'Failed to sign transaction',
+  data: {},
+}
+
+export const TransactionErrorFailedToExecute: FunError = {
+  code: 4009,
+  message: 'Failed to execute transaction',
+  data: {},
+}
+
+export const TransactionErrorNonGroupTransaction: FunError = {
+  code: 4010,
+  message: 'Transaction is not a group transaction',
+}
+
+export const TransactionErrorRejectionOperation: FunError = {
+  code: 4011,
+  message: 'Failed to create rejection operation',
+}
+
+export const TransactionErrorMissingOpId: FunError = {
+  code: 4012,
+  message: 'Missing operation id',
+}
+
 export const GetAssetsError: FunError = {
   code: 4007,
   message: 'Failed to get assets of FunWallet.',

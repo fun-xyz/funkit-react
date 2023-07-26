@@ -32,17 +32,19 @@ export const useAction = (args: FirstClassActionParams, txOptions?: EnvOption) =
         const userId = await firstSigner.getUserId()
         console.log('action launching ', args, args.action, userId, args.params)
         const Operation = await wallet[args.action](firstSigner, userId, args.params as any, txOptions)
-        wallet
-          .executeOperation(firstSigner, Operation, txOptions)
-          .then((receipt) => {
-            setResult(receipt)
-            setLoading(false)
-          })
-          .catch((err) => {
-            // TODO: handle error since its likely unable to execute the transaction
-            setResult(Operation)
-            setLoading(false)
-          })
+        setResult(Operation)
+        setLoading(false)
+        // wallet
+        //   .executeOperation(firstSigner, Operation, txOptions)
+        //   .then((receipt) => {
+        //     setResult(receipt)
+        //     setLoading(false)
+        //   })
+        //   .catch((err) => {
+        //     // TODO: handle error since its likely unable to execute the transaction
+        //     setResult(Operation)
+        //     setLoading(false)
+        //   })
 
         // check if there are any other signers which could sign the transaction to execute it fully
       } catch (error) {

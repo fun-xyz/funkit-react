@@ -4,12 +4,12 @@ import type { Connector } from '@web3-react/types'
 import { useCallback, useEffect, useState } from 'react'
 import { shallow } from 'zustand/shallow'
 
-import { useGetName } from '..'
-import { ConnectorArray, ConnectorTuple } from '../connectors/Types'
-import { NoMetaMaskError } from '../store'
-import { FunError } from '../store/plugins/ErrorStore'
-import { useFun } from './index'
-import { usePrimaryConnector } from './util/UsePrimaryConnector'
+import { useGetName } from '../..'
+import { ConnectorArray, ConnectorTuple } from '../../connectors/Types'
+import { NoMetaMaskError } from '../../store'
+import { FunError } from '../../store/plugins/ErrorStore'
+import { useFun } from '../index'
+import { usePrimaryConnector } from '../util/UsePrimaryConnector'
 
 export enum CONNECTOR_BY_NAME {
   METAMASK = 0,
@@ -98,7 +98,6 @@ export const useConnector = (args: IUseConnector): IUseConnectorReturn => {
   useEffect(() => {
     if (!args.autoConnect) return
     if (!connector || !connector[0].connectEagerly) return
-    console.log('connecting eagerly')
     const connectPromise = connector[0].connectEagerly()
     if (connectPromise && typeof connectPromise.catch === 'function') {
       connectPromise.catch(() => {
