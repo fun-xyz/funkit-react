@@ -8,7 +8,7 @@ import { configureConnectorStore, ConnectorStoreInterface } from './plugins/Conn
 import { configureErrorStore, ErrorStoreInterface } from './plugins/ErrorStore'
 import { configureFunAccountStore, FunAccountStoreInterface } from './plugins/FunAccountStore'
 import { configureAuthStore, IFunAuthStore } from './plugins/FunAuthStore'
-import { configureTransactionStore, TransactionStoreState } from './plugins/TransactionStore'
+import { configureTransactionStore, TransactionStoreState } from './plugins/OperationsStore'
 
 export interface useFunStoreInterface
   extends FunAccountStoreInterface,

@@ -1,4 +1,4 @@
-import { ExecutionReceipt } from '@fun-xyz/core'
+import { ExecutionReceipt, Operation } from '@fun-xyz/core'
 
 const MAX_TRANSACTION_HISTORY = 10
 
@@ -6,6 +6,8 @@ export interface TransactionStoreState {
   transactions: ExecutionReceipt[]
   lastTransaction: ExecutionReceipt | null
   addTransaction: (newTransaction: ExecutionReceipt) => void
+  operations: Operation[]
+  addOperation: (newOperation: Operation) => void
 }
 
 export const addNewTransaction = (
@@ -26,4 +28,13 @@ export const configureTransactionStore = (get: () => TransactionStoreState, set:
   transactions: [],
   lastTransaction: null,
   addTransaction: (newTransaction: ExecutionReceipt) => addNewTransaction(newTransaction, get, set),
+  operations: [],
+  addOperation: (newOperation: Operation) => {
+    const operations = get().operations
+    if (operations.length - 1 > MAX_TRANSACTION_HISTORY) operations.pop()
+    operations.unshift(newOperation)
+    set({
+      operations,
+    })
+  },
 })

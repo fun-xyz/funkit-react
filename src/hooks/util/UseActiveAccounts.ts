@@ -1,4 +1,4 @@
-import { ConnectorArray } from '../connectors/Types'
+import { ConnectorArray } from '../../connectors/Types'
 
 export const useActiveAccounts = (connections: ConnectorArray): string[] | null => {
   const activeAccountAddresses = connections

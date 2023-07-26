@@ -1,3 +1,4 @@
+export * from './actions'
 export * from './UseAuth'
 export * from './UseConfig'
 export * from './UseConnector'

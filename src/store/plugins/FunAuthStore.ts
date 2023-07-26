@@ -1,4 +1,4 @@
-import { Auth, Wallet } from '@fun-xyz/core'
+import { Wallet } from '@fun-xyz/core'
 
 export interface IActiveAuthList {
   active: boolean
@@ -10,8 +10,6 @@ export interface IActiveAuthList {
 
 // should create a set opf FunWalletAccount Addresses and the connectors they come from. Then i can just sort by number of connections greatest to smallest.
 export interface IFunAuthStore {
-  Auth: Auth | null // the primary auth provider
-  setAuth: (Authorizer: Auth) => void
   activeAuthClients: IActiveAuthList[]
   setActiveAuthClients: (newActiveAuthClients: IActiveAuthList[]) => void
   activeClientSubscriber: number | null
@@ -21,8 +19,6 @@ export interface IFunAuthStore {
 }
 
 export const configureAuthStore = (get: any, set: any): IFunAuthStore => ({
-  Auth: null,
-  setAuth: (Authorizer: Auth) => set({ Auth: Authorizer }),
   activeAuthClients: [],
   setActiveAuthClients: (newActiveAuthClients: IActiveAuthList[]) => {
     set({ activeAuthClients: newActiveAuthClients })

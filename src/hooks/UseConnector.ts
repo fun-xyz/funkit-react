@@ -1,7 +1,6 @@
 import { OAuthProvider } from '@magic-ext/oauth'
 import type { Web3ReactHooks } from '@web3-react/core'
-import { getPriorityConnector } from '@web3-react/core'
-import type { Connector, Web3ReactStore } from '@web3-react/types'
+import type { Connector } from '@web3-react/types'
 import { useCallback, useEffect, useState } from 'react'
 import { shallow } from 'zustand/shallow'
 
@@ -10,6 +9,7 @@ import { ConnectorArray, ConnectorTuple } from '../connectors/Types'
 import { NoMetaMaskError } from '../store'
 import { FunError } from '../store/plugins/ErrorStore'
 import { useFun } from './index'
+import { usePrimaryConnector } from './util/UsePrimaryConnector'
 
 export enum CONNECTOR_BY_NAME {
   METAMASK = 0,
@@ -174,22 +174,5 @@ export const useConnectors = (): IUseConnectorsReturn => {
     activate: activateConnectorNow,
     deactivate: deactivateConnector,
     deactivateAll: deactivateAllConnectorsNow,
-  }
-}
-
-export const usePrimaryConnector = () => {
-  const { connectors } = useFun((state) => {
-    return {
-      connectors: state.connectors,
-    }
-  }, shallow)
-
-  const { usePriorityConnector, usePriorityProvider } = getPriorityConnector(
-    ...(connectors as [Connector, Web3ReactHooks][] | [Connector, Web3ReactHooks, Web3ReactStore][])
-  )
-
-  return {
-    connector: usePriorityConnector(),
-    provider: usePriorityProvider(),
   }
 }

@@ -10,6 +10,7 @@ import {
   MissingInitializationArgs,
 } from '../store'
 import { useFun } from './index'
+import { usePrimaryAuth } from './util'
 
 export interface initializeFunAccount extends FunWalletParams {
   index?: number
@@ -20,9 +21,8 @@ export interface initializeFunAccount extends FunWalletParams {
  * @returns An object containing the created Fun wallet account, the account address, the chain ID, any errors that occurred, a boolean indicating whether the account is being initialized, a function to reset any errors, and a function to initialize a new Fun wallet account.
  */
 export const useCreateFun = () => {
-  const { auth, storedFunWallet, account, error, config, setLogin, setTempError, resetFunError } = useFun(
+  const { storedFunWallet, account, error, config, setLogin, setTempError, resetFunError } = useFun(
     (state) => ({
-      auth: state.Auth,
       storedFunWallet: state.FunWallet,
       account: state.account,
       error: state.error,
@@ -35,7 +35,7 @@ export const useCreateFun = () => {
   )
 
   const [initializing, setInitializing] = useState(false)
-
+  const auth = usePrimaryAuth()
   /**
    * Handles any errors that occur during the creation of a new Fun wallet account.
    * @param error The error that occurred.
@@ -63,12 +63,14 @@ export const useCreateFun = () => {
       if (args.walletAddr == null && args.users == null)
         return handleBuildError(generateTransactionError(MissingInitializationArgs, args))
       try {
+        let chainId = config.chain
+        if (chainId instanceof Chain) {
+          chainId = await chainId.getChainId()
+        }
+        // explicitly defined User array
         if (args.users) {
-          let chainId = config.chain
-          if (chainId instanceof Chain) {
-            chainId = await chainId.getChainId()
-          }
           const WALLET_UNIQUE_ID = await auth.getWalletUniqueId(chainId.toString(), args.index ?? 0)
+          console.log('wallet unique id ', WALLET_UNIQUE_ID)
           const newFunWallet = new FunWallet({
             users: args.users,
             uniqueId: WALLET_UNIQUE_ID,
@@ -77,10 +79,21 @@ export const useCreateFun = () => {
           setLogin(newAccountAddress, newFunWallet)
           return newFunWallet
         }
-
-        const newFunWallet = new FunWallet({ walletAddr: args.walletAddr })
-        const account = await newFunWallet.getAddress()
-        setLogin(account, newFunWallet)
+        // login to a specific fun wallet
+        if (args.walletAddr) {
+          const newFunWallet = new FunWallet({ walletAddr: args.walletAddr })
+          const account = await newFunWallet.getAddress()
+          setLogin(account, newFunWallet)
+          return newFunWallet
+        }
+        // Default login as the primary auth
+        const WALLET_UNIQUE_ID = await auth.getWalletUniqueId(chainId.toString(), args.index ?? 0)
+        const newFunWallet = new FunWallet({
+          users: [{ userId: await auth.getUserId() }],
+          uniqueId: WALLET_UNIQUE_ID,
+        })
+        const newAccountAddress = await newFunWallet.getAddress()
+        setLogin(newAccountAddress, newFunWallet)
         return newFunWallet
       } catch (err) {
         console.log('Multi Signer Error: ', err)

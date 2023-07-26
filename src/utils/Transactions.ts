@@ -1,10 +1,9 @@
 import {
   ApproveParams,
+  Auth,
   Chain,
   ContractInterface,
   EnvOption,
-  Auth,
-  ExecutionReceipt,
   FinishUnstakeParams,
   FunWallet,
   GaslessSponsor,
@@ -38,14 +37,13 @@ export type transactionParams =
   | FinishUnstakeParams
   | TransactionData
 
-export interface transactionArgsInterface {
+export interface IOperationsArgs {
   type: transactionTypes
   txParams: transactionParams
-  txOptions?: (EnvOption & false) | (EnvOption & true)
-  estimateGas?: boolean
+  txOptions?: EnvOption
 }
 
-export function checkTransactionType(txArgs: transactionArgsInterface): boolean {
+export function checkTransactionType(txArgs: IOperationsArgs): boolean {
   switch (txArgs.type) {
     case 'transfer':
       if (
@@ -333,7 +331,7 @@ export const prepareTransaction = async (build: any, Auth: Auth, wallet: FunWall
 //   })
 // }
 
-export const estimateGas = async (build: transactionArgsInterface, Auth: Auth, wallet: FunWallet) => {
+export const estimateGas = async (build: IOperationsArgs, Auth: Auth, wallet: FunWallet) => {
   return new Promise((resolve, reject) => {
     if (Auth == null) reject('No Auth')
     if (wallet == null) reject('No wallet')
