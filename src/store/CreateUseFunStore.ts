@@ -22,12 +22,7 @@ export interface useFunStoreInterface
   assets: object | null
 }
 
-export interface createUseFunInterface {
-  defaultIndex?: number
-  connectEagerly?: boolean
-}
-
-export const createUseFunStore = (hookBuildParams: createUseFunInterface) => {
+export const createUseFunStore = () => {
   return create(
     (set: any, get: any): useFunStoreInterface => ({
       ...configureConnectorStore(get, set),

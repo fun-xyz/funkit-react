@@ -133,7 +133,10 @@ export const useConnector = (args: IUseConnector): IUseConnectorReturn => {
   }
 }
 
-interface IUseConnectorsReturn {
+export interface IUseConnectors {
+  autoConnect?: boolean
+}
+export interface IUseConnectorsReturn {
   connectors: ConnectorArray
   activeConnectors: { active: boolean; name: string; account: string | undefined }[]
   primaryConnector: Connector
@@ -142,7 +145,7 @@ interface IUseConnectorsReturn {
   deactivateAll: () => void
 }
 
-export const useConnectors = (): IUseConnectorsReturn => {
+export const useConnectors = (args: IUseConnectors): IUseConnectorsReturn => {
   const { connectors, setTempError } = useFun((state) => {
     return {
       connectors: state.connectors,
@@ -151,12 +154,29 @@ export const useConnectors = (): IUseConnectorsReturn => {
   }, shallow)
 
   const activeConnector = usePrimaryConnector()
+  const [autoConnect, setAutoConnect] = useState(args?.autoConnect || false)
+
+  useEffect(() => {
+    if (!autoConnect) return
+    connectors.map((connector) => {
+      if (connector[0].connectEagerly) {
+        const connectPromise = connector[0].connectEagerly()
+        if (connectPromise && typeof connectPromise.catch === 'function') {
+          connectPromise.catch(() => {
+            console.debug(`Failed to connect eagerly to ${connector[0].constructor.name}`)
+          })
+        }
+      }
+    })
+    setAutoConnect(false)
+  }, [autoConnect, connectors])
 
   const activeConnectors = connectors.map((connector) => {
     const active = connector[1].useIsActive()
     const account = connector[1].useAccount()
     // eslint-disable-next-line react-hooks/rules-of-hooks
     const name = useGetName(connector[0])
+
     return { active, name, account }
   })
 

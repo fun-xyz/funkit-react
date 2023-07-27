@@ -7,9 +7,7 @@ import { ConnectorArray } from '../connectors/Types'
 import { FunTestnet, Goerli } from '../network/Networks'
 import { createUseFunStore } from '../store'
 
-export const useFun = createUseFunStore({
-  defaultIndex: 0,
-})
+export const useFun = createUseFunStore()
 
 export const ShallowEqual = shallow
 
@@ -30,7 +28,8 @@ const DEFAULT_FUN_WALLET_CONFIG: GlobalEnvOption = {
   chain: FunTestnet,
 }
 export const configureNewFunStore = async (params?: configureFunParams) => {
-  if (useFun.getState().connectors.length > 0) return
+  console.log('configureNewFunStore')
+  // if (useFun.getState().connectors.length > 0) return
   if (!params) {
     useFun.setState({ connectors: DEFAULT_CONNECTORS })
     useFun.setState({ supportedChains: [FunTestnet, Goerli] })
