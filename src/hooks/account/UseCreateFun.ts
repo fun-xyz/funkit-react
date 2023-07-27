@@ -1,4 +1,4 @@
-import { Chain, FunWallet, FunWalletParams } from '@fun-xyz/core'
+import { Chain, FunWallet, FunWalletParams, generateRandomGroupId } from '@fun-xyz/core'
 import { useCallback, useState } from 'react'
 import { shallow } from 'zustand/shallow'
 
@@ -12,7 +12,13 @@ import {
 import { useFun } from '../index'
 import { usePrimaryAuth } from '../util'
 
-export interface initializeFunAccount extends FunWalletParams {
+export interface IInitializeFunAccount extends FunWalletParams {
+  index?: number
+}
+
+export interface IInitializeMultiSigFunAccount {
+  userIds: string[]
+  threshold: number
   index?: number
 }
 
@@ -56,7 +62,7 @@ export const useCreateFun = () => {
    * @returns The created Fun wallet account, any errors that occurred, or undefined if the account is already being initialized.
    */
   const initializeFunAccount = useCallback(
-    async (args: initializeFunAccount): Promise<FunWallet | FunError | undefined> => {
+    async (args: IInitializeFunAccount): Promise<FunWallet | FunError | undefined> => {
       if (initializing) return
       if (auth == null) return handleBuildError(MissingActiveSigner)
       if (config == null || !config.chain) return handleBuildError(MissingConfigError)
@@ -106,6 +112,46 @@ export const useCreateFun = () => {
     [auth, config, handleBuildError, initializing, setLogin]
   )
 
+  const initializeFunMultiSigAccount = useCallback(
+    async (args: IInitializeMultiSigFunAccount) => {
+      if (initializing) return
+      if (auth == null) return handleBuildError(MissingActiveSigner)
+      if (config == null || !config.chain) return handleBuildError(MissingConfigError)
+      try {
+        let chainId = config.chain
+        if (chainId instanceof Chain) {
+          chainId = await chainId.getChainId()
+        }
+        const groupId = generateRandomGroupId()
+
+        const WALLET_UNIQUE_ID = await auth.getWalletUniqueId(chainId.toString(), args.index ?? 0)
+        const newFunWallet = new FunWallet({
+          users: [
+            {
+              userId: groupId,
+              groupInfo: {
+                threshold: args.threshold,
+                memberIds: args.userIds as `0x${string}`[],
+              },
+            },
+          ],
+          uniqueId: WALLET_UNIQUE_ID,
+        })
+        const newAccountAddress = await newFunWallet.getAddress()
+        setLogin(newAccountAddress, newFunWallet)
+        return newFunWallet
+      } catch (err) {
+        console.log('Multi Signer Error: ', err)
+        return handleBuildError({
+          code: 0,
+          message: 'Failed to configure account',
+          err,
+        })
+      }
+    },
+    [auth, config, handleBuildError, initializing, setLogin]
+  )
+
   return {
     funWallet: storedFunWallet,
     account,
@@ -114,5 +160,6 @@ export const useCreateFun = () => {
     loading: initializing,
     resetFunError,
     initializeFunAccount,
+    initializeFunMultiSigAccount,
   }
 }
