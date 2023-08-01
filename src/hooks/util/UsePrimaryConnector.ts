@@ -11,7 +11,6 @@ export const usePrimaryConnector = () => {
       connectors: state.connectors,
     }
   }, shallow)
-
   const { usePriorityConnector, usePriorityProvider } = getPriorityConnector(
     ...(connectors as [Connector, Web3ReactHooks][] | [Connector, Web3ReactHooks, Web3ReactStore][])
   )

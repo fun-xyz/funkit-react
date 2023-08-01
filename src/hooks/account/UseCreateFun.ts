@@ -41,7 +41,7 @@ export const useCreateFun = () => {
   )
 
   const [initializing, setInitializing] = useState(false)
-  const auth = usePrimaryAuth()
+  const [auth] = usePrimaryAuth()
   /**
    * Handles any errors that occur during the creation of a new Fun wallet account.
    * @param error The error that occurred.

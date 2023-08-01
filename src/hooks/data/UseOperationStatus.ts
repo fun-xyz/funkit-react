@@ -19,7 +19,6 @@ export const useOperationStatus = () => {
 
   const fetchOperations = useCallback(
     async (status: OperationStatus = OperationStatus.ALL) => {
-      console.log('fetching operations', funWallet, fetching)
       if (funWallet == null) return
       if (fetching) return
 
@@ -27,12 +26,13 @@ export const useOperationStatus = () => {
       const operations = await funWallet.getOperations(status)
       setOperationStatuses(operations)
       setFetching(false)
+      console.log('fetched operations', operations)
     },
     [fetching, funWallet]
   )
 
   useEffect(() => {
-    console.log('should fetch operations', operationStatuses.length, fetched)
+    // console.log('should fetch operations', operationStatuses.length, fetched)
     if (operationStatuses.length > 0 || fetched || !funWallet) return
     fetchOperations()
     setFetched(true)

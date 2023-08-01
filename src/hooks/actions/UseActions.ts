@@ -1,12 +1,34 @@
-import { Auth, EnvOption, Operation } from '@fun-xyz/core'
+import { Auth, EnvOption, FunWallet, Operation } from '@fun-xyz/core'
 import { useCallback, useState } from 'react'
 import { shallow } from 'zustand/shallow'
 
-import { ExecutionReceipt, useFunStoreInterface } from '../..'
+import { ExecutionReceipt, useFunStoreInterface, useWalletGroupInfo } from '../..'
 import { FunError, generateTransactionError, TransactionErrorCatch } from '../../store'
 import { useFun } from '../UseFun'
 import { usePrimaryAuth } from '../util'
 import { FirstClassActionParams } from './types'
+
+const SignUntilExecute = async (
+  wallet: FunWallet,
+  auths: Auth[],
+  operation: Operation,
+  threshold: number,
+  txOptions?: EnvOption
+) => {
+  let operationToExecute = operation
+  // for each active auth sign the Operation or if we achieve the threshold execute the transaction
+  // starts at 1 since the priary auth signed already
+  for (let i = 1; i < auths.length; i++) {
+    const currentAuth = auths[i]
+    if (operationToExecute.signatures != null && operationToExecute.signatures.length - 1 >= threshold) {
+      const receipt = await wallet.executeOperation(currentAuth, operationToExecute, txOptions)
+      return receipt
+    } else {
+      operationToExecute = await wallet.signOperation(currentAuth, operationToExecute, txOptions)
+    }
+  }
+  return operationToExecute
+}
 
 export const useAction = (args: FirstClassActionParams, txOptions?: EnvOption) => {
   const { wallet } = useFun(
@@ -17,6 +39,7 @@ export const useAction = (args: FirstClassActionParams, txOptions?: EnvOption) =
   )
   const primaryAuth = usePrimaryAuth()
 
+  const { activeUser } = useWalletGroupInfo()
   const [loading, setLoading] = useState<boolean>(false)
   const [result, setResult] = useState<ExecutionReceipt | Operation | null>(null)
   const [error, setTxError] = useState<FunError | null>(null)
@@ -24,27 +47,61 @@ export const useAction = (args: FirstClassActionParams, txOptions?: EnvOption) =
   const executeNewOperation = useCallback(
     async (auth?: Auth) => {
       if (loading) return
-      if (wallet == null) return // invalid tx params error
-      const firstSigner = auth ?? primaryAuth
+      if (wallet == null || activeUser == null) return // invalid tx params error
+      const firstSigner = auth ?? primaryAuth[0]
       if (firstSigner == null) return // no signer error
       setLoading(true)
       try {
-        const userId = await firstSigner.getUserId()
-        console.log('action launching ', args, args.action, userId, args.params)
-        const Operation = await wallet[args.action](firstSigner, userId, args.params as any, txOptions)
-        setResult(Operation)
-        setLoading(false)
-        // wallet
-        //   .executeOperation(firstSigner, Operation, txOptions)
-        //   .then((receipt) => {
-        //     setResult(receipt)
-        //     setLoading(false)
-        //   })
-        //   .catch((err) => {
-        //     // TODO: handle error since its likely unable to execute the transaction
-        //     setResult(Operation)
-        //     setLoading(false)
-        //   })
+        console.log('action launching ', args, args.action, activeUser, args.params)
+        const operation: Operation = await wallet[args.action](
+          firstSigner,
+          activeUser.userId,
+          args.params as any,
+          txOptions
+        )
+
+        console.log('operation', operation, operation.signatures)
+        // check if the active User is a group or has a threshold of 1 and therefor can be executed right away
+        console.log('activeUser.groupInfo', activeUser.groupInfo)
+        if (activeUser.groupInfo == null || activeUser.groupInfo.threshold === 1) {
+          // if there is no group execute the transaction right away
+          const receipt = await wallet.executeOperation(firstSigner, operation, txOptions)
+          console.log('executed right away', receipt)
+          setResult(receipt)
+          setLoading(false)
+          return receipt
+        } else {
+          let count = 1
+          // for each active auth sign the Operation or if we achieve the threshold execute the transaction
+          // starts at 1 since the priary auth signed already
+          for (let i = 1; i < primaryAuth.length; i++) {
+            const currentAuth = primaryAuth[i]
+            console.log('checking if we sign or execute', count, activeUser.groupInfo.threshold)
+
+            if (count + 1 >= activeUser.groupInfo.threshold) {
+              console.log('executing operation', operation)
+              const receipt = await wallet.executeOperation(currentAuth, operation, txOptions)
+              console.log('executed operation', receipt)
+              setResult(receipt)
+              setLoading(false)
+              return receipt
+            } else {
+              console.log('signing operation', operation)
+              wallet
+                .signOperation(currentAuth, operation, txOptions)
+                .then(() => {
+                  count++
+                })
+                .catch((err) => {
+                  // we want to catch issues here because they may have rejected the signature on purpose
+                  console.log('error signing operation', err)
+                })
+            }
+          }
+          setResult(operation)
+          setLoading(false)
+          return operation
+        }
 
         // check if there are any other signers which could sign the transaction to execute it fully
       } catch (error) {
@@ -59,9 +116,16 @@ export const useAction = (args: FirstClassActionParams, txOptions?: EnvOption) =
           )
         )
         setLoading(false)
+        return generateTransactionError(
+          TransactionErrorCatch,
+          {
+            args,
+          },
+          error
+        )
       }
     },
-    [args, primaryAuth, loading, txOptions, wallet]
+    [loading, wallet, activeUser, primaryAuth, args, txOptions]
   )
 
   return {

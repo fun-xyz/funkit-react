@@ -1,4 +1,4 @@
-import { Wallet } from '@fun-xyz/core'
+import { User, Wallet } from '@fun-xyz/core'
 
 export interface IActiveAuthList {
   active: boolean
@@ -16,6 +16,10 @@ export interface IFunAuthStore {
   setActiveClientSubscriber: (newActiveClientSubscriber: number | null) => void
   FunGroupAccounts: Wallet[]
   setFunGroupAccounts: (newGroupAccounts: Wallet[]) => void
+  FunAccounts: { [key: string]: { wallet: Wallet; count: number } }
+  setFunAccounts: (newFunAccounts: { [key: string]: { wallet: Wallet; count: number } }) => void
+  activeUser: User | null
+  setActiveUser: (newActiveUser: User | null) => void
 }
 
 export const configureAuthStore = (get: any, set: any): IFunAuthStore => ({
@@ -30,5 +34,13 @@ export const configureAuthStore = (get: any, set: any): IFunAuthStore => ({
   FunGroupAccounts: [],
   setFunGroupAccounts: (newGroupAccounts: Wallet[]) => {
     set({ FunGroupAccounts: newGroupAccounts })
+  },
+  FunAccounts: {},
+  setFunAccounts: (newFunAccounts: { [key: string]: { wallet: Wallet; count: number } }) => {
+    set({ FunAccounts: newFunAccounts })
+  },
+  activeUser: null,
+  setActiveUser: (newActiveUser: User | null) => {
+    set({ activeUser: newActiveUser })
   },
 })

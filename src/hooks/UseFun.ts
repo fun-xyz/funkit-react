@@ -2,7 +2,7 @@ import { Chain, configureEnvironment } from '@fun-xyz/core'
 import { GlobalEnvOption } from '@fun-xyz/core'
 import { shallow } from 'zustand/shallow'
 
-import { CoinbaseWalletConnector, MetamaskConnector, SocialOauthConnector, WalletConnectConnector } from '../connectors'
+import { MetamaskConnector } from '../connectors'
 import { ConnectorArray } from '../connectors/Types'
 import { FunTestnet, Goerli } from '../network/Networks'
 import { createUseFunStore } from '../store'
@@ -11,12 +11,7 @@ export const useFun = createUseFunStore()
 
 export const ShallowEqual = shallow
 
-const DEFAULT_CONNECTORS = [
-  MetamaskConnector(),
-  CoinbaseWalletConnector(),
-  WalletConnectConnector(),
-  SocialOauthConnector(['google', 'twitter', 'apple', 'discord']),
-]
+const DEFAULT_CONNECTORS = [MetamaskConnector()]
 
 interface configureFunParams {
   connectors: ConnectorArray
@@ -55,7 +50,7 @@ export const configureNewFunStore = async (params?: configureFunParams) => {
       useFun.setState({ config: params.config })
       if (params.config.chain) {
         if (params.config.chain instanceof Chain) {
-          useFun.setState({ chain: params.config.chain, chainId: Number(params.config.chain.chainId) })
+          useFun.setState({ chain: params.config.chain, chainId: Number(await params.config.chain.getChainId()) })
         } else throw new Error('Chain must be a Chain object')
       } else {
         throw new Error('Chain must be set in config')
@@ -65,7 +60,7 @@ export const configureNewFunStore = async (params?: configureFunParams) => {
       useFun.setState({
         config: DEFAULT_FUN_WALLET_CONFIG,
         chain: FunTestnet,
-        chainId: Number(FunTestnet.chainId),
+        chainId: Number(await FunTestnet.getChainId()),
       })
     }
   }

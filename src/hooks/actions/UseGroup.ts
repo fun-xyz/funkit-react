@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { Auth, Operation } from '@fun-xyz/core'
 import { CreateGroupParams } from '@fun-xyz/core'
 import { EnvOption } from '@fun-xyz/core'

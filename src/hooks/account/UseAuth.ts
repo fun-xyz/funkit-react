@@ -1,10 +1,10 @@
-import { Auth, Wallet } from '@fun-xyz/core'
-import { useEffect } from 'react'
+import { Auth, User, Wallet } from '@fun-xyz/core'
+import { useEffect, useMemo } from 'react'
 import { shallow } from 'zustand/shallow'
 
 import { useFunStoreInterface } from '../..'
 import { useFun } from '../UseFun'
-import { useActiveClients, usePrimaryAuth, useTraceUpdate } from '../util'
+import { useActiveClients } from '../util'
 
 interface IUseAuthReturn {
   activeClients: {
@@ -14,32 +14,45 @@ interface IUseAuthReturn {
     provider: any
   }[]
   FunGroupAccounts: Wallet[]
-  primaryAuth: Auth | null
 }
 
 export const useAuth = (): IUseAuthReturn => {
-  const { chainId, FunGroupAccounts, setFunGroupAccounts } = useFun(
+  const {
+    chainId,
+    FunGroupAccounts,
+    setFunGroupAccounts,
+    FunAccounts,
+    setFunAccounts,
+    account,
+    activeUser,
+    setActiveUser,
+  } = useFun(
     (state: useFunStoreInterface) => ({
+      wallet: state.FunWallet,
       chainId: state.chainId,
       FunGroupAccounts: state.FunGroupAccounts,
       setFunGroupAccounts: state.setFunGroupAccounts,
+      FunAccounts: state.FunAccounts,
+      setFunAccounts: state.setFunAccounts,
+      account: state.account,
+      activeUser: state.activeUser,
+      setActiveUser: state.setActiveUser,
     }),
     shallow
   )
 
   // TODO optimize this by making it only update when the connectors change
   const activeClients = useActiveClients()
-  const PrimaryAuth = usePrimaryAuth()
 
   // useTraceUpdate({ activeClients, PrimaryAuth, chainId, setFunGroupAccounts })
 
   useEffect(() => {
+    if (chainId == null) return
     /* TODO this function will fetch the same data multiple times if there are multiple connectors. We should cache the results by Account address
      *  and only fetch if the results are not cached
      */
     const updateWalletList = async () => {
       try {
-        // console.log('updating wallet list')
         const wallets: Wallet[][] = []
         for (let i = 0; i < activeClients.length; i++) {
           const currentClient = activeClients[i]
@@ -69,6 +82,7 @@ export const useAuth = (): IUseAuthReturn => {
         const sortedFunWallets = Object.entries(WalletSet)
           .sort((a, b) => b[1].count - a[1].count)
           .map(([_, val]) => val.wallet)
+        // setFunAccounts({ ...FunAccounts, ...WalletSet })
 
         return {
           sortedFunWallets,
@@ -83,11 +97,36 @@ export const useAuth = (): IUseAuthReturn => {
         setFunGroupAccounts(res.sortedFunWallets)
       }
     })
-  }, [activeClients, chainId, setFunGroupAccounts])
+  }, [FunAccounts, activeClients, chainId, setFunAccounts, setFunGroupAccounts])
+
+  // const groupInfo = useMemo(() => {
+  //   if (account == null) return null
+  //   if (FunAccounts[account] || FunAccounts[account].wallet) return null
+
+  //   if (FunAccounts[account].wallet.userIds.length === 1) {
+  //     const user: User = FunAccounts[account].wallet.userIds[0]
+  //     return {
+  //       activeUser: user,
+  //       allUsers: [user.userId],
+  //     }
+  //   } else {
+  //     const users: string[] = []
+  //     wallet.userInfo.forEach((user) => {
+  //       users.push(user.userId)
+  //     })
+  //     return {
+  //       activeUser: wallet.userInfo.values().next().value,
+  //       allUsers: users,
+  //     }
+  //   }
+  // }, [wallet])
+
+  // useEffect(() => {
+  //   if (activeUser == null && groupInfo && groupInfo.activeUser) setActiveUser(groupInfo?.activeUser)
+  // }, [groupInfo, activeUser, setActiveUser])
 
   return {
     activeClients,
     FunGroupAccounts,
-    primaryAuth: PrimaryAuth,
   }
 }

@@ -26,6 +26,7 @@ export {
   Chain,
   configureEnvironment,
   ExecutionReceipt,
+  generateRandomGroupId,
   GlobalEnvOption,
   Operation,
   OperationStatus,
