@@ -28,12 +28,12 @@ export const useWalletGroupInfo = () => {
       const user: User = wallet.userInfo.values().next().value
       return {
         activeUser: user,
-        allUsers: [user.userId],
+        allUsers: [user],
       }
     } else {
-      const users: string[] = []
+      const users: User[] = []
       wallet.userInfo.forEach((user) => {
-        users.push(user.userId)
+        users.push(user)
       })
       return {
         activeUser: wallet.userInfo.values().next().value,

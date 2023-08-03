@@ -81,25 +81,29 @@ export const useCreateFun = () => {
             uniqueId: WALLET_UNIQUE_ID,
           })
           const newAccountAddress = await newFunWallet.getAddress()
+          console.log('newAccountAddress user', newAccountAddress)
           setLogin(newAccountAddress, newFunWallet)
           return newFunWallet
         }
         // login to a specific fun wallet
-        if (args.walletAddr) {
+        else if (args.walletAddr) {
           const newFunWallet = new FunWallet({ walletAddr: args.walletAddr })
           const account = await newFunWallet.getAddress()
+          console.log('newAccountAddress walletaddr', account)
           setLogin(account, newFunWallet)
           return newFunWallet
+        } else {
+          // Default login as the primary auth
+          const WALLET_UNIQUE_ID = await auth.getWalletUniqueId(chainId.toString(), args.index ?? 0)
+          const newFunWallet = new FunWallet({
+            users: [{ userId: await auth.getUserId() }],
+            uniqueId: WALLET_UNIQUE_ID,
+          })
+          const newAccountAddress = await newFunWallet.getAddress()
+          console.log('newAccountAddress', newAccountAddress)
+          setLogin(newAccountAddress, newFunWallet)
+          return newFunWallet
         }
-        // Default login as the primary auth
-        const WALLET_UNIQUE_ID = await auth.getWalletUniqueId(chainId.toString(), args.index ?? 0)
-        const newFunWallet = new FunWallet({
-          users: [{ userId: await auth.getUserId() }],
-          uniqueId: WALLET_UNIQUE_ID,
-        })
-        const newAccountAddress = await newFunWallet.getAddress()
-        setLogin(newAccountAddress, newFunWallet)
-        return newFunWallet
       } catch (err) {
         console.log('Multi Signer Error: ', err)
         return handleBuildError({

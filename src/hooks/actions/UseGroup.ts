@@ -26,6 +26,8 @@ export const useGroup = () => {
   const [result, setResult] = useState<ExecutionReceipt | Operation | null>(null)
   const [error, setTxError] = useState<FunError | null>(null)
 
+
+  // TODO should automatically add group as an owner of the wallet. if No RBAC is set which it will not be for now
   const createGroup = useCallback(
     async (userId: string, params: CreateGroupParams, auth?: Auth, txOptions?: EnvOption) => {
       if (loading) return

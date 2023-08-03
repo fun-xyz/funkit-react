@@ -5,7 +5,7 @@ import { shallow } from 'zustand/shallow'
 import { useFunStoreInterface } from '../..'
 import { useFun } from '../UseFun'
 
-export const useOperationStatus = () => {
+export const useOperationStatus = (status: OperationStatus = OperationStatus.ALL) => {
   const { funWallet } = useFun(
     (state: useFunStoreInterface) => ({
       funWallet: state.FunWallet,
@@ -17,19 +17,16 @@ export const useOperationStatus = () => {
   const [fetching, setFetching] = useState(false)
   const [fetched, setFetched] = useState(false)
 
-  const fetchOperations = useCallback(
-    async (status: OperationStatus = OperationStatus.ALL) => {
-      if (funWallet == null) return
-      if (fetching) return
+  const fetchOperations = useCallback(async () => {
+    if (funWallet == null) return
+    if (fetching) return
 
-      setFetching(true)
-      const operations = await funWallet.getOperations(status)
-      setOperationStatuses(operations)
-      setFetching(false)
-      console.log('fetched operations', operations)
-    },
-    [fetching, funWallet]
-  )
+    setFetching(true)
+    const operations = await funWallet.getOperations(status)
+    setOperationStatuses(operations)
+    setFetching(false)
+    console.log('fetched operations', operations, funWallet, await funWallet.getAddress())
+  }, [fetching, funWallet, status])
 
   useEffect(() => {
     // console.log('should fetch operations', operationStatuses.length, fetched)

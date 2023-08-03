@@ -52,7 +52,7 @@ export const useAction = (args: FirstClassActionParams, txOptions?: EnvOption) =
       if (firstSigner == null) return // no signer error
       setLoading(true)
       try {
-        console.log('action launching ', args, args.action, activeUser, args.params)
+        console.log('action launching ', args, args.action, activeUser, args.params, firstSigner, activeUser)
         const operation: Operation = await wallet[args.action](
           firstSigner,
           activeUser.userId,
