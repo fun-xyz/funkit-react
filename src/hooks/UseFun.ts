@@ -15,12 +15,12 @@ const DEFAULT_CONNECTORS = [MetamaskConnector()]
 
 interface configureFunParams {
   connectors: ConnectorArray
-  supportedChains?: Chain[]
+  supportedChains?: (number | string | { rpcUrl: string })[]
   config?: GlobalEnvOption
 }
 const DEFAULT_FUN_WALLET_CONFIG: GlobalEnvOption = {
   apiKey: 'hnHevQR0y394nBprGrvNx4HgoZHUwMet5mXTOBhf',
-  chain: FunTestnet,
+  chain: '5',
 }
 export const configureNewFunStore = async (params?: configureFunParams) => {
   console.log('configureNewFunStore', params)
@@ -38,6 +38,7 @@ export const configureNewFunStore = async (params?: configureFunParams) => {
     } else {
       useFun.setState({ connectors: DEFAULT_CONNECTORS })
     }
+
     if (params.supportedChains && params.supportedChains.length > 0) {
       useFun.setState({ supportedChains: params.supportedChains })
     } else {
@@ -51,7 +52,10 @@ export const configureNewFunStore = async (params?: configureFunParams) => {
       if (params.config.chain) {
         if (params.config.chain instanceof Chain) {
           useFun.setState({ chain: params.config.chain, chainId: Number(await params.config.chain.getChainId()) })
-        } else throw new Error('Chain must be a Chain object')
+        } else {
+          const chain = await Chain.getChain({ chainIdentifier: params.config.chain })
+          useFun.setState({ chain, chainId: Number(await chain.getChainId()) })
+        }
       } else {
         throw new Error('Chain must be set in config')
       }
@@ -59,8 +63,8 @@ export const configureNewFunStore = async (params?: configureFunParams) => {
       await configureEnvironment(DEFAULT_FUN_WALLET_CONFIG)
       useFun.setState({
         config: DEFAULT_FUN_WALLET_CONFIG,
-        chain: FunTestnet,
-        chainId: Number(await FunTestnet.getChainId()),
+        chain: await Chain.getChain({ chainIdentifier: Goerli }),
+        chainId: 5,
       })
     }
   }

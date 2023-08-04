@@ -161,8 +161,7 @@ export const useCreateFun = () => {
   return {
     funWallet: storedFunWallet,
     account,
-    chainId:
-      config?.chain instanceof Chain ? config?.chain : Chain.getChain({ chainIdentifier: config?.chain.toString() }),
+    chainId: config?.chain ? Chain.getChain({ chainIdentifier: config?.chain.toString() }) : '5',
     error,
     loading: initializing,
     resetFunError,

@@ -136,7 +136,7 @@ export const validateGasBehavior = async (config: EnvOption, wallet: FunWallet):
     const walletAddress = await wallet.getAddress()
     let currentChain = config.chain as Chain
     if (typeof config.chain === 'string' || typeof config.chain === 'number')
-      currentChain = Chain.getChain({ chainIdentifier: `${config.chain}` })
+      currentChain = await Chain.getChain({ chainIdentifier: `${config.chain}` })
     const client = await currentChain.getClient()
     const iscontract = await isContract(walletAddress, client)
     if (config.gasSponsor) {
