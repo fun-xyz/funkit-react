@@ -10,6 +10,8 @@ import {
   TransactionErrorMissingOpId,
   TransactionErrorNonGroupTransaction,
   TransactionErrorRejectionOperation,
+  TransactionErrorRequiresSigners,
+  TransactionErrorUserIdMismatch,
   useFunStoreInterface,
 } from '../../store'
 import { useWalletGroupInfo } from '../account/UseWalletGroupInfo'
@@ -92,12 +94,30 @@ export const useOperations = () => {
     [activeClients, activeUser, fetchOperations, primaryAuth, wallet]
   )
 
+  /// should check if the group Operation and ready to be signed once and executed
+  // should check if the group Operation userId matches the current active user
   const executeOperation = useCallback(
     async (operation: Operation, auth: Auth, txOption?: EnvOption) => {
-      if (wallet == null) return
+      if (wallet == null || activeUser == null) return
+      if (processing) return // don't allow it to return an error if its already processing
+      if (operation.groupId == null) return generateTransactionError(TransactionErrorNonGroupTransaction, { operation })
+      if (operation.groupId !== activeUser.userId)
+        return generateTransactionError(TransactionErrorUserIdMismatch, { operation, activeUser })
+
+      const { remainingConnectedSigners, threshold } = remainingConnectedSignersForOperation(
+        operation,
+        activeUser,
+        activeClients
+      )
+      if (remainingConnectedSigners.length === 0 || remainingConnectedSigners.length < (threshold ?? 1))
+        return generateTransactionError(TransactionErrorRequiresSigners, { operation })
+
+      const signer = auth ? auth : new Auth({ provider: remainingConnectedSigners[0].provider })
+      if (signer == null) return generateTransactionError(TransactionErrorFailedToSign, { operation })
+      console.log('executeOperation', operation, signer)
       setProcessing(true)
       try {
-        const Operation = await wallet.executeOperation(auth, operation, txOption)
+        const Operation = await wallet.executeOperation(signer, operation, txOption)
         setProcessing(false)
         fetchOperations()
         return Operation
@@ -107,7 +127,29 @@ export const useOperations = () => {
         return generateTransactionError(TransactionErrorFailedToExecute, { operation }, err)
       }
     },
-    [fetchOperations, wallet]
+    [activeClients, activeUser, fetchOperations, processing, wallet]
+  )
+
+  const SignAndExecute = useCallback(
+    async (operation: Operation, auth: Auth, txOption?: EnvOption) => {
+      if (wallet == null || activeUser == null) return
+      const firstSigner = auth ?? primaryAuth[0]
+      if (firstSigner == null) return // no signer error
+      if (processing) return
+      console.log('executeOperation', operation, firstSigner)
+      setProcessing(true)
+      try {
+        const Operation = await wallet.executeOperation(firstSigner, operation, txOption)
+        setProcessing(false)
+        fetchOperations()
+        return Operation
+      } catch (err) {
+        console.log('[useOperations ERROR] failed to sign operation', err)
+        setProcessing(false)
+        return generateTransactionError(TransactionErrorFailedToExecute, { operation }, err)
+      }
+    },
+    [activeUser, fetchOperations, primaryAuth, processing, wallet]
   )
 
   const rejectOperation = useCallback(

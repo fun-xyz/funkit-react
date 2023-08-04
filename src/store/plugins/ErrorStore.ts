@@ -153,25 +153,35 @@ export const TransactionErrorFailedToSign: FunError = {
   message: 'Failed to sign transaction',
   data: {},
 }
+export const TransactionErrorRequiresSigners: FunError = {
+  code: 4008,
+  message: 'Failed to Execute transaction. Requires more signers',
+  data: {},
+}
 
 export const TransactionErrorFailedToExecute: FunError = {
-  code: 4009,
+  code: 40020,
   message: 'Failed to execute transaction',
   data: {},
 }
 
 export const TransactionErrorNonGroupTransaction: FunError = {
-  code: 4010,
+  code: 4021,
   message: 'Transaction is not a group transaction',
 }
 
+export const TransactionErrorUserIdMismatch: FunError = {
+  code: 4022,
+  message: 'Operation does not match current active userId',
+}
+
 export const TransactionErrorRejectionOperation: FunError = {
-  code: 4011,
+  code: 4031,
   message: 'Failed to create rejection operation',
 }
 
 export const TransactionErrorMissingOpId: FunError = {
-  code: 4012,
+  code: 4032,
   message: 'Missing operation id',
 }
 

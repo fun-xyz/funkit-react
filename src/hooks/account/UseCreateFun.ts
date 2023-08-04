@@ -73,6 +73,8 @@ export const useCreateFun = () => {
         if (chainId instanceof Chain) {
           chainId = await chainId.getChainId()
         }
+        console.log('initializing', args, auth)
+
         // explicitly defined User array
         if (args.users) {
           const WALLET_UNIQUE_ID = await auth.getWalletUniqueId(chainId.toString(), args.index ?? 0)
@@ -159,7 +161,8 @@ export const useCreateFun = () => {
   return {
     funWallet: storedFunWallet,
     account,
-    chainId: config?.chain instanceof Chain ? config?.chain : new Chain({ chainId: config?.chain.toString() }),
+    chainId:
+      config?.chain instanceof Chain ? config?.chain : Chain.getChain({ chainIdentifier: config?.chain.toString() }),
     error,
     loading: initializing,
     resetFunError,

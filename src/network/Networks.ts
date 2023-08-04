@@ -1,16 +1,16 @@
 import { Chain } from '@fun-xyz/core'
 import { PublicClient } from 'viem'
 
-export const Ethereum = new Chain({ chainId: '1' })
-export const Goerli = new Chain({ chainId: '5' })
-export const Arbitrum = new Chain({ chainId: '42161' })
-export const Polygon = new Chain({ chainId: '137' })
-export const Avalanche = new Chain({ chainId: '43114' })
-export const Binance = new Chain({ chainId: '56' })
-export const Optimism = new Chain({ chainId: '10' })
-export const OptimismGoerli = new Chain({ chainId: '420' })
+export const Ethereum = Chain.getChain({ chainIdentifier: '1' })
+export const Goerli = Chain.getChain({ chainIdentifier: '5' })
+export const Arbitrum = Chain.getChain({ chainIdentifier: '42161' })
+export const Polygon = Chain.getChain({ chainIdentifier: '137' })
+export const Avalanche = Chain.getChain({ chainIdentifier: '43114' })
+export const Binance = Chain.getChain({ chainIdentifier: '56' })
+export const Optimism = Chain.getChain({ chainIdentifier: '10' })
+export const OptimismGoerli = Chain.getChain({ chainIdentifier: '420' })
 
-export const FunTestnet = new Chain({
+export const FunTestnet = Chain.getChain({
   rpcUrl: 'https://rpc.vnet.tenderly.co/devnet/bundler-test/55eff413-d465-4d63-8d98-7da15c63ed96',
 })
 
