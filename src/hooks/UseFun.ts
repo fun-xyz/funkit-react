@@ -23,7 +23,7 @@ const DEFAULT_FUN_WALLET_CONFIG: GlobalEnvOption = {
   chain: FunTestnet,
 }
 export const configureNewFunStore = async (params?: configureFunParams) => {
-  console.log('configureNewFunStore')
+  console.log('configureNewFunStore', params)
   // if (useFun.getState().connectors.length > 0) return
   if (!params) {
     useFun.setState({ connectors: DEFAULT_CONNECTORS })

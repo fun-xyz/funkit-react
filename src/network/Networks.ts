@@ -1,8 +1,8 @@
 import { Chain } from '@fun-xyz/core'
 import { PublicClient } from 'viem'
 
-export const Ethereum = Chain.getChain({ chainIdentifier: '1' })
-export const Goerli = Chain.getChain({ chainIdentifier: '5' })
+// export const Ethereum = Chain.getChain({ chainIdentifier: '1' })
+export const Goerli = Chain.getChain({ chainIdentifier: 5 })
 export const Arbitrum = Chain.getChain({ chainIdentifier: '42161' })
 export const Polygon = Chain.getChain({ chainIdentifier: '137' })
 export const Avalanche = Chain.getChain({ chainIdentifier: '43114' })
@@ -15,7 +15,7 @@ export const FunTestnet = Chain.getChain({
 })
 
 export const chainName = {
-  '1': Ethereum,
+  // '1': Ethereum,
   '5': Goerli,
   '10': Optimism,
   '56': Binance,
@@ -27,7 +27,7 @@ export const chainName = {
 }
 
 export const chainNumber = {
-  ethereum: Ethereum,
+  // ethereum: Ethereum,
   binance: Binance,
   polygon: Polygon,
   avalanche: Avalanche,
