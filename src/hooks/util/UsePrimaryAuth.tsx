@@ -29,17 +29,23 @@ export const usePrimaryAuth = (): Auth[] => {
           if (memberClient) {
             return new Auth({ provider: memberClient.provider })
           } else {
-            return []
+            return undefined
           }
         })
         .filter((auth) => auth != null) as Auth[]
       if (memberAuths.length === 0) {
-        throw new Error('No valid auth found no member Auths')
+        if (primary.provider == null && !shallowCompare(authRef.current, [])) authRef.current = []
+        else if (
+          primary.provider != null &&
+          !shallowCompare(authRef.current, [new Auth({ provider: primary.provider })])
+        ) {
+          authRef.current = [new Auth({ provider: primary.provider })]
+        }
       }
+      // console.log('setting Group ID clients', memberAuths)
       if (!shallowCompare(authRef.current, memberAuths)) authRef.current = memberAuths
     } else {
       const activeAuthClient = activeClients.find((client) => client.userId === activeUser.userId)
-      console.log('active client', activeAuthClient)
       if (activeAuthClient && !shallowCompare(authRef.current, [new Auth({ provider: activeAuthClient.provider })])) {
         authRef.current = [new Auth({ provider: activeAuthClient.provider })]
       } else {

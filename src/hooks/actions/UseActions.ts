@@ -1,4 +1,4 @@
-import { Auth, EnvOption, FunWallet, Operation } from '@fun-xyz/core'
+import { Auth, EnvOption, Operation } from '@fun-xyz/core'
 import { useCallback, useState } from 'react'
 import { shallow } from 'zustand/shallow'
 
@@ -8,27 +8,6 @@ import { useFun } from '../UseFun'
 import { usePrimaryAuth } from '../util'
 import { FirstClassActionParams } from './types'
 
-const SignUntilExecute = async (
-  wallet: FunWallet,
-  auths: Auth[],
-  operation: Operation,
-  threshold: number,
-  txOptions?: EnvOption
-) => {
-  let operationToExecute = operation
-  // for each active auth sign the Operation or if we achieve the threshold execute the transaction
-  // starts at 1 since the priary auth signed already
-  for (let i = 1; i < auths.length; i++) {
-    const currentAuth = auths[i]
-    if (operationToExecute.signatures != null && operationToExecute.signatures.length - 1 >= threshold) {
-      const receipt = await wallet.executeOperation(currentAuth, operationToExecute, txOptions)
-      return receipt
-    } else {
-      operationToExecute = await wallet.signOperation(currentAuth, operationToExecute, txOptions)
-    }
-  }
-  return operationToExecute
-}
 
 export const useAction = (args: FirstClassActionParams, txOptions?: EnvOption) => {
   const { wallet } = useFun(
@@ -53,6 +32,7 @@ export const useAction = (args: FirstClassActionParams, txOptions?: EnvOption) =
       setLoading(true)
       try {
         console.log('action launching ', args, args.action, activeUser, args.params, firstSigner, activeUser)
+        console.log('ACTION: ', firstSigner, primaryAuth)
         const operation: Operation = await wallet[args.action](
           firstSigner,
           activeUser.userId,
