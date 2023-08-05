@@ -1,7 +1,7 @@
 import { Auth } from '@fun-xyz/core'
 import { useRef } from 'react'
 
-import { useWalletGroupInfo } from '../account/UseWalletGroupInfo'
+import { useUserInfo } from '../account/UseUserInfo'
 import { useActiveClients } from './UseActiveClients'
 import { usePrimaryConnector } from './UsePrimaryConnector'
 
@@ -17,7 +17,7 @@ const shallowCompare = (obj1: Record<string, any> | null | undefined, obj2: Reco
 export const usePrimaryAuth = (): Auth[] => {
   const primary = usePrimaryConnector()
   const activeClients = useActiveClients()
-  const { activeUser } = useWalletGroupInfo()
+  const { activeUser } = useUserInfo()
   const authRef = useRef<Auth[]>([])
 
   if (activeUser != null) {

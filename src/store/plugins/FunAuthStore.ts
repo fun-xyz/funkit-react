@@ -20,6 +20,9 @@ export interface IFunAuthStore {
   setFunAccounts: (newFunAccounts: { [key: string]: { wallet: Wallet; count: number } }) => void
   activeUser: User | null
   setActiveUser: (newActiveUser: User | null) => void
+  allUsers: User[] | null
+  setAllUsers: (newAllUsers: User[] | null) => void
+  setNewAccountUsers: (newAccountUsers: User[], activeUser: User) => void
 }
 
 export const configureAuthStore = (get: any, set: any): IFunAuthStore => ({
@@ -42,5 +45,12 @@ export const configureAuthStore = (get: any, set: any): IFunAuthStore => ({
   activeUser: null,
   setActiveUser: (newActiveUser: User | null) => {
     set({ activeUser: newActiveUser })
+  },
+  allUsers: null,
+  setAllUsers: (newAllUsers: User[] | null) => {
+    set({ allUsers: newAllUsers })
+  },
+  setNewAccountUsers: (newAccountUsers: User[], activeUser: User) => {
+    set({ allUsers: newAccountUsers, activeUser })
   },
 })

@@ -2,7 +2,7 @@ import { Auth, EnvOption, Operation } from '@fun-xyz/core'
 import { useCallback, useState } from 'react'
 import { shallow } from 'zustand/shallow'
 
-import { ExecutionReceipt, useFunStoreInterface, useWalletGroupInfo } from '../..'
+import { ExecutionReceipt, useFunStoreInterface, useUserInfo } from '../..'
 import { FunError, generateTransactionError, TransactionErrorCatch } from '../../store'
 import { useFun } from '../UseFun'
 import { usePrimaryAuth } from '../util'
@@ -18,7 +18,7 @@ export const useAction = (args: FirstClassActionParams, txOptions?: EnvOption) =
   )
   const primaryAuth = usePrimaryAuth()
 
-  const { activeUser } = useWalletGroupInfo()
+  const { activeUser } = useUserInfo()
   const [loading, setLoading] = useState<boolean>(false)
   const [result, setResult] = useState<ExecutionReceipt | Operation | null>(null)
   const [error, setTxError] = useState<FunError | null>(null)

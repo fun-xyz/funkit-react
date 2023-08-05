@@ -1,12 +1,12 @@
-import { Auth, User, Wallet } from '@fun-xyz/core'
-import { useEffect, useMemo } from 'react'
+import { Auth, Wallet } from '@fun-xyz/core'
+import { useEffect } from 'react'
 import { shallow } from 'zustand/shallow'
 
 import { useFunStoreInterface } from '../..'
 import { useFun } from '../UseFun'
 import { useActiveClients } from '../util'
 
-interface IUseAuthReturn {
+interface IUseFunAccountsReturn {
   activeClients: {
     active: boolean
     name: string
@@ -16,17 +16,8 @@ interface IUseAuthReturn {
   FunGroupAccounts: Wallet[]
 }
 
-export const useAuth = (): IUseAuthReturn => {
-  const {
-    chainId,
-    FunGroupAccounts,
-    setFunGroupAccounts,
-    FunAccounts,
-    setFunAccounts,
-    account,
-    activeUser,
-    setActiveUser,
-  } = useFun(
+export const useFunAccounts = (): IUseFunAccountsReturn => {
+  const { chainId, FunGroupAccounts, setFunGroupAccounts, FunAccounts, setFunAccounts } = useFun(
     (state: useFunStoreInterface) => ({
       wallet: state.FunWallet,
       chainId: state.chainId,
@@ -98,32 +89,6 @@ export const useAuth = (): IUseAuthReturn => {
       }
     })
   }, [FunAccounts, activeClients, chainId, setFunAccounts, setFunGroupAccounts])
-
-  // const groupInfo = useMemo(() => {
-  //   if (account == null) return null
-  //   if (FunAccounts[account] || FunAccounts[account].wallet) return null
-
-  //   if (FunAccounts[account].wallet.userIds.length === 1) {
-  //     const user: User = FunAccounts[account].wallet.userIds[0]
-  //     return {
-  //       activeUser: user,
-  //       allUsers: [user.userId],
-  //     }
-  //   } else {
-  //     const users: string[] = []
-  //     wallet.userInfo.forEach((user) => {
-  //       users.push(user.userId)
-  //     })
-  //     return {
-  //       activeUser: wallet.userInfo.values().next().value,
-  //       allUsers: users,
-  //     }
-  //   }
-  // }, [wallet])
-
-  // useEffect(() => {
-  //   if (activeUser == null && groupInfo && groupInfo.activeUser) setActiveUser(groupInfo?.activeUser)
-  // }, [groupInfo, activeUser, setActiveUser])
 
   return {
     activeClients,

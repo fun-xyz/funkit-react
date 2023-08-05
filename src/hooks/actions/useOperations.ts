@@ -14,7 +14,7 @@ import {
   TransactionErrorUserIdMismatch,
   useFunStoreInterface,
 } from '../../store'
-import { useWalletGroupInfo } from '../account/UseWalletGroupInfo'
+import { useUserInfo } from '../account/UseUserInfo'
 import { useOperationStatus } from '../data/UseOperationStatus'
 import { useFun } from '../UseFun'
 import { useActiveClients, usePrimaryAuth } from '../util'
@@ -55,7 +55,7 @@ export const useOperations = () => {
   const { wallet } = useFun((state: useFunStoreInterface) => ({ wallet: state.FunWallet }), shallow)
   const { operations, loading, fetchOperations } = useOperationStatus()
   const primaryAuth = usePrimaryAuth()
-  const { activeUser, allUsers } = useWalletGroupInfo()
+  const { activeUser } = useUserInfo()
   const activeClients = useActiveClients()
   const [processing, setProcessing] = useState<boolean>(false)
 
@@ -100,7 +100,16 @@ export const useOperations = () => {
     async (operation: Operation, auth: Auth, txOption?: EnvOption) => {
       if (wallet == null || activeUser == null) return
       if (processing) return // don't allow it to return an error if its already processing
-      if (operation.groupId == null) return generateTransactionError(TransactionErrorNonGroupTransaction, { operation })
+      if (operation.groupId == null) {
+        // if its not a group transaction than check if the auth matches the operation userId and try and execute it
+        if (pad(operation.proposer as `0x${string}`, { size: 32 }) !== activeUser.userId)
+          return generateTransactionError(TransactionErrorUserIdMismatch, { operation, activeUser })
+        const signer = auth ? auth : primaryAuth[0]
+        const Operation = await wallet.executeOperation(signer, operation, txOption)
+        setProcessing(false)
+        fetchOperations()
+        return Operation
+      }
       if (operation.groupId !== activeUser.userId)
         return generateTransactionError(TransactionErrorUserIdMismatch, { operation, activeUser })
 
