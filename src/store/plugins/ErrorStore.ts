@@ -90,6 +90,12 @@ export const SwitchChainError: FunError = {
   data: {},
 }
 
+export const NoActiveUserError: FunError = {
+  code: 2005,
+  message: 'No active user. Set a user.',
+  data: {},
+}
+
 export const TransactionErrorCatch: FunError = {
   code: 4000,
   message: 'Unable to validate transaction. Caught error',

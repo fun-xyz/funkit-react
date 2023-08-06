@@ -1,10 +1,13 @@
 // @ts-nocheck
-import { Auth, Operation } from '@fun-xyz/core'
-import { CreateGroupParams } from '@fun-xyz/core'
-import { EnvOption } from '@fun-xyz/core'
-import { AddUserToGroupParams } from '@fun-xyz/core'
-import { RemoveUserFromGroupParams } from '@fun-xyz/core'
-import { UpdateThresholdOfGroupParams } from '@fun-xyz/core'
+import {
+  AddUserToGroupParams,
+  Auth,
+  CreateGroupParams,
+  EnvOption,
+  Operation,
+  RemoveUserFromGroupParams,
+  UpdateThresholdOfGroupParams,
+} from '@fun-xyz/core'
 import { useCallback, useState } from 'react'
 import { shallow } from 'zustand/shallow'
 
@@ -25,7 +28,6 @@ export const useGroup = () => {
   const [loading, setLoading] = useState<boolean>(false)
   const [result, setResult] = useState<ExecutionReceipt | Operation | null>(null)
   const [error, setTxError] = useState<FunError | null>(null)
-
 
   // TODO should automatically add group as an owner of the wallet. if No RBAC is set which it will not be for now
   const createGroup = useCallback(

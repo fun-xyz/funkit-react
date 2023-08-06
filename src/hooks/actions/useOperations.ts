@@ -23,14 +23,11 @@ export const remainingConnectedSignersForOperation = (operation: Operation, acti
   const currentClients = activeClients.filter((client) => client.userId != null)
   const currentSigners = operation.signatures
   if (currentSigners == null || currentSigners.length == 0) return { remainingConnectedSigners: [], threshold: 0 }
-  console.log('currentSigners precheck', currentSigners, currentClients, activeUser)
   const remainingConnectedSigners = currentClients
     .map(({ userId, provider }) => {
       const isRequiredSignature = activeUser.groupInfo?.memberIds.includes(userId)
-      console.log('is userId required', userId, isRequiredSignature)
       if (!isRequiredSignature) return undefined
       const foundSignature = currentSigners.find((signer) => pad(signer.userId, { size: 32 }) === userId)
-      console.log('foundSignature', foundSignature)
       if (foundSignature == null) {
         return { userId, provider }
       } else {
@@ -136,30 +133,9 @@ export const useOperations = () => {
         return generateTransactionError(TransactionErrorFailedToExecute, { operation }, err)
       }
     },
-    [activeClients, activeUser, fetchOperations, processing, wallet]
+    [activeClients, activeUser, fetchOperations, primaryAuth, processing, wallet]
   )
 
-  const SignAndExecute = useCallback(
-    async (operation: Operation, auth: Auth, txOption?: EnvOption) => {
-      if (wallet == null || activeUser == null) return
-      const firstSigner = auth ?? primaryAuth[0]
-      if (firstSigner == null) return // no signer error
-      if (processing) return
-      console.log('executeOperation', operation, firstSigner)
-      setProcessing(true)
-      try {
-        const Operation = await wallet.executeOperation(firstSigner, operation, txOption)
-        setProcessing(false)
-        fetchOperations()
-        return Operation
-      } catch (err) {
-        console.log('[useOperations ERROR] failed to sign operation', err)
-        setProcessing(false)
-        return generateTransactionError(TransactionErrorFailedToExecute, { operation }, err)
-      }
-    },
-    [activeUser, fetchOperations, primaryAuth, processing, wallet]
-  )
 
   const rejectOperation = useCallback(
     async (operation: Operation, rejectionMessage: string, auth: Auth, txOption?: EnvOption) => {
