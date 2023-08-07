@@ -203,6 +203,12 @@ export const GetOnRampError: FunError = {
   data: {},
 }
 
+export const GetOffRampError: FunError = {
+  code: 4009,
+  message: 'Failed to get on-ramp url of FunWallet.',
+  data: {},
+}
+
 export const generateTransactionError = (error: FunError, data: FunErrorData, err?: unknown): FunError => {
   return {
     ...error,

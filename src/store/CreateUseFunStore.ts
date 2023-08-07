@@ -20,8 +20,10 @@ export interface useFunStoreInterface
     ErrorStoreInterface {
   setAssets: (assets: object) => void
   setOnRamp: (onRamp: string) => void
+  setOffRamp: (onRamp: string) => void
   assets: object | null
   onRamp: string | null
+  offRamp: string | null
 }
 
 export const createUseFunStore = () => {
@@ -43,8 +45,10 @@ export const createUseFunStore = () => {
       // Asset Store
       setAssets: (assets) => set({ assets }),
       setOnRamp: (onRamp) => set({ onRamp }),
+      setOffRamp: (offRamp) => set({ offRamp }),
       assets: null,
       onRamp: null,
+      offRamp: null,
     })
   )
 }
