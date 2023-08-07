@@ -197,6 +197,12 @@ export const GetAssetsError: FunError = {
   data: {},
 }
 
+export const GetOnRampError: FunError = {
+  code: 4008,
+  message: 'Failed to get on-ramp url of FunWallet.',
+  data: {},
+}
+
 export const generateTransactionError = (error: FunError, data: FunErrorData, err?: unknown): FunError => {
   return {
     ...error,

@@ -1,5 +1,4 @@
 import { Chain } from '@fun-xyz/core'
-import { PublicClient } from 'viem'
 
 // export const Ethereum = Chain.getChain({ chainIdentifier: '1' })
 export const Goerli = '5'
@@ -36,7 +35,7 @@ export const convertToChain = async (chain: string | number): Promise<Chain> => 
   }
 }
 
-export const getPublicClient = async (chainId: string | number): Promise<PublicClient> => {
+export const getPublicClient = async (chainId: string | number): Promise<any> => {
   const Chain = await convertToChain(chainId)
   return Chain.getClient()
 }
