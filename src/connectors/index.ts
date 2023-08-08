@@ -5,11 +5,12 @@ import { useEffect, useState } from 'react'
 
 import { MagicAuthConnector } from '../magicAuth/src/MagicAuth'
 //
-import CoinbaseWalletConnector from './CoinbaseWallet'
-import MetamaskConnector from './MetaMask'
-import SocialOauthConnector from './SocialOAuthConnector'
 import { ConnectorType } from './Types'
-import WalletConnectConnector from './WalletConnectV2'
+
+export { CoinbaseWalletConnector } from './CoinbaseWallet'
+export { MetamaskConnector } from './MetaMask'
+export { SocialOauthConnector, SUPPORTED_OAUTH_PROVIDERS } from './SocialOAuthConnector'
+export { WalletConnectConnector } from './WalletConnectV2'
 
 export const useGetName = (connector: ConnectorType): string => {
   const [mounted, setMounted] = useState(false)
@@ -29,6 +30,5 @@ export const useGetName = (connector: ConnectorType): string => {
   return 'Unknown'
 }
 
-export { CoinbaseWalletConnector, MetamaskConnector, SocialOauthConnector, WalletConnectConnector }
 export * from './Types'
 export { OAuthProvider } from '@magic-ext/oauth'

@@ -1,7 +1,10 @@
 import { CoinbaseWallet } from '@web3-react/coinbase-wallet'
 import { initializeConnector } from '@web3-react/core'
 
-const CoinbaseWalletConnector = (appName = 'fun-wallet-react', rpcUrl = ['https://goerli.gateway.tenderly.co']) => {
+export const CoinbaseWalletConnector = (
+  appName = 'fun-wallet-react',
+  rpcUrl = ['https://goerli.gateway.tenderly.co']
+) => {
   return initializeConnector<CoinbaseWallet>(
     (actions) =>
       new CoinbaseWallet({

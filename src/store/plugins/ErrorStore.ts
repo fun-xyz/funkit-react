@@ -96,6 +96,9 @@ export const NoActiveUserError: FunError = {
   data: {},
 }
 
+/*
+ * Transaction Errors
+ */
 export const TransactionErrorCatch: FunError = {
   code: 4000,
   message: 'Unable to validate transaction. Caught error',

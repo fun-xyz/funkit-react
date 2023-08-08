@@ -35,7 +35,7 @@ export type FirstClassActionParams =
 export enum ActionType {
   Swap = 'swap',
   Transfer = 'transfer',
-  Approve = 'approve',
+  Approve = 'tokenApprove',
   Stake = 'stake',
   Unstake = 'unstake',
   ExecRawTx = 'execRawTx',

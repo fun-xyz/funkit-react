@@ -96,9 +96,14 @@ export const useCreateFun = () => {
             uniqueId: WALLET_UNIQUE_ID,
           })
           const newAccountAddress = await newFunWallet.getAddress()
-          const allUsers = await newFunWallet.getUsers(auth)
-          console.log('newAccountAddress user', account, allUsers)
-          setNewAccountUsers(allUsers, allUsers[0])
+          newFunWallet
+            .getUsers(auth)
+            .then((allUsers) => {
+              console.log('newAccountAddress user', account, allUsers)
+              setNewAccountUsers(allUsers, allUsers[0])
+            })
+            .catch()
+
           setLogin(newAccountAddress, newFunWallet)
           return newFunWallet
         }

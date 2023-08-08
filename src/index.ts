@@ -6,8 +6,11 @@ export {
   ConnectorTuple,
   ConnectorTupleWithStore,
   ConnectorType,
+  FunWalletConnectorInterface,
   MetamaskConnector,
+  OAuthProvider,
   SocialOauthConnector,
+  SUPPORTED_OAUTH_PROVIDERS,
   useGetName,
   WalletConnectConnector,
 } from './connectors'

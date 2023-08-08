@@ -4,15 +4,10 @@ import { shallow } from 'zustand/shallow'
 
 import { useFunStoreInterface } from '../..'
 import { useFun } from '../UseFun'
-import { useActiveClients } from '../util'
+import { IActiveAuthList, useActiveClients } from '../util'
 
 interface IUseFunAccountsReturn {
-  activeClients: {
-    active: boolean
-    name: string
-    account: string
-    provider: any
-  }[]
+  activeClients: IActiveAuthList[]
   FunGroupAccounts: Wallet[]
 }
 

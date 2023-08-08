@@ -8,8 +8,9 @@ import { useFun } from '../UseFun'
 import { usePrimaryAuth } from '../util'
 import { FirstClassActionParams } from './types'
 
-
 export const useAction = (args: FirstClassActionParams, txOptions?: EnvOption) => {
+  // if (typeof args.action == ActionType.){}
+
   const { wallet } = useFun(
     (state: useFunStoreInterface) => ({
       wallet: state.FunWallet,
@@ -22,7 +23,6 @@ export const useAction = (args: FirstClassActionParams, txOptions?: EnvOption) =
   const [loading, setLoading] = useState<boolean>(false)
   const [result, setResult] = useState<ExecutionReceipt | Operation | null>(null)
   const [error, setTxError] = useState<FunError | null>(null)
-
   const executeNewOperation = useCallback(
     async (auth?: Auth) => {
       if (loading) return
@@ -84,8 +84,9 @@ export const useAction = (args: FirstClassActionParams, txOptions?: EnvOption) =
         }
 
         // check if there are any other signers which could sign the transaction to execute it fully
-      } catch (error) {
-        console.log('actionError', error)
+      } catch (error: any) {
+        console.log('actionError', error, error.code)
+
         setTxError(
           generateTransactionError(
             TransactionErrorCatch,

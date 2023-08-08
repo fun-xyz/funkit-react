@@ -94,7 +94,7 @@ export const useOperations = () => {
   /// should check if the group Operation and ready to be signed once and executed
   // should check if the group Operation userId matches the current active user
   const executeOperation = useCallback(
-    async (operation: Operation, auth: Auth, txOption?: EnvOption) => {
+    async (operation: Operation, auth?: Auth, txOption?: EnvOption) => {
       if (wallet == null || activeUser == null) return
       if (processing) return // don't allow it to return an error if its already processing
       if (operation.groupId == null) {
@@ -120,7 +120,7 @@ export const useOperations = () => {
 
       const signer = auth ? auth : new Auth({ provider: remainingConnectedSigners[0].provider })
       if (signer == null) return generateTransactionError(TransactionErrorFailedToSign, { operation })
-      console.log('executeOperation', operation, signer)
+      console.log('executeOperation', operation, signer, remainingConnectedSigners, 'default auth', auth)
       setProcessing(true)
       try {
         const Operation = await wallet.executeOperation(signer, operation, txOption)
@@ -136,11 +136,13 @@ export const useOperations = () => {
     [activeClients, activeUser, fetchOperations, primaryAuth, processing, wallet]
   )
 
-
   const rejectOperation = useCallback(
     async (operation: Operation, rejectionMessage: string, auth: Auth, txOption?: EnvOption) => {
-      if (wallet == null) return
+      if (wallet == null || activeUser == null) return
       if (operation.groupId == null) return generateTransactionError(TransactionErrorNonGroupTransaction, { operation })
+      if (operation.groupId !== activeUser.userId)
+        return generateTransactionError(TransactionErrorUserIdMismatch, { operation, activeUser })
+
       setProcessing(true)
       try {
         const rejectedOperation = await wallet.createRejectOperation(

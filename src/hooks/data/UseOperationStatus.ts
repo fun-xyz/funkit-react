@@ -27,7 +27,7 @@ export const useOperationStatus = (status: OperationStatus = OperationStatus.ALL
     setFetching(true)
     const operations = await funWallet.getOperations(status)
 
-    setOperationStatuses(operations.sort((a, b) => Number(b.userOp.nonce) - Number(a.userOp.nonce)))
+    setOperationStatuses(operations.sort((a, b) => Number(b.proposedTime) - Number(a.proposedTime)))
 
     setFetching(false)
     console.log('fetched operations', operations, funWallet, await funWallet.getAddress())
