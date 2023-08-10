@@ -19,6 +19,7 @@ export { MagicAuthConnector as SocialLoginConnector } from './magicAuth/src/Magi
 export * from './network/Networks'
 export * from './store/CreateUseFunStore'
 export {
+  convertToValidUserId,
   GasValidationResponse,
   IOperationsArgs as transactionArgsInterface,
   transactionParams,

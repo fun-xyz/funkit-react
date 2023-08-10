@@ -379,6 +379,7 @@ export const signUntilExecute = async ({
   txOptions,
 }: SignUntilExecuteParams) => {
   if (threshold === 1) {
+    console.log('signing with first signer', firstSigner, operation)
     return await wallet.executeOperation(firstSigner, operation, txOptions)
   } else {
     let count = 1
@@ -386,8 +387,10 @@ export const signUntilExecute = async ({
       const currentAuth = remainingConnectedSigners[i].auth
 
       if (count + 1 >= threshold) {
-        return wallet.executeOperation(currentAuth, operation, txOptions)
+        console.log('Final signature, executing operation: ', currentAuth, operation)
+        return await wallet.executeOperation(currentAuth, operation, txOptions)
       } else {
+        console.log('Signing with: ', currentAuth, operation)
         wallet
           .signOperation(currentAuth, operation, txOptions)
           .then(() => {
@@ -399,6 +402,7 @@ export const signUntilExecute = async ({
           })
       }
     }
+    console.log("returning operation because we didn't have enough signatures")
     return operation
   }
 }

@@ -1,4 +1,4 @@
-export * from './MultiAuth'
+export { convertToValidUserId } from './MultiAuth'
 export {
   GasValidationResponse,
   IOperationsArgs,

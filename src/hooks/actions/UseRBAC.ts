@@ -1,4 +1,4 @@
-import { EnvOption, ExecutionReceipt, Operation, User } from '@fun-xyz/core'
+import { EnvOption, ExecutionReceipt, Operation } from '@fun-xyz/core'
 import { useCallback, useState } from 'react'
 import { shallow } from 'zustand/shallow'
 
@@ -26,25 +26,12 @@ export const useRBAC = () => {
 
   const primaryAuth = usePrimaryAuth()
   const activeClients = useActiveClients()
-  const { activeUser, setActiveUser, setAllUsers } = useUserInfo()
+  const { activeUser, fetchUsers } = useUserInfo()
 
   const [loading, setLoading] = useState<boolean>(false)
   const [result, setResult] = useState<ExecutionReceipt | Operation | null>(null)
   const [error, setTxError] = useState<FunError | null>(null)
 
-  const fetchAllWalletUsers = useCallback(
-    async (setNewActive = false) => {
-      if (wallet == null || primaryAuth[0] == null) return
-      console.log('FETCHING ALL WALLET USERS RBAC: ', primaryAuth[0])
-      wallet.getUsers(primaryAuth[0]).then((users: User[]) => {
-        if (users && users.length > 0) {
-          setAllUsers(users)
-          if (setNewActive) setActiveUser(users[0])
-        }
-      })
-    },
-    [primaryAuth, setActiveUser, setAllUsers, wallet]
-  )
   const addOwner = useCallback(
     async (newOwnerId: string, txOptions?: EnvOption) => {
       if (wallet == null || !chainId || !primaryAuth) return
@@ -94,10 +81,10 @@ export const useRBAC = () => {
         return err
       } finally {
         setLoading(false)
-        fetchAllWalletUsers()
+        fetchUsers()
       }
     },
-    [activeClients, activeUser, chainId, fetchAllWalletUsers, loading, primaryAuth, wallet]
+    [activeClients, activeUser, chainId, fetchUsers, loading, primaryAuth, wallet]
   )
 
   const removeOwner = useCallback(
@@ -110,6 +97,10 @@ export const useRBAC = () => {
       if (loading) return
 
       try {
+        console.log('ADDING NEW OWNER: ', primaryAuth[0], activeUser, {
+          ownerId: convertToValidUserId(ownerId) as `0x${string}`,
+          chainId,
+        })
         const operation = await wallet.removeOwner(primaryAuth[0], activeUser?.userId, {
           ownerId: ownerId as `0x${string}`,
           chainId,
@@ -137,14 +128,16 @@ export const useRBAC = () => {
         setResult(response)
         return response
       } catch (error) {
+        console.log(error)
         const err = generateTransactionError(TransactionErrorCatch, { ownerId }, error)
         setTxError(err)
         return err
       } finally {
         setLoading(false)
+        fetchUsers()
       }
     },
-    [activeClients, activeUser, chainId, loading, primaryAuth, wallet]
+    [activeClients, activeUser, chainId, fetchUsers, loading, primaryAuth, wallet]
   )
 
   return { addOwner, removeOwner, loading, result, error }

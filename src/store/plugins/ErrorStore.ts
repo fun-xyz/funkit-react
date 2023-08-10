@@ -174,6 +174,12 @@ export const TransactionErrorNotPending: FunError = {
   data: {},
 }
 
+export const TransactionErrorUnableToReject: FunError = {
+  code: 4011,
+  message: 'Unable to reject transaction',
+  data: {},
+}
+
 export const TransactionErrorFailedToExecute: FunError = {
   code: 40020,
   message: 'Failed to execute transaction',
