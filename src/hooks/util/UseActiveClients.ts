@@ -1,8 +1,8 @@
 import { useRef } from 'react'
-import { pad } from 'viem'
 import { shallow } from 'zustand/shallow'
 
 import { useGetName } from '../../connectors'
+import { convertToValidUserId } from '../../utils'
 import { useFun } from '../UseFun'
 
 export interface IActiveAuthList {
@@ -24,7 +24,7 @@ export const useActiveClients = (): IActiveAuthList[] => {
     const name = useGetName(connector[0])
 
     let userId: (Uint8Array | `0x${string}`) | undefined = undefined
-    if (account) userId = pad(account, { size: 32 })
+    if (account) userId = convertToValidUserId(account)
     return {
       active,
       name,

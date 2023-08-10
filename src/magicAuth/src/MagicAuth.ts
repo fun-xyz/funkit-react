@@ -49,7 +49,7 @@ export class MagicAuthConnector extends Connector {
   constructor({ actions, options, onError }: MagicAuthConstructorArgs) {
     super(actions, onError)
     this.options = options
-    this.name = `Not Connected`
+    this.name = `Social Login Connector`
     this.magicAuthApiKey = options.magicAuthApiKey
     this.supportedAuthProviders = options.supportedAuthProviders
     if (options.supportedAuthProviders.length === 0)
@@ -246,17 +246,6 @@ export class MagicAuthConnector extends Connector {
     this.authId = this.getAuthId()
   }
 
-  // async postRedirectHandler(): Promise<boolean> {
-  //   try {
-  //     const magic = this.getMagic()
-  //     if (magic == null) return false
-
-  //   } catch (err) {
-  //     console.log('Error in postRedirectHandler', err)
-  //     return false
-  //   }
-
-  // }
 
   async isAuthorized() {
     try {
@@ -282,7 +271,6 @@ export class MagicAuthConnector extends Connector {
         return false
       }
     } catch (err) {
-      console.log('Catching auth error', err)
       return false
     }
   }

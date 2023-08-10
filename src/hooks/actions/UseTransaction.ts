@@ -19,7 +19,7 @@ import {
   TransactionErrorCatch,
   TransactionErrorMissingOrIncorrectFields,
 } from '../../store/plugins/ErrorStore'
-import { checkTransactionType, IOperationsArgs, validateGasBehavior } from '../../utils/Transactions'
+import { checkTransactionType, IOperationsArgs, validateGasBehavior } from '../../utils/transactions/Transactions'
 import { useFun } from '../UseFun'
 import { usePrevious } from '../util/UsePrevious'
 

@@ -1,18 +1,8 @@
-export const convertAccountsMultiAuthIds = (accounts: string[]): [string, string][] => {
-  const accountSet = new Set<string>()
-  const accountPairs: [string, string][] = []
+import { pad } from 'viem'
 
-  for (let i = 0; i < accounts.length; i++) {
-    const account = accounts[i]
-    if (account !== undefined && account !== null) {
-      if (!accountSet.has(account)) {
-        accountSet.add(account)
-        accountPairs.push([account, account])
-      }
-    }
-  }
-
-  return accountPairs
+export const convertToValidUserId = (userId: string | `0x${string}`) => {
+  if (!userId.startsWith('0x')) throw new Error(`Invalid userId: ${userId}`)
+  return pad(userId as `0x${string}`, { size: 32 }).toLowerCase() as `0x${string}`
 }
 
 export function getMatchingHexStrings(hexStrings: (string | undefined)[], indexList?: number[]) {

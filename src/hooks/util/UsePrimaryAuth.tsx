@@ -22,10 +22,13 @@ export const usePrimaryAuth = (): Auth[] => {
 
   if (activeUser != null) {
     if (activeUser.groupInfo) {
-      const memberIds = activeUser.groupInfo.memberIds
-      const memberAuths = memberIds
+      // console.log('activeUser.groupInfo', activeUser.groupInfo)
+      const memberAuths = activeUser.groupInfo.memberIds
         .map((memberId) => {
-          const memberClient = activeClients.find((client) => client.userId === memberId)
+          // console.log('memberId', memberId, activeClients)
+          const memberClient = activeClients.find(
+            (client) => ((client.userId ?? '') as string).toLowerCase() === memberId
+          )
           if (memberClient) {
             return new Auth({ provider: memberClient.provider })
           } else {
@@ -34,26 +37,33 @@ export const usePrimaryAuth = (): Auth[] => {
         })
         .filter((auth) => auth != null) as Auth[]
       if (memberAuths.length === 0) {
+        // no valid auth found
+        // console.log('no valid auth found for group members.length 0')
         if (primary.provider == null && !shallowCompare(authRef.current, [])) authRef.current = []
         else if (
           primary.provider != null &&
           !shallowCompare(authRef.current, [new Auth({ provider: primary.provider })])
         ) {
+          // console.log('setting default auth because no group auths found')
           authRef.current = [new Auth({ provider: primary.provider })]
         }
       }
       // console.log('setting Group ID clients', memberAuths)
       if (!shallowCompare(authRef.current, memberAuths)) authRef.current = memberAuths
     } else {
-      const activeAuthClient = activeClients.find((client) => client.userId === activeUser.userId)
+      // console.log('activeUser', activeUser, activeClients)
+      const activeAuthClient = activeClients.find((client) => client.userId === activeUser.userId.toLowerCase())
       if (activeAuthClient && !shallowCompare(authRef.current, [new Auth({ provider: activeAuthClient.provider })])) {
+        // console.log('default valid auth from activeClients', activeAuthClient)
         authRef.current = [new Auth({ provider: activeAuthClient.provider })]
       } else {
         // no valid auth found
+        // console.log('no valid auth found for non group active auth')
         if (!shallowCompare(authRef.current, [])) authRef.current = []
       }
     }
   } else {
+    // console.log('default connector auth')
     // the default state if there is no active user is either an empty array or an array with the primary provider as auth
     if (primary.provider == null && !shallowCompare(authRef.current, [])) authRef.current = []
     else if (primary.provider != null && !shallowCompare(authRef.current, [new Auth({ provider: primary.provider })])) {

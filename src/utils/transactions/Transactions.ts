@@ -8,14 +8,19 @@ import {
   FunWallet,
   GaslessSponsor,
   isContract,
+  Operation,
+  OperationType,
   RequestUnstakeParams,
   StakeParams,
   SwapParam,
   TokenSponsor,
   TransactionData,
   TransferParams,
-  UserOperation,
+  User,
 } from '@fun-xyz/core'
+import { pad } from 'viem'
+
+import { IActiveAuthList } from '@/hooks/util'
 
 import {
   FunError,
@@ -24,8 +29,9 @@ import {
   TransactionErrorGasSponsorWhitelist,
   TransactionErrorInsufficientPaymasterAllowance,
   TransactionErrorLowFunWalletBalance,
-} from '../store/plugins/ErrorStore'
-import ERC20_ALLOWANCE_BALANCE from './miniAbi/ERC20AllowanceBalance.json'
+} from '../../store/plugins/ErrorStore'
+import ERC20_ALLOWANCE_BALANCE from '../miniAbi/ERC20AllowanceBalance.json'
+import { convertToValidUserId } from '../MultiAuth'
 
 export type transactionTypes = 'transfer' | 'approve' | 'swap' | 'stake' | 'unstake' | 'create' | 'execRawTx'
 export type transactionParams =
@@ -94,27 +100,6 @@ export interface GasValidationResponse {
   valid: boolean
   error?: FunError
   allowance?: bigint
-}
-
-/**
- * Validates and prepares a transaction for execution.
- * @param build - The transaction build object.
- * @param Auth - The Auth object.
- * @param wallet - The FunWallet object.
- * @returns An object containing a boolean indicating whether the validation was successful, and the prepared transaction if successful.
- */
-export const validateAndPrepareTransaction = async (build: any, Auth: Auth, wallet: FunWallet) => {
-  try {
-    const preparedTransaction = await prepareTransaction(build, Auth, wallet)
-    console.log('preparedTx', preparedTransaction)
-    return { valid: true, preparedTransaction }
-  } catch (err) {
-    console.log(err)
-    return {
-      valid: false,
-      error: { code: 0, message: 'Error Validating fetching sponsor Validation status', err },
-    }
-  }
 }
 
 // TODO allowance should be looked into for permit
@@ -282,55 +267,6 @@ export const validateGasSponsorMode = async (
   }
 }
 
-/**
- * Prepares a transaction for execution.
- * @param build - The transaction build object.
- * @param Auth - The Auth object.
- * @param wallet - The FunWallet object.
- * @returns A promise that resolves with a UserOperation object representing the prepared transaction, or rejects with an error message.
- */
-export const prepareTransaction = async (build: any, Auth: Auth, wallet: FunWallet): Promise<UserOperation> => {
-  return new Promise((resolve, reject) => {
-    if (!build.type) reject('No type specified')
-    if (!wallet[build.type]) reject('Invalid type')
-    if (!build.txParams) reject('No txParams specified')
-    wallet[build.type](
-      Auth,
-      build.txParams as (((((TransferParams & ApproveParams) & SwapParam) & StakeParams) &
-        (RequestUnstakeParams | FinishUnstakeParams)) &
-        (EnvOption | undefined)) &
-        TransactionData,
-      { ...build.txOptions, sendLater: true }
-    )
-      .then((preparedTx) => {
-        console.log('preparedTx', preparedTx)
-        resolve(preparedTx)
-      })
-      .catch((err) => {
-        reject(err)
-      })
-  })
-}
-
-// /**
-//  * Executes a prepared transaction.
-//  * @param preparedTx - The prepared transaction to execute.
-//  * @param wallet - The FunWallet object.
-//  * @returns A promise that resolves with the execution receipt, or rejects with an error message.
-//  */
-// export const executePreparedTransaction = async (preparedTx: UserOperation, wallet: FunWallet): Promise<ExecutionReceipt> => {
-//   return new Promise((resolve, reject) => {
-//     wallet
-//       .sendTx(preparedTx)
-//       .then((txReceipt) => {
-//         resolve(txReceipt)
-//       })
-//       .catch((err) => {
-//         reject(err)
-//       })
-//   })
-// }
-
 export const estimateGas = async (build: IOperationsArgs, Auth: Auth, wallet: FunWallet) => {
   return new Promise((resolve, reject) => {
     if (Auth == null) reject('No Auth')
@@ -351,4 +287,118 @@ export const estimateGas = async (build: IOperationsArgs, Auth: Auth, wallet: Fu
         console.log('GasEstimationError Error: ', err)
       })
   })
+}
+
+export interface IRemainingSigners {
+  operation: Operation
+  activeUser: User
+  activeClients: IActiveAuthList[]
+  firstSigner: string | `0x${string}` | null
+}
+
+export interface IRemainingSignersResponse {
+  remainingConnectedSigners: { userId: string; auth: Auth }[]
+  signerCount: number
+  threshold: number
+}
+
+export const remainingConnectedSignersForOperation = ({
+  operation,
+  activeUser,
+  activeClients,
+  firstSigner,
+}: IRemainingSigners): IRemainingSignersResponse => {
+  if (operation.opType === OperationType.SINGLE_OPERATION || activeUser.groupInfo == null)
+    return { remainingConnectedSigners: [], signerCount: operation.signatures?.length ?? 0, threshold: 1 }
+  const currentClients = activeClients.filter((client) => client.userId != null)
+  const currentSigners = operation.signatures
+  // if there are no signers then we need to sign with all the required signers
+  console.log('fetching Remaining Signers: ', currentSigners, currentClients)
+
+  // handle the case where this is the first signature. It should return all the connected signers
+  if (currentSigners == null || currentSigners.length == 0) {
+    console.log("First Signer, so we'll return all the connected signers")
+    const remainingConnectedSigners = currentClients
+      .map(({ userId, provider }) => {
+        if (userId == firstSigner) return undefined
+        const isRequiredSignature = activeUser.groupInfo?.memberIds.includes(userId as `0x${string}`)
+        if (isRequiredSignature) return { userId, auth: new Auth({ provider }) }
+        else return undefined
+      })
+      .filter((signer) => signer != null) as { userId: string; auth: Auth }[]
+    return { remainingConnectedSigners, signerCount: 0, threshold: activeUser.groupInfo?.threshold }
+  }
+  // if the number of signers is greater than or equal to the threshold then we don't need to sign anymore so no need to calculate additonal signers
+  if (currentSigners?.length >= activeUser.groupInfo?.threshold) {
+    console.log('remainingSigners, Threshold met')
+    return {
+      remainingConnectedSigners: [],
+      signerCount: currentSigners?.length,
+      threshold: activeUser.groupInfo?.threshold,
+    }
+  }
+  console.log('returning all signers that are connected')
+  const remainingConnectedSigners = currentClients
+    .map(({ userId, provider }) => {
+      if (userId == firstSigner) return undefined
+      const isRequiredSignature = activeUser.groupInfo?.memberIds.includes(userId as `0x${string}`)
+      if (!isRequiredSignature) return undefined
+      // TODO remove the to Lower case when the server enforces lower case userIds
+      const foundSignature = currentSigners.find((signer) => convertToValidUserId(signer.userId) === userId)
+      if (foundSignature == null) {
+        return { userId, auth: new Auth({ provider }) }
+      } else {
+        return undefined
+      }
+    })
+    .filter((signer) => {
+      return signer != null
+    }) as { userId: string; auth: Auth }[]
+  return {
+    remainingConnectedSigners,
+    signerCount: currentSigners?.length,
+    threshold: activeUser.groupInfo?.threshold ?? 1,
+  }
+}
+
+export interface SignUntilExecuteParams {
+  wallet: FunWallet
+  remainingConnectedSigners: { userId: string; auth: Auth }[]
+  threshold: number
+  operation: Operation
+  firstSigner: Auth
+  txOptions?: EnvOption
+}
+
+export const signUntilExecute = async ({
+  wallet,
+  remainingConnectedSigners,
+  threshold,
+  operation,
+  firstSigner,
+  txOptions,
+}: SignUntilExecuteParams) => {
+  if (threshold === 1) {
+    return await wallet.executeOperation(firstSigner, operation, txOptions)
+  } else {
+    let count = 1
+    for (let i = 0; i < remainingConnectedSigners.length; i++) {
+      const currentAuth = remainingConnectedSigners[i].auth
+
+      if (count + 1 >= threshold) {
+        return wallet.executeOperation(currentAuth, operation, txOptions)
+      } else {
+        wallet
+          .signOperation(currentAuth, operation, txOptions)
+          .then(() => {
+            count++
+          })
+          .catch((err) => {
+            // we want to catch issues here because they may have rejected the signature on purpose
+            console.log('error signing operation', err)
+          })
+      }
+    }
+    return operation
+  }
 }

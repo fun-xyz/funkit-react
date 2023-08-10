@@ -1,4 +1,9 @@
 export * from './MultiAuth'
-export * from './Transactions'
-export * from '../hooks/util/UseTraceUpdates'
+export {
+  GasValidationResponse,
+  IOperationsArgs,
+  remainingConnectedSignersForOperation,
+  transactionParams,
+  transactionTypes,
+} from './transactions/Transactions'
 export * from './Viem'

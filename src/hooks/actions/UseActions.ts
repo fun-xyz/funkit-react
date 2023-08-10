@@ -23,8 +23,10 @@ export const useAction = (args: FirstClassActionParams, txOptions?: EnvOption) =
   const [loading, setLoading] = useState<boolean>(false)
   const [result, setResult] = useState<ExecutionReceipt | Operation | null>(null)
   const [error, setTxError] = useState<FunError | null>(null)
+
   const executeNewOperation = useCallback(
     async (auth?: Auth) => {
+      console.log('executeNewOperation', auth, primaryAuth, wallet, activeUser, loading)
       if (loading) return
       if (wallet == null || activeUser == null) return // invalid tx params error
       const firstSigner = auth ?? primaryAuth[0]

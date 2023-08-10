@@ -163,8 +163,14 @@ export const TransactionErrorFailedToSign: FunError = {
   data: {},
 }
 export const TransactionErrorRequiresSigners: FunError = {
-  code: 4008,
+  code: 4009,
   message: 'Failed to Execute transaction. Requires more signers',
+  data: {},
+}
+
+export const TransactionErrorNotPending: FunError = {
+  code: 4010,
+  message: 'Transaction is not pending and does not need additional Signatures',
   data: {},
 }
 

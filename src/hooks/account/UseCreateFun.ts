@@ -96,6 +96,7 @@ export const useCreateFun = () => {
             uniqueId: WALLET_UNIQUE_ID,
           })
           const newAccountAddress = await newFunWallet.getAddress()
+          console.log('fetching users for maybe existing wallet')
           newFunWallet
             .getUsers(auth)
             .then((allUsers) => {
@@ -111,9 +112,15 @@ export const useCreateFun = () => {
         else if (args.walletAddr) {
           const newFunWallet = new FunWallet({ walletAddr: args.walletAddr })
           const account = await newFunWallet.getAddress()
-          const allUsers = await newFunWallet.getUsers(auth)
+          console.log('fetching users for existing wallet')
+          newFunWallet
+            .getUsers(auth)
+            .then((allUsers) => {
+              console.log('newAccountAddress user', account, allUsers)
+              setNewAccountUsers(allUsers, allUsers[0])
+            })
+            .catch()
           console.log('newAccountAddress walletaddr', account, allUsers)
-          setNewAccountUsers(allUsers, allUsers[0])
           setLogin(account, newFunWallet)
           return newFunWallet
         } else {
@@ -124,9 +131,15 @@ export const useCreateFun = () => {
             uniqueId: WALLET_UNIQUE_ID,
           })
           const newAccountAddress = await newFunWallet.getAddress()
-          const allUsers = await newFunWallet.getUsers(auth)
+          console.log('fetching users for new wallet')
+          newFunWallet
+            .getUsers(auth)
+            .then((allUsers) => {
+              console.log('newAccountAddress user', account, allUsers)
+              setNewAccountUsers(allUsers, allUsers[0])
+            })
+            .catch()
           console.log('newAccountAddress default', account, allUsers)
-          setNewAccountUsers(allUsers, allUsers[0])
           setLogin(newAccountAddress, newFunWallet)
           return newFunWallet
         }
@@ -139,7 +152,7 @@ export const useCreateFun = () => {
         })
       }
     },
-    [initializing, auth, handleBuildError, config, account, setNewAccountUsers, setLogin]
+    [initializing, auth, handleBuildError, config, setLogin, account, setNewAccountUsers, allUsers]
   )
 
   // const initializeFunMultiSigAccount = useCallback(
