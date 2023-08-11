@@ -5,25 +5,21 @@ import { PublicClient } from 'viem'
 export const Goerli = '5'
 export const Arbitrum = '42161'
 export const Polygon = '137'
-export const Avalanche = '43114'
-export const Binance = '56'
 export const Optimism = '10'
-export const OptimismGoerli = '420'
 
-export const FunTestnet = {
-  rpcUrl: 'https://rpc.vnet.tenderly.co/devnet/bundler-test/55eff413-d465-4d63-8d98-7da15c63ed96',
-}
+// Polygon
+// Arbitrum one
+// optimism 
+// Goerli 
+
+
 
 export const chainNumber = {
   // ethereum: Ethereum,
-  binance: Binance,
   polygon: Polygon,
-  avalanche: Avalanche,
   arbitrum: Arbitrum,
   optimism: Optimism,
-  optimismGoerli: OptimismGoerli,
   goerli: Goerli,
-  funTestnet: FunTestnet,
 }
 
 export const convertToChain = async (chain: string | number): Promise<Chain> => {
