@@ -246,7 +246,6 @@ export class MagicAuthConnector extends Connector {
     this.authId = this.getAuthId()
   }
 
-
   async isAuthorized() {
     try {
       const magic = this.getMagic()

@@ -18,7 +18,6 @@ import {
   TransferParams,
   User,
 } from '@fun-xyz/core'
-import { pad } from 'viem'
 
 import { IActiveAuthList } from '@/hooks/util'
 
