@@ -1,7 +1,8 @@
 import { OAuthExtension, OAuthProvider, OAuthRedirectResult } from '@magic-ext/oauth'
+import { MagicSDKAdditionalConfiguration } from '@magic-sdk/commons'
 import { InstanceWithExtensions, SDKBase } from '@magic-sdk/provider'
 import { Actions, Connector, ProviderConnectInfo, ProviderRpcError } from '@web3-react/types'
-import { Magic, MagicSDKAdditionalConfiguration } from 'magic-sdk'
+import { Magic } from 'magic-sdk'
 
 function parseChainId(chainId: string | number) {
   return typeof chainId === 'number' ? chainId : Number.parseInt(chainId, chainId.startsWith('0x') ? 16 : 10)
@@ -48,7 +49,7 @@ export class MagicAuthConnector extends Connector {
   constructor({ actions, options, onError }: MagicAuthConstructorArgs) {
     super(actions, onError)
     this.options = options
-    this.name = `Not Connected`
+    this.name = `Social Login Connector`
     this.magicAuthApiKey = options.magicAuthApiKey
     this.supportedAuthProviders = options.supportedAuthProviders
     if (options.supportedAuthProviders.length === 0)
@@ -172,17 +173,25 @@ export class MagicAuthConnector extends Connector {
   // "autoconnect"
   override async connectEagerly(): Promise<void> {
     const cancelActivation = this.actions.startActivation()
-    const isLoggedIn = await this.isAuthorized()
-    if (!isLoggedIn) {
+    const resetTimeout = setTimeout(cancelActivation, 5000)
+    try {
+      const isLoggedIn = await this.isAuthorized()
+      if (!isLoggedIn) {
+        cancelActivation()
+        return
+      }
+      this.completeActivation()
+    } catch (err) {
       cancelActivation()
-      return
+    } finally {
+      clearTimeout(resetTimeout)
     }
-    this.completeActivation()
   }
 
   // "connect"
   async activate(activateArgs: MagicAuthActivateArgs): Promise<void> {
     const cancelActivation = this.actions.startActivation()
+    const resetTimeout = setTimeout(cancelActivation, 5000)
     try {
       // Initialize the magic instance
       if (activateArgs.oAuthProvider == this.oAuthProvider && (await this.isAuthorized())) {
@@ -211,6 +220,8 @@ export class MagicAuthConnector extends Connector {
       }
     } catch (error) {
       cancelActivation()
+    } finally {
+      clearTimeout(resetTimeout)
     }
   }
 
@@ -240,9 +251,9 @@ export class MagicAuthConnector extends Connector {
       const magic = this.getMagic()
       if (magic == null) return false
       const isLoggedIn = await magic.user.isLoggedIn()
+
       const oauth = window.localStorage.getItem('oAuthProvider')
       this.oAuthProvider = oauth ? JSON.parse(oauth) : this.oAuthProvider
-
       if (isLoggedIn) {
         return true
       }
@@ -259,7 +270,6 @@ export class MagicAuthConnector extends Connector {
         return false
       }
     } catch (err) {
-      console.log('Catching auth error', err)
       return false
     }
   }

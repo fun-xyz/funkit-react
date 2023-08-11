@@ -2,8 +2,10 @@ import { ConnectorArray } from '../../connectors/Types'
 
 export interface ConnectorStoreInterface {
   connectors: ConnectorArray
-  groupId: string | null
-  setGroupId: (groupId: string) => void
-  requiredActiveConnectors: number
-  setRequiredActiveConnectors: (requiredActiveConnectors: number) => void
+  initializeConnectors: (connectors: ConnectorArray) => void
 }
+
+export const configureConnectorStore = (get: any, set: any): ConnectorStoreInterface => ({
+  connectors: [],
+  initializeConnectors: (connectors: ConnectorArray) => set({ connectors }),
+})

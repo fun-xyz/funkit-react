@@ -1,32 +1,21 @@
 import { Chain } from '@fun-xyz/core'
+import { PublicClient } from 'viem'
 
-export const Ethereum = new Chain({ chainId: '1' })
-export const Goerli = new Chain({ chainId: '5' })
-export const Arbitrum = new Chain({ chainId: '42161' })
-export const Polygon = new Chain({ chainId: '137' })
-export const Avalanche = new Chain({ chainId: '43114' })
-export const Binance = new Chain({ chainId: '56' })
-export const Optimism = new Chain({ chainId: '10' })
-export const OptimismGoerli = new Chain({ chainId: '420' })
+// export const Ethereum = Chain.getChain({ chainIdentifier: '1' })
+export const Goerli = '5'
+export const Arbitrum = '42161'
+export const Polygon = '137'
+export const Avalanche = '43114'
+export const Binance = '56'
+export const Optimism = '10'
+export const OptimismGoerli = '420'
 
-export const FunTestnet = new Chain({
+export const FunTestnet = {
   rpcUrl: 'https://rpc.vnet.tenderly.co/devnet/bundler-test/55eff413-d465-4d63-8d98-7da15c63ed96',
-})
-
-export const chainName = {
-  '1': Ethereum,
-  '5': Goerli,
-  '10': Optimism,
-  '56': Binance,
-  '137': Polygon,
-  '420': OptimismGoerli,
-  '36865': FunTestnet,
-  '43114': Avalanche,
-  '42161': Arbitrum,
 }
 
 export const chainNumber = {
-  ethereum: Ethereum,
+  // ethereum: Ethereum,
   binance: Binance,
   polygon: Polygon,
   avalanche: Avalanche,
@@ -37,17 +26,17 @@ export const chainNumber = {
   funTestnet: FunTestnet,
 }
 
-export const convertToChain = (chain: string | number): Chain => {
+export const convertToChain = async (chain: string | number): Promise<Chain> => {
   if (typeof chain === 'string') {
-    const parsedChain = parseInt(chain)
-    return isNaN(parsedChain)
-      ? chainNumber[chain.toLowerCase() as keyof typeof chainNumber]
-      : chainName[chain as keyof typeof chainName]
+    const chainInfo = chainNumber[chain]
+    if (chainInfo.rpcUrl) return await Chain.getChain({ rpcUrl: chainInfo.rpcUrl })
+    return await Chain.getChain({ chainIdentifier: chainInfo })
+  } else {
+    return await Chain.getChain({ chainIdentifier: chain })
   }
-  return chainName[`${chain}` as keyof typeof chainName]
 }
 
-export const getPublicClient = (chainId: string | number) => {
-  const Chain = convertToChain(chainId)
+export const getPublicClient = async (chainId: string | number): Promise<PublicClient> => {
+  const Chain = await convertToChain(chainId)
   return Chain.getClient()
 }
