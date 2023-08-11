@@ -9,10 +9,8 @@ export const Optimism = '10'
 
 // Polygon
 // Arbitrum one
-// optimism 
-// Goerli 
-
-
+// optimism
+// Goerli
 
 export const chainNumber = {
   // ethereum: Ethereum,
@@ -25,6 +23,7 @@ export const chainNumber = {
 export const convertToChain = async (chain: string | number): Promise<Chain> => {
   if (typeof chain === 'string') {
     const chainInfo = chainNumber[chain]
+    if (!chainInfo) return await Chain.getChain({ chainIdentifier: chain })
     if (chainInfo.rpcUrl) return await Chain.getChain({ rpcUrl: chainInfo.rpcUrl })
     return await Chain.getChain({ chainIdentifier: chainInfo })
   } else {

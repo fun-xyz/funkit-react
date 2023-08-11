@@ -30,7 +30,7 @@ export const useUserInfo = () => {
         const users = await wallet.getUsers(primaryAuth)
         if (users && users.length > 0) {
           setAllUsers(users)
-
+          console.log('users found', users)
           if (resetActiveUser) setActiveUser(users[0])
         }
         console.log('no users found')

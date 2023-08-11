@@ -15,7 +15,7 @@ const DEFAULT_CONNECTORS = [MetamaskConnector()]
 
 interface configureFunParams {
   connectors: ConnectorArray
-  supportedChains?: (number | string | { rpcUrl: string })[]
+  supportedChains?: (number | string)[]
   config?: GlobalEnvOption
 }
 const DEFAULT_FUN_WALLET_CONFIG: GlobalEnvOption = {

@@ -109,9 +109,29 @@ export const useCreateFun = () => {
           return newFunWallet
         }
         // login to a specific fun wallet
-        else if (args.walletAddr) {
+        else if (args.walletAddr && args.uniqueId) {
+          console.log("args.walletUniqueId", args.uniqueId)
+          const newFunWallet = new FunWallet({ users: [{ userId: await auth.getUserId() }], uniqueId: args.uniqueId })
+          const account = await newFunWallet.getAddress()
+          // if exists on chain and if it doesnt throw error if the uniqueID isnt also passed
+          console.log('fetching users for existing wallet')
+          newFunWallet
+            .getUsers(auth)
+            .then((allUsers) => {
+              console.log('newAccountAddress user', account, allUsers)
+              setNewAccountUsers(allUsers, allUsers[0])
+            })
+            .catch()
+          console.log('newAccountAddress walletaddr', account, allUsers)
+          setLogin(account, newFunWallet)
+          return newFunWallet
+        } else if (args.walletAddr && !args.uniqueId) {
+          console.warn("WARNING: You're logging into an existing wallet without a uniqueId.")
+          console.warn('WARNING: if the wallet has not been initialized it will throw errors.')
+
           const newFunWallet = new FunWallet({ walletAddr: args.walletAddr })
           const account = await newFunWallet.getAddress()
+          // if exists on chain and if it doesnt throw error if the uniqueID isnt also passed
           console.log('fetching users for existing wallet')
           newFunWallet
             .getUsers(auth)
@@ -198,7 +218,8 @@ export const useCreateFun = () => {
   return {
     funWallet: storedFunWallet,
     account,
-    chainId: config?.chain ? Chain.getChain({ chainIdentifier: config?.chain.toString() }) : '5',
+    // chainId:
+    //   config?.chain instanceof Chain ? config?.chain : Chain.getChain({ chainIdentifier: config?.chain.toString() }),
     error,
     loading: initializing,
     activeUser,
