@@ -1,10 +1,8 @@
-import { User } from '@fun-xyz/core'
 import { Auth } from '@fun-xyz/core'
 import { useCallback, useState } from 'react'
 import { shallow } from 'zustand/shallow'
 
-import { useFunStoreInterface } from '@/store'
-
+import { useFunStoreInterface } from '../../store'
 import { useFun } from '../UseFun'
 import { usePrimaryConnector } from '../util'
 
@@ -27,22 +25,31 @@ export const useUserInfo = () => {
     async (resetActiveUser = false) => {
       if (wallet == null || loading) return
       setLoading(true)
-      wallet
-        .getUsers(new Auth({ provider: primary.provider }))
-        .then((users: User[]) => {
-          if (users && users.length > 0) {
-            setAllUsers(users)
-            if (resetActiveUser) setActiveUser(users[0])
-          }
-          setLoading(false)
-        })
-        .catch((err: any) => {
-          console.log('Error fetching users: ', err)
-          setLoading(false)
-        })
+      const primaryAuth = new Auth({ provider: primary.provider })
+      try {
+        const users = await wallet.getUsers(primaryAuth)
+        if (users && users.length > 0) {
+          setAllUsers(users)
+
+          if (resetActiveUser) setActiveUser(users[0])
+        }
+        console.log('no users found')
+        const userId = await primaryAuth.getUserId()
+        setActiveUser({ userId })
+      } catch (err) {
+        console.log('error fetching Users', err)
+      } finally {
+        setLoading(false)
+      }
     },
     [loading, primary.provider, setActiveUser, setAllUsers, wallet]
   )
 
-  return { activeUser, setActiveUser, fetchUsers, allUsers, setAllUsers }
+  return {
+    activeUser,
+    setActiveUser,
+    fetchUsers,
+    allUsers,
+    setAllUsers,
+  }
 }

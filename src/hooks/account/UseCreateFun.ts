@@ -90,20 +90,20 @@ export const useCreateFun = () => {
 
         // explicitly defined User array
         if (args.users) {
-          const WALLET_UNIQUE_ID = await auth.getWalletUniqueId(chainId.toString(), args.index ?? 0)
+          const WALLET_UNIQUE_ID = await auth.getWalletUniqueId(args.index ?? 0)
           const newFunWallet = new FunWallet({
             users: args.users,
             uniqueId: WALLET_UNIQUE_ID,
           })
           const newAccountAddress = await newFunWallet.getAddress()
           console.log('fetching users for maybe existing wallet')
-          newFunWallet
-            .getUsers(auth)
-            .then((allUsers) => {
-              console.log('newAccountAddress user', account, allUsers)
-              setNewAccountUsers(allUsers, allUsers[0])
-            })
-            .catch()
+          // newFunWallet
+          //   .getUsers(auth)
+          //   .then((allUsers) => {
+          //     console.log('newAccountAddress user', account, allUsers)
+          //     setNewAccountUsers(allUsers, allUsers[0])
+          //   })
+          //   .catch()
 
           setLogin(newAccountAddress, newFunWallet)
           return newFunWallet
@@ -125,20 +125,20 @@ export const useCreateFun = () => {
           return newFunWallet
         } else {
           // Default login as the primary auth
-          const WALLET_UNIQUE_ID = await auth.getWalletUniqueId(chainId.toString(), args.index ?? 0)
+          const WALLET_UNIQUE_ID = await auth.getWalletUniqueId(args.index ?? 0)
           const newFunWallet = new FunWallet({
             users: [{ userId: await auth.getUserId() }],
             uniqueId: WALLET_UNIQUE_ID,
           })
           const newAccountAddress = await newFunWallet.getAddress()
-          console.log('fetching users for new wallet')
-          newFunWallet
-            .getUsers(auth)
-            .then((allUsers) => {
-              console.log('newAccountAddress user', account, allUsers)
-              setNewAccountUsers(allUsers, allUsers[0])
-            })
-            .catch()
+          // console.log('fetching users for new wallet')
+          // newFunWallet
+          //   .getUsers(auth)
+          //   .then((allUsers) => {
+          //     console.log('newAccountAddress user', account, allUsers)
+          //     setNewAccountUsers(allUsers, allUsers[0])
+          //   })
+          //   .catch()
           console.log('newAccountAddress default', account, allUsers)
           setLogin(newAccountAddress, newFunWallet)
           return newFunWallet
@@ -167,7 +167,7 @@ export const useCreateFun = () => {
   //       }
   //       const groupId = generateRandomGroupId()
 
-  //       const WALLET_UNIQUE_ID = await auth.getWalletUniqueId(chainId.toString(), args.index ?? 0)
+  //       const WALLET_UNIQUE_ID = await auth.getWalletUniqueId(args.index ?? 0)
   //       const newFunWallet = new FunWallet({
   //         users: [
   //           {
