@@ -6,11 +6,7 @@ import { GetAssetsError } from '../../store'
 import { useFunStoreInterface } from '../../store/CreateUseFunStore'
 import { useFun } from '../UseFun'
 
-export interface assetRequest {
-  address: string
-}
-
-export const useGetAssets = (req: assetRequest) => {
+export const useGetAssets = () => {
   const { userWallet, setAssets, assets, error, setTempError } = useFun(
     (state: useFunStoreInterface) => ({
       userWallet: state.FunWallet,

@@ -1,4 +1,4 @@
-import { Auth, EnvOption, Operation, UserOpFailureError } from '@fun-xyz/core'
+import { Auth, EnvOption, Operation } from '@fun-xyz/core'
 import { useCallback, useState } from 'react'
 import { shallow } from 'zustand/shallow'
 

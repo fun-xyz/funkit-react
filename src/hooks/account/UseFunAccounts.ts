@@ -67,7 +67,7 @@ export const useFunAccounts = (): IUseFunAccountsReturn => {
 
         const sortedFunWallets = Object.entries(WalletSet)
           .sort((a, b) => b[1].count - a[1].count)
-          .map(([_, val]) => val.wallet)
+          .map(([, val]) => val.wallet)
         // setFunAccounts({ ...FunAccounts, ...WalletSet })
 
         return {

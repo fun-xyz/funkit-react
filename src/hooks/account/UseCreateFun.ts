@@ -110,7 +110,7 @@ export const useCreateFun = () => {
         }
         // login to a specific fun wallet
         else if (args.walletAddr && args.uniqueId) {
-          console.log("args.walletUniqueId", args.uniqueId)
+          console.log('args.walletUniqueId', args.uniqueId)
           const newFunWallet = new FunWallet({ users: [{ userId: await auth.getUserId() }], uniqueId: args.uniqueId })
           const account = await newFunWallet.getAddress()
           // if exists on chain and if it doesnt throw error if the uniqueID isnt also passed
@@ -174,46 +174,6 @@ export const useCreateFun = () => {
     },
     [initializing, auth, handleBuildError, config, setLogin, account, setNewAccountUsers, allUsers]
   )
-
-  // const initializeFunMultiSigAccount = useCallback(
-  //   async (args: IInitializeMultiSigFunAccount) => {
-  //     if (initializing) return
-  //     if (auth == null) return handleBuildError(MissingActiveSigner)
-  //     if (config == null || !config.chain) return handleBuildError(MissingConfigError)
-  //     try {
-  //       let chainId = config.chain
-  //       if (chainId instanceof Chain) {
-  //         chainId = await chainId.getChainId()
-  //       }
-  //       const groupId = generateRandomGroupId()
-
-  //       const WALLET_UNIQUE_ID = await auth.getWalletUniqueId(args.index ?? 0)
-  //       const newFunWallet = new FunWallet({
-  //         users: [
-  //           {
-  //             userId: groupId,
-  //             groupInfo: {
-  //               threshold: args.threshold,
-  //               memberIds: args.userIds as `0x${string}`[],
-  //             },
-  //           },
-  //         ],
-  //         uniqueId: WALLET_UNIQUE_ID,
-  //       })
-  //       const newAccountAddress = await newFunWallet.getAddress()
-  //       setLogin(newAccountAddress, newFunWallet)
-  //       return newFunWallet
-  //     } catch (err) {
-  //       console.log('Multi Signer Error: ', err)
-  //       return handleBuildError({
-  //         code: 0,
-  //         message: 'Failed to configure account',
-  //         err,
-  //       })
-  //     }
-  //   },
-  //   [auth, config, handleBuildError, initializing, setLogin]
-  // )
 
   return {
     funWallet: storedFunWallet,
