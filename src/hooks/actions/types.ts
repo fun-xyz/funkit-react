@@ -11,7 +11,6 @@ import {
   SessionKeyParams,
   StakeParams,
   SwapParam,
-  TransactionParams,
   TransferParams,
   UpdateThresholdOfGroupParams,
 } from '@fun-xyz/core'
@@ -22,7 +21,6 @@ export type FirstClassActionParams =
   | IApprove
   | IStakeParams
   | IUnstakeParams
-  | IExecRawTxParams
   | ICreateSessionKeyParams
   | IAddOwnerParams
   | IRemoveOwnerParams
@@ -38,7 +36,6 @@ export enum ActionType {
   Approve = 'tokenApprove',
   Stake = 'stake',
   Unstake = 'unstake',
-  ExecRawTx = 'execRawTx',
   createSessionKey = 'createSessionKey',
   addOwner = 'addOwner',
   removeOwner = 'removeOwner',
@@ -71,11 +68,6 @@ export interface IStakeParams {
 export interface IUnstakeParams {
   action: ActionType.Unstake
   params: RequestUnstakeParams | FinishUnstakeParams
-}
-
-export interface IExecRawTxParams {
-  action: ActionType.ExecRawTx
-  params: TransactionParams
 }
 
 export interface ICreateSessionKeyParams {

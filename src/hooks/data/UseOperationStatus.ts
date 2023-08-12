@@ -25,12 +25,18 @@ export const useOperationStatus = (status: OperationStatus = OperationStatus.ALL
     if (fetching) return
 
     setFetching(true)
-    const operations = await funWallet.getOperations(status)
+    try {
+      const operations = await funWallet.getOperations(status)
 
-    setOperationStatuses(operations.sort((a, b) => Number(b.proposedTime) - Number(a.proposedTime)))
-
-    setFetching(false)
-    console.log('fetched operations', operations, funWallet, await funWallet.getAddress())
+      if (operations == null) return setOperationStatuses([])
+      setOperationStatuses(operations.sort((a, b) => Number(b.proposedTime) - Number(a.proposedTime)))
+    } catch (e) {
+      console.error(e)
+      setOperationStatuses([])
+    } finally {
+      setFetching(false)
+    }
+    // console.log('fetched operations', operations, funWallet, await funWallet.getAddress())
   }, [fetching, funWallet, status])
 
   useEffect(() => {

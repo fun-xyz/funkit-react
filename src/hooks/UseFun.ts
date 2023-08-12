@@ -4,7 +4,7 @@ import { shallow } from 'zustand/shallow'
 
 import { MetamaskConnector } from '../connectors'
 import { ConnectorArray } from '../connectors/Types'
-import { FunTestnet, Goerli } from '../network/Networks'
+import { Arbitrum, Goerli, Optimism, Polygon } from '../network/Networks'
 import { createUseFunStore } from '../store'
 
 export const useFun = createUseFunStore()
@@ -15,7 +15,7 @@ const DEFAULT_CONNECTORS = [MetamaskConnector()]
 
 interface configureFunParams {
   connectors: ConnectorArray
-  supportedChains?: (number | string | { rpcUrl: string })[]
+  supportedChains?: (number | string)[]
   config?: GlobalEnvOption
 }
 const DEFAULT_FUN_WALLET_CONFIG: GlobalEnvOption = {
@@ -27,7 +27,7 @@ export const configureNewFunStore = async (params?: configureFunParams) => {
   // if (useFun.getState().connectors.length > 0) return
   if (!params) {
     useFun.setState({ connectors: DEFAULT_CONNECTORS })
-    useFun.setState({ supportedChains: [FunTestnet, Goerli] })
+    useFun.setState({ supportedChains: [Optimism, Arbitrum, Polygon, Goerli] })
   } else {
     if (params.connectors && params.connectors.length > 0) {
       if (typeof params.connectors[0] === 'function')
@@ -42,7 +42,7 @@ export const configureNewFunStore = async (params?: configureFunParams) => {
     if (params.supportedChains && params.supportedChains.length > 0) {
       useFun.setState({ supportedChains: params.supportedChains })
     } else {
-      useFun.setState({ supportedChains: [FunTestnet, Goerli] })
+      useFun.setState({ supportedChains: [Optimism, Arbitrum, Polygon, Goerli] })
     }
 
     if (params.config) {
