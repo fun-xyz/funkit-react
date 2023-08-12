@@ -33,5 +33,5 @@ export const convertToChain = async (chain: string | number): Promise<Chain> => 
 
 export const getPublicClient = async (chainId: string | number): Promise<PublicClient> => {
   const Chain = await convertToChain(chainId)
-  return Chain.getClient()
+  return Chain.getClient() as any as PublicClient
 }

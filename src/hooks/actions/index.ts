@@ -6,7 +6,6 @@ export {
   IApprove,
   ICreateGroupParams,
   ICreateSessionKeyParams,
-  IExecRawTxParams,
   IRemoveGroupParams,
   IRemoveOwnerParams,
   IRemoveUserFromGroupParams,
