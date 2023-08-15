@@ -1,7 +1,6 @@
 import { Chain } from '@fun-xyz/core'
 import { PublicClient } from 'viem'
 
-// export const Ethereum = Chain.getChain({ chainIdentifier: '1' })
 export const Goerli = '5'
 export const Arbitrum = '42161'
 export const Polygon = '137'

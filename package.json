@@ -1,6 +1,6 @@
 {
   "name": "@fun-xyz/react",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "React interface for the FunWallet SDK",
   "repository": "git@github.com:TheFunGroup/fun-wallet-react.git",
   "author": "The Fun Group (https://fun.xyz/)",
@@ -26,7 +26,7 @@
   },
   "dependencies": {
     "@coinbase/wallet-sdk": "^3.6.6",
-    "@fun-xyz/core": "^0.3.5",
+    "@fun-xyz/core": "^0.4.0",
     "@magic-ext/oauth": "11.0.0",
     "@magic-sdk/commons": "^14.2.1",
     "@magic-sdk/provider": "^18.2.1",
