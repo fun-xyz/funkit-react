@@ -26,7 +26,7 @@
   },
   "dependencies": {
     "@coinbase/wallet-sdk": "^3.6.6",
-    "@fun-xyz/core": "^0.4.0",
+    "@fun-xyz/core": "^0.4.1",
     "@magic-ext/oauth": "11.0.0",
     "@magic-sdk/commons": "^14.2.1",
     "@magic-sdk/provider": "^18.2.1",
