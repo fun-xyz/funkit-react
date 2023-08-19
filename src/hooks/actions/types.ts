@@ -11,6 +11,7 @@ import {
   SessionKeyParams,
   StakeParams,
   SwapParam,
+  TransactionParams,
   TransferParams,
   UpdateThresholdOfGroupParams,
 } from '@fun-xyz/core'
@@ -29,6 +30,7 @@ export type FirstClassActionParams =
   | IRemoveUserFromGroupParams
   | IUpdateThresholdOfGroupParams
   | IRemoveGroupParams
+  | ITransactionParams
 
 export enum ActionType {
   Swap = 'swap',
@@ -44,6 +46,12 @@ export enum ActionType {
   removeUserFromGroup = 'removeUserFromGroup',
   updateThresholdOfGroup = 'updateThresholdOfGroup',
   removeGroup = 'removeGroup',
+  createOperation = 'createOperation',
+}
+
+export interface ITransactionParams {
+  action: ActionType.createOperation
+  params: TransactionParams
 }
 
 export interface ISwapParams {
