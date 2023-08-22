@@ -91,7 +91,6 @@ export const useAction = (args: FirstClassActionParams, txOptions?: EnvOption) =
         // check if there are any other signers which could sign the transaction to execute it fully
       } catch (error: any) {
         console.log(error)
-        console.log('actionError', error.getErrorData())
 
         setTxError(
           generateTransactionError(
