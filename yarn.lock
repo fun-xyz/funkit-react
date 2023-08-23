@@ -830,10 +830,10 @@
     "@ethersproject/properties" "^5.7.0"
     "@ethersproject/strings" "^5.7.0"
 
-"@fun-xyz/core@^0.4.1":
-  version "0.4.1"
-  resolved "https://registry.yarnpkg.com/@fun-xyz/core/-/core-0.4.1.tgz#e567e657b43136c5fa79ec9d348b1bb92bb64d6b"
-  integrity sha512-dU3Vg5clWiGGBCotbOpUBRf5mmhg7YXF5jdbjIr3WgSirP+PCZm75oADeHd63nG9QPWoyfFKSwA+PvaCvUaZsA==
+"@fun-xyz/core@^0.4.4":
+  version "0.4.4"
+  resolved "https://registry.yarnpkg.com/@fun-xyz/core/-/core-0.4.4.tgz#0d8c66c966b370eda1b09106c577978ffb42349b"
+  integrity sha512-L6G72ko/ESzYypCqYzcgQY7/D3YpHGJWHNHReQhy7mTfEFryffYXj9wDrmUeDCq0ouyPhvbZhOf3G30yhzG/5w==
   dependencies:
     "@aws-sdk/client-secrets-manager" "^3.315.0"
     "@ethersproject/contracts" "^5.7.0"
