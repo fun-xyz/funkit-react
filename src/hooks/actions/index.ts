@@ -10,7 +10,7 @@ export {
   IRemoveOwnerParams,
   IRemoveUserFromGroupParams,
   IStakeParams,
-  ISwapParams,
+  ISwapParamss,
   ITransfer,
   IUnstakeParams,
   IUpdateThresholdOfGroupParams,

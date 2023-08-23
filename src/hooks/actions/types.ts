@@ -10,13 +10,13 @@ import {
   RequestUnstakeParams,
   SessionKeyParams,
   StakeParams,
-  SwapParam,
+  SwapParams,
   TransferParams,
   UpdateThresholdOfGroupParams,
 } from '@fun-xyz/core'
 
 export type FirstClassActionParams =
-  | ISwapParams
+  | ISwapParamss
   | ITransfer
   | IApprove
   | IStakeParams
@@ -46,9 +46,9 @@ export enum ActionType {
   removeGroup = 'removeGroup',
 }
 
-export interface ISwapParams {
+export interface ISwapParamss {
   action: ActionType.Swap
-  params: SwapParam
+  params: SwapParams
 }
 export interface ITransfer {
   action: ActionType.Transfer
