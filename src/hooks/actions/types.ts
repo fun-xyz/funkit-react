@@ -16,7 +16,7 @@ import {
 } from '@fun-xyz/core'
 
 export type FirstClassActionParams =
-  | ISwapParamss
+  | ISwapParams
   | ITransfer
   | IApprove
   | IStakeParams
@@ -46,7 +46,7 @@ export enum ActionType {
   removeGroup = 'removeGroup',
 }
 
-export interface ISwapParamss {
+export interface ISwapParams {
   action: ActionType.Swap
   params: SwapParams
 }
