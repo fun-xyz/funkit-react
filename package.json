@@ -41,7 +41,7 @@
     "viem": "^1.3.0",
     "web3-core": "^4.0.1",
     "zustand": "^4.3.8",
-    "@fun-xyz/core": "^0.4.4"
+    "@fun-xyz/core": "^0.4.6"
   },
   "devDependencies": {
     "@tsconfig/recommended": "^1.0.1",
