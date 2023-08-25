@@ -72,7 +72,7 @@ export const useAction = (args: FirstClassActionParams, txOptions?: EnvOption) =
               return receipt
             } else {
               console.log('signing operation', operation)
-              wallet
+              await wallet
                 .signOperation(currentAuth, operation, txOptions)
                 .then(() => {
                   count++
