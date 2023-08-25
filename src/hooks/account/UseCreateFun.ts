@@ -76,12 +76,11 @@ export const useCreateFun = () => {
    * @returns The created Fun wallet account, any errors that occurred, or undefined if the account is already being initialized.
    */
   const initializeFunAccount = useCallback(
-    async (args: IInitializeFunAccount): Promise<FunWallet | FunError | undefined> => {
+    async (args: IInitializeFunAccount | string): Promise<FunWallet | FunError | undefined> => {
       if (initializing) return
       if (auth == null) return handleBuildError(MissingActiveSigner)
       if (config == null || !config.chain) return handleBuildError(MissingConfigError)
-      if (args.walletAddr == null && args.users == null)
-        return handleBuildError(generateTransactionError(MissingInitializationArgs, args))
+      if (args == null) return handleBuildError(generateTransactionError(MissingInitializationArgs, args))
       try {
         let chainId = config.chain
         if (chainId instanceof Chain) {
@@ -89,6 +88,22 @@ export const useCreateFun = () => {
         }
 
         // explicitly defined User array
+        if (typeof args === 'string') {
+          console.warn("WARNING: You're logging into an existing wallet without a uniqueId.")
+          console.warn('WARNING: if the wallet has not been initialized it will throw errors.')
+
+          const newFunWallet = new FunWallet(args)
+          const account = await newFunWallet.getAddress()
+          // if exists on chain and if it doesnt throw error if the uniqueID isnt also passed
+          newFunWallet
+            .getUsers(auth)
+            .then((allUsers) => {
+              setNewAccountUsers(allUsers, allUsers[0])
+            })
+            .catch()
+          setLogin(account, newFunWallet)
+          return newFunWallet
+        }
         if (args.users) {
           const WALLET_UNIQUE_ID = await auth.getWalletUniqueId(args.index ?? 0)
           const newFunWallet = new FunWallet({
@@ -107,23 +122,8 @@ export const useCreateFun = () => {
           return newFunWallet
         }
         // login to a specific fun wallet
-        else if (args.walletAddr && args.uniqueId) {
+        else if (args.uniqueId) {
           const newFunWallet = new FunWallet({ users: [{ userId: await auth.getUserId() }], uniqueId: args.uniqueId })
-          const account = await newFunWallet.getAddress()
-          // if exists on chain and if it doesnt throw error if the uniqueID isnt also passed
-          newFunWallet
-            .getUsers(auth)
-            .then((allUsers) => {
-              setNewAccountUsers(allUsers, allUsers[0])
-            })
-            .catch()
-          setLogin(account, newFunWallet)
-          return newFunWallet
-        } else if (args.walletAddr && !args.uniqueId) {
-          console.warn("WARNING: You're logging into an existing wallet without a uniqueId.")
-          console.warn('WARNING: if the wallet has not been initialized it will throw errors.')
-
-          const newFunWallet = new FunWallet({ walletAddr: args.walletAddr })
           const account = await newFunWallet.getAddress()
           // if exists on chain and if it doesnt throw error if the uniqueID isnt also passed
           newFunWallet

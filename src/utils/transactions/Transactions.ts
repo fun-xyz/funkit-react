@@ -12,7 +12,7 @@ import {
   OperationType,
   RequestUnstakeParams,
   StakeParams,
-  SwapParam,
+  SwapParams,
   TokenSponsor,
   TransactionData,
   TransferParams,
@@ -36,7 +36,7 @@ export type transactionTypes = 'transfer' | 'approve' | 'swap' | 'stake' | 'unst
 export type transactionParams =
   | TransferParams
   | ApproveParams
-  | SwapParam
+  | SwapParams
   | StakeParams
   | RequestUnstakeParams
   | FinishUnstakeParams
@@ -272,7 +272,7 @@ export const estimateGas = async (build: IOperationsArgs, Auth: Auth, wallet: Fu
     if (wallet == null) reject('No wallet')
     FunWallet[build.type](
       Auth,
-      build.txParams as (((((TransferParams & ApproveParams) & SwapParam) & StakeParams) &
+      build.txParams as (((((TransferParams & ApproveParams) & SwapParams) & StakeParams) &
         (RequestUnstakeParams | FinishUnstakeParams)) &
         (EnvOption | undefined)) &
         TransactionData,

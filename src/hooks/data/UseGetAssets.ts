@@ -1,4 +1,3 @@
-import { FunWallet } from '@fun-xyz/core'
 import { useCallback, useState } from 'react'
 import { shallow } from 'zustand/shallow'
 
@@ -22,8 +21,10 @@ export const useGetAssets = () => {
   const getAssets = useCallback(async () => {
     setLoading(true)
     try {
-      let wallet = userWallet
-      if (!wallet) wallet = new FunWallet({ uniqueId: '0x00' })
+      const wallet = userWallet
+      if (!wallet) {
+        throw new Error('Wallet Not Initialized')
+      }
       const getAssetResult = await wallet.getAssets()
       setAssets(getAssetResult)
       setLoading(false)

@@ -10,7 +10,7 @@ import {
   RequestUnstakeParams,
   SessionKeyParams,
   StakeParams,
-  SwapParam,
+  SwapParams,
   TransactionParams,
   TransferParams,
   UpdateThresholdOfGroupParams,
@@ -56,7 +56,7 @@ export interface ITransactionParams {
 
 export interface ISwapParams {
   action: ActionType.Swap
-  params: SwapParam
+  params: SwapParams
 }
 export interface ITransfer {
   action: ActionType.Transfer

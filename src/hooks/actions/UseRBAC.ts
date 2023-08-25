@@ -49,7 +49,7 @@ export const useRBAC = () => {
         const operation = await wallet.addOwner(
           primaryAuth[0],
           activeUser?.userId,
-          { ownerId: convertToValidUserId(newOwnerId) as `0x${string}`, chainId },
+          { ownerId: convertToValidUserId(newOwnerId) as `0x${string}` },
           txOptions
         )
         const { remainingConnectedSigners, threshold } = remainingConnectedSignersForOperation({
@@ -103,7 +103,6 @@ export const useRBAC = () => {
         })
         const operation = await wallet.removeOwner(primaryAuth[0], activeUser?.userId, {
           ownerId: ownerId as `0x${string}`,
-          chainId,
         })
         const { remainingConnectedSigners, threshold } = remainingConnectedSignersForOperation({
           operation,
