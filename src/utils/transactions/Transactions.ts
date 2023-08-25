@@ -275,7 +275,7 @@ export const estimateGas = async (build: IOperationsArgs, Auth: Auth, wallet: Fu
       build.txParams as (((((TransferParams & ApproveParams) & SwapParams) & StakeParams) &
         (RequestUnstakeParams | FinishUnstakeParams)) &
         (EnvOption | undefined)) &
-      TransactionData,
+        TransactionData,
       build.txOptions,
       true // estimateGas
     )
