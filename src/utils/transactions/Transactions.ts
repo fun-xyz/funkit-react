@@ -18,6 +18,7 @@ import {
   TransferParams,
   User,
 } from '@fun-xyz/core'
+import { Address } from 'viem'
 
 import { IActiveAuthList } from '@/hooks/util'
 
@@ -220,11 +221,11 @@ export const validateGasSponsorMode = async (
   let getWhiteListedPromise: Promise<boolean>
 
   if (gasSponsor instanceof GaslessSponsor) {
-    getBlackListedPromise = gasSponsor.getSpenderBlacklistMode(walletAddress, sponsorAddress)
-    getWhiteListedPromise = gasSponsor.getSpenderWhitelistMode(walletAddress, sponsorAddress)
+    getBlackListedPromise = gasSponsor.getSpenderBlacklistMode(walletAddress as Address, sponsorAddress as Address)
+    getWhiteListedPromise = gasSponsor.getSpenderWhitelistMode(walletAddress as Address, sponsorAddress as Address)
   } else if (gasSponsor instanceof TokenSponsor) {
-    getBlackListedPromise = gasSponsor.getSpenderBlacklisted(walletAddress, sponsorAddress)
-    getWhiteListedPromise = gasSponsor.getSpenderWhitelisted(walletAddress, sponsorAddress)
+    getBlackListedPromise = gasSponsor.getSpenderBlacklisted(walletAddress as Address, sponsorAddress as Address)
+    getWhiteListedPromise = gasSponsor.getSpenderWhitelisted(walletAddress as Address, sponsorAddress as Address)
   } else {
     return {
       valid: false,
