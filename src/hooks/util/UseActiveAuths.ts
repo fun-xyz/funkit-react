@@ -11,7 +11,7 @@ const shallowCompare = (obj1: Record<string, any> | null | undefined, obj2: Reco
 }
 
 // TODO it seems that this system will allow the primaryAuth to not be a part of the group?
-export const useActiveAuth = (): Auth[] => {
+export const useActiveAuths = (): Auth[] => {
   const activeClients = useActiveClients()
   const activeAuths: Auth[] = []
 
