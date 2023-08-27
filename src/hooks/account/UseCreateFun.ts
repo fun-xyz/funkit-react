@@ -53,7 +53,7 @@ export const useCreateFun = () => {
       allUsers: state.allUsers,
       setNewAccountUsers: state.setNewAccountUsers,
       setGroupIds: state.setGroupIds,
-      groupIds,
+      groupIds: state.groupIds,
     }),
     shallow
   )
