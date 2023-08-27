@@ -8,6 +8,8 @@ export interface FunAccountStoreInterface {
   setLogin: (account: string, funWallet: FunWallet) => void
   ensName: string | null
   setEnsName: (ensName: string) => void
+  groupIds: string[]
+  setGroupIds: (groupIds: string[]) => void
 }
 
 export const configureFunAccountStore = (get: any, set: any): FunAccountStoreInterface => ({
@@ -20,4 +22,6 @@ export const configureFunAccountStore = (get: any, set: any): FunAccountStoreInt
   },
   ensName: null,
   setEnsName: (ensName: string) => set({ ensName }),
+  groupIds: [],
+  setGroupIds: (groupIds: string[]) => set({ groupIds }),
 })
