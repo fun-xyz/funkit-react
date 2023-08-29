@@ -1,4 +1,4 @@
-import { Auth, Wallet } from '@fun-xyz/core'
+import { Auth, Wallet } from '@funkit/core'
 import { useEffect } from 'react'
 import { shallow } from 'zustand/shallow'
 
@@ -53,7 +53,9 @@ export const useFunAccounts = (): IUseFunAccountsReturn => {
 
         if (wallets.flat().length === 0) return { sortedFunWallets: [] }
         // sort the wallets
-        const WalletSet: { [account: string]: { wallet: Wallet; count: number } } = {}
+        const WalletSet: {
+          [account: string]: { wallet: Wallet; count: number }
+        } = {}
         wallets
           .concat()
           .flat()

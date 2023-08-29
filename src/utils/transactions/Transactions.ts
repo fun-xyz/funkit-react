@@ -17,7 +17,7 @@ import {
   TransactionData,
   TransferParams,
   User,
-} from '@fun-xyz/core'
+} from '@funkit/core'
 import { Address } from 'viem'
 
 import { IActiveAuthList } from '@/hooks/util'
@@ -121,7 +121,9 @@ export const validateGasBehavior = async (config: EnvOption, wallet: FunWallet):
     const walletAddress = await wallet.getAddress()
     let currentChain = config.chain as Chain
     if (typeof config.chain === 'string' || typeof config.chain === 'number')
-      currentChain = await Chain.getChain({ chainIdentifier: `${config.chain}` })
+      currentChain = await Chain.getChain({
+        chainIdentifier: `${config.chain}`,
+      })
     const client = await currentChain.getClient()
     const iscontract = await isContract(walletAddress, client)
     if (config.gasSponsor) {
@@ -187,12 +189,16 @@ export const validateGasBehavior = async (config: EnvOption, wallet: FunWallet):
       if (etherBalance < gasPrice * 100000n)
         return {
           valid: false,
-          error: generateTransactionError(TransactionErrorLowFunWalletBalance, { amount: etherBalance }),
+          error: generateTransactionError(TransactionErrorLowFunWalletBalance, {
+            amount: etherBalance,
+          }),
         }
       if (iscontract && etherBalance < gasPrice * 1500000n)
         return {
           valid: false,
-          error: generateTransactionError(TransactionErrorLowFunWalletBalance, { amount: etherBalance }),
+          error: generateTransactionError(TransactionErrorLowFunWalletBalance, {
+            amount: etherBalance,
+          }),
         }
       return { valid: true }
     }
@@ -200,7 +206,11 @@ export const validateGasBehavior = async (config: EnvOption, wallet: FunWallet):
     console.log('========= Error:', err)
     return {
       valid: false,
-      error: { code: 0, message: 'Error Validating fetching sponsor Validation status', err },
+      error: {
+        code: 0,
+        message: 'Error Validating fetching sponsor Validation status',
+        err,
+      },
     }
   }
 }
@@ -243,14 +253,20 @@ export const validateGasSponsorMode = async (
       if (isBlackListed) {
         return {
           valid: false,
-          error: generateTransactionError(TransactionErrorGasSponsorBlacklist, { sponsorAddress, walletAddress }),
+          error: generateTransactionError(TransactionErrorGasSponsorBlacklist, {
+            sponsorAddress,
+            walletAddress,
+          }),
         }
       }
     } else {
       if (!isWhiteListed) {
         return {
           valid: false,
-          error: generateTransactionError(TransactionErrorGasSponsorWhitelist, { sponsorAddress, walletAddress }),
+          error: generateTransactionError(TransactionErrorGasSponsorWhitelist, {
+            sponsorAddress,
+            walletAddress,
+          }),
         }
       }
     }
@@ -262,7 +278,11 @@ export const validateGasSponsorMode = async (
     console.log('Error:', err)
     return {
       valid: false,
-      error: { code: 0, message: 'Error validating fetching sponsor mode validation status', err },
+      error: {
+        code: 0,
+        message: 'Error validating fetching sponsor mode validation status',
+        err,
+      },
     }
   }
 }
@@ -309,7 +329,11 @@ export const remainingConnectedSignersForOperation = ({
   firstSigner,
 }: IRemainingSigners): IRemainingSignersResponse => {
   if (operation.opType === OperationType.SINGLE_OPERATION || activeUser.groupInfo == null)
-    return { remainingConnectedSigners: [], signerCount: operation.signatures?.length ?? 0, threshold: 1 }
+    return {
+      remainingConnectedSigners: [],
+      signerCount: operation.signatures?.length ?? 0,
+      threshold: 1,
+    }
   const currentClients = activeClients.filter((client) => client.userId != null)
   const currentSigners = operation.signatures
   // if there are no signers then we need to sign with all the required signers
@@ -326,7 +350,11 @@ export const remainingConnectedSignersForOperation = ({
         else return undefined
       })
       .filter((signer) => signer != null) as { userId: string; auth: Auth }[]
-    return { remainingConnectedSigners, signerCount: 0, threshold: activeUser.groupInfo?.threshold }
+    return {
+      remainingConnectedSigners,
+      signerCount: 0,
+      threshold: activeUser.groupInfo?.threshold,
+    }
   }
   // if the number of signers is greater than or equal to the threshold then we don't need to sign anymore so no need to calculate additonal signers
   if (currentSigners?.length >= activeUser.groupInfo?.threshold) {

@@ -1,4 +1,4 @@
-import { Auth } from '@fun-xyz/core'
+import { Auth } from '@funkit/core'
 
 import { useActiveClients } from './UseActiveClients'
 

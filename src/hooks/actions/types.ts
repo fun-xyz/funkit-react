@@ -14,7 +14,7 @@ import {
   TransactionParams,
   TransferParams,
   UpdateThresholdOfGroupParams,
-} from '@fun-xyz/core'
+} from '@funkit/core'
 
 export type FirstClassActionParams =
   | ISwapParams

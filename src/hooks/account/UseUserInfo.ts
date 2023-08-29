@@ -1,4 +1,4 @@
-import { Auth } from '@fun-xyz/core'
+import { Auth } from '@funkit/core'
 import { useCallback, useState } from 'react'
 import { shallow } from 'zustand/shallow'
 

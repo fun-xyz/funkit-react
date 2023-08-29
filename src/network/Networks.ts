@@ -1,4 +1,4 @@
-import { Chain } from '@fun-xyz/core'
+import { Chain } from '@funkit/core'
 import { PublicClient } from 'viem'
 
 export const Goerli = '5'

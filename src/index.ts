@@ -1,4 +1,4 @@
-import { GlobalEnvOption } from '@fun-xyz/core'
+import { GlobalEnvOption } from '@funkit/core'
 
 export {
   CoinbaseWalletConnector,
@@ -35,7 +35,7 @@ export {
   Operation,
   OperationStatus,
   User,
-} from '@fun-xyz/core'
+} from '@funkit/core'
 declare global {
   interface Window {
     globalEnvOption: GlobalEnvOption
