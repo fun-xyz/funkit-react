@@ -1,4 +1,4 @@
-import { Auth, EnvOption, Operation, OperationStatus } from '@fun-xyz/core'
+import { Auth, EnvOption, Operation, OperationStatus } from '@funkit/core'
 import { useCallback, useMemo, useState } from 'react'
 import { shallow } from 'zustand/shallow'
 
@@ -50,12 +50,24 @@ export const useOperations = () => {
   const signOperation = useCallback(
     async (operation: Operation, auth?: Auth, txOption?: EnvOption) => {
       if (wallet == null) return
-      if (primaryAuth == null) return generateTransactionError(TransactionErrorFailedToSign, { operation })
-      if (activeUser == null) return generateTransactionError(TransactionErrorFailedToSign, { operation })
+      if (primaryAuth == null)
+        return generateTransactionError(TransactionErrorFailedToSign, {
+          operation,
+        })
+      if (activeUser == null)
+        return generateTransactionError(TransactionErrorFailedToSign, {
+          operation,
+        })
       if (operation.groupId !== activeUser.userId)
-        return generateTransactionError(TransactionErrorUserIdMismatch, { operation, activeUser })
+        return generateTransactionError(TransactionErrorUserIdMismatch, {
+          operation,
+          activeUser,
+        })
       if (operation.status !== OperationStatus.PENDING_APPROVED)
-        return generateTransactionError(TransactionErrorNotPending, { operation, activeUser })
+        return generateTransactionError(TransactionErrorNotPending, {
+          operation,
+          activeUser,
+        })
 
       const { remainingConnectedSigners } = remainingConnectedSignersForOperation({
         operation,
@@ -65,9 +77,14 @@ export const useOperations = () => {
       })
 
       if (remainingConnectedSigners.length === 0)
-        return generateTransactionError(TransactionErrorRequiresSigners, { operation })
+        return generateTransactionError(TransactionErrorRequiresSigners, {
+          operation,
+        })
       const signer = auth ? auth : remainingConnectedSigners[0]?.auth
-      if (signer == null) return generateTransactionError(TransactionErrorRequiresSigners, { operation })
+      if (signer == null)
+        return generateTransactionError(TransactionErrorRequiresSigners, {
+          operation,
+        })
 
       setProcessing(true)
       try {
@@ -89,12 +106,18 @@ export const useOperations = () => {
       if (wallet == null || activeUser == null) return
       if (processing) return // don't allow it to return an error if its already processing
       if (operation.status !== OperationStatus.PENDING_APPROVED && operation.status !== OperationStatus.APPROVED)
-        return generateTransactionError(TransactionErrorNotPending, { operation, activeUser })
+        return generateTransactionError(TransactionErrorNotPending, {
+          operation,
+          activeUser,
+        })
 
       if (operation.groupId == null) {
         // if its not a group transaction than check if the auth matches the operation userId and try and execute it
         if (convertToValidUserId(operation.proposer) !== convertToValidUserId(activeUser.userId))
-          return generateTransactionError(TransactionErrorUserIdMismatch, { operation, activeUser })
+          return generateTransactionError(TransactionErrorUserIdMismatch, {
+            operation,
+            activeUser,
+          })
         const signer = auth ? auth : primaryAuth[0]
         const Operation = await wallet.executeOperation(signer, operation, txOption)
         setProcessing(false)
@@ -102,7 +125,10 @@ export const useOperations = () => {
         return Operation
       }
       if (operation.groupId !== activeUser.userId)
-        return generateTransactionError(TransactionErrorUserIdMismatch, { operation, activeUser })
+        return generateTransactionError(TransactionErrorUserIdMismatch, {
+          operation,
+          activeUser,
+        })
 
       const { remainingConnectedSigners, signerCount, threshold } = remainingConnectedSignersForOperation({
         operation,
@@ -113,12 +139,20 @@ export const useOperations = () => {
       console.log('remainingConnectedSigners', remainingConnectedSigners, signerCount, threshold)
       // if there are no remaining signers to execute the operation  and if the threshold hasn't already been met
       if (remainingConnectedSigners.length === 0 && signerCount < threshold)
-        return generateTransactionError(TransactionErrorRequiresSigners, { operation })
+        return generateTransactionError(TransactionErrorRequiresSigners, {
+          operation,
+        })
 
-      if (threshold - signerCount > 1) return generateTransactionError(TransactionErrorRequiresSigners, { operation })
+      if (threshold - signerCount > 1)
+        return generateTransactionError(TransactionErrorRequiresSigners, {
+          operation,
+        })
 
       const signer = auth ? auth : remainingConnectedSigners[0]?.auth ?? primaryAuth[0]
-      if (signer == null) return generateTransactionError(TransactionErrorFailedToSign, { operation })
+      if (signer == null)
+        return generateTransactionError(TransactionErrorFailedToSign, {
+          operation,
+        })
       setProcessing(true)
       try {
         const Operation = await wallet.executeOperation(signer, operation, txOption)
@@ -137,15 +171,28 @@ export const useOperations = () => {
   const rejectOperation = useCallback(
     async (operation: Operation, rejectionMessage: string, auth?: Auth, txOptions?: EnvOption) => {
       if (wallet == null || activeUser == null || processing) return
-      if (operation.groupId == null) return generateTransactionError(TransactionErrorNonGroupTransaction, { operation })
+      if (operation.groupId == null)
+        return generateTransactionError(TransactionErrorNonGroupTransaction, {
+          operation,
+        })
       if (operation.status !== OperationStatus.PENDING_APPROVED && operation.status !== OperationStatus.APPROVED)
-        return generateTransactionError(TransactionErrorUnableToReject, { operation, activeUser })
+        return generateTransactionError(TransactionErrorUnableToReject, {
+          operation,
+          activeUser,
+        })
       if (operation.groupId !== activeUser.userId)
-        return generateTransactionError(TransactionErrorUserIdMismatch, { operation, activeUser })
+        return generateTransactionError(TransactionErrorUserIdMismatch, {
+          operation,
+          activeUser,
+        })
 
       const firstSigner = auth ?? primaryAuth[0]
       if (firstSigner == null)
-        return generateTransactionError(TransactionErrorFailedToSign, { operation, auth, primaryAuth })
+        return generateTransactionError(TransactionErrorFailedToSign, {
+          operation,
+          auth,
+          primaryAuth,
+        })
       setProcessing(true)
       try {
         const rejectedOperation = await wallet.createRejectOperation(
@@ -162,7 +209,14 @@ export const useOperations = () => {
           firstSigner: null,
         })
         if (remainingConnectedSigners.length > 0) {
-          signUntilExecute({ wallet, remainingConnectedSigners, threshold, operation, firstSigner, txOptions })
+          signUntilExecute({
+            wallet,
+            remainingConnectedSigners,
+            threshold,
+            operation,
+            firstSigner,
+            txOptions,
+          })
         }
         fetchOperations()
         return rejectedOperation
@@ -179,7 +233,10 @@ export const useOperations = () => {
   const removeOperation = useCallback(
     async (operation: Operation, auth: Auth, txOption?: EnvOption) => {
       if (wallet == null) return
-      if (operation.opId == null) return generateTransactionError(TransactionErrorMissingOpId, { operation })
+      if (operation.opId == null)
+        return generateTransactionError(TransactionErrorMissingOpId, {
+          operation,
+        })
       setProcessing(true)
       try {
         const removedOperation = await wallet.removeOperation(auth, operation.opId, txOption)

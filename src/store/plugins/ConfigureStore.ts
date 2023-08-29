@@ -1,4 +1,4 @@
-import { configureEnvironment, GlobalEnvOption } from '@fun-xyz/core'
+import { configureEnvironment, GlobalEnvOption } from '@funkit/core'
 
 export interface ConfigureStoreInterface {
   config: GlobalEnvOption | null

@@ -1,4 +1,4 @@
-import { User, Wallet } from '@fun-xyz/core'
+import { User, Wallet } from '@funkit/core'
 
 export interface IActiveAuthList {
   active: boolean

@@ -1,4 +1,4 @@
-import { Auth, EnvOption, Operation } from '@fun-xyz/core'
+import { Auth, EnvOption, Operation } from '@funkit/core'
 import { useCallback, useState } from 'react'
 import { shallow } from 'zustand/shallow'
 
@@ -31,10 +31,17 @@ export const useAction = (args: FirstClassActionParams, txOptions?: EnvOption) =
       if (wallet == null || (activeUser == null && primaryAuth[0] == null))
         return generateTransactionError(MissingActiveSigner, { activeUser }) // invalid tx params error
       const firstSigner = auth ?? primaryAuth[0]
-      if (firstSigner == null) return generateTransactionError(MissingActiveSigner, { activeUser, primaryAuth, auth })
+      if (firstSigner == null)
+        return generateTransactionError(MissingActiveSigner, {
+          activeUser,
+          primaryAuth,
+          auth,
+        })
       setLoading(true)
       try {
-        const ActiveUser = activeUser ?? { userId: await firstSigner.getUserId() }
+        const ActiveUser = activeUser ?? {
+          userId: await firstSigner.getUserId(),
+        }
 
         console.log('action launching ', args, args.action, activeUser, args.params, firstSigner, activeUser)
         console.log('ACTION: ', firstSigner, primaryAuth)

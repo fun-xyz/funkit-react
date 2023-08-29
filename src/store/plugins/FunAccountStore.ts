@@ -1,4 +1,4 @@
-import { FunWallet } from '@fun-xyz/core'
+import { FunWallet } from '@funkit/core'
 
 export interface FunAccountStoreInterface {
   FunWallet: FunWallet | null

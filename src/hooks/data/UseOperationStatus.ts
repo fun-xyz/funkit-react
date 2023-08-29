@@ -1,4 +1,4 @@
-import { Operation, OperationStatus } from '@fun-xyz/core'
+import { Operation, OperationStatus } from '@funkit/core'
 import { useCallback, useEffect, useState } from 'react'
 import { shallow } from 'zustand/shallow'
 

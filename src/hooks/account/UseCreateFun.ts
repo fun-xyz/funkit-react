@@ -1,4 +1,4 @@
-import { Chain, FunWallet, FunWalletParams } from '@fun-xyz/core'
+import { Chain, FunWallet, FunWalletParams } from '@funkit/core'
 import { useCallback, useState } from 'react'
 import { shallow } from 'zustand/shallow'
 
@@ -131,7 +131,10 @@ export const useCreateFun = () => {
         }
         // login to a specific fun wallet
         else if (args.uniqueId) {
-          const newFunWallet = new FunWallet({ users: [{ userId: await auth.getUserId() }], uniqueId: args.uniqueId })
+          const newFunWallet = new FunWallet({
+            users: [{ userId: await auth.getUserId() }],
+            uniqueId: args.uniqueId,
+          })
           const account = await newFunWallet.getAddress()
           // if exists on chain and if it doesnt throw error if the uniqueID isnt also passed
           newFunWallet

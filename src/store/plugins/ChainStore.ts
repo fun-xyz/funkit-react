@@ -1,4 +1,4 @@
-import { Chain, GlobalEnvOption } from '@fun-xyz/core'
+import { Chain, GlobalEnvOption } from '@funkit/core'
 
 import { convertToChain } from '../../network/Networks'
 import { buildAndUpdateConfig } from './ConfigureStore'

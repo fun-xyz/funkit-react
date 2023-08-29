@@ -1,4 +1,4 @@
-import { EnvOption, ExecutionReceipt, Operation } from '@fun-xyz/core'
+import { EnvOption, ExecutionReceipt, Operation } from '@funkit/core'
 import { useCallback, useState } from 'react'
 import { shallow } from 'zustand/shallow'
 

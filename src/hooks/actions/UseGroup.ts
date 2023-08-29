@@ -7,7 +7,7 @@ import {
   Operation,
   RemoveUserFromGroupParams,
   UpdateThresholdOfGroupParams,
-} from '@fun-xyz/core'
+} from '@funkit/core'
 import { useCallback, useState } from 'react'
 import { shallow } from 'zustand/shallow'
 
