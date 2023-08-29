@@ -1,6 +1,6 @@
 ![backdrop](./backdrop.png)
 
-# **FunKit**
+# **FunKit React**
 
 FunKit empowers you to create feature-rich and extensible smart wallets built on account abstraction. Leveraging the FunKit, you can customize gas behavior, adopt multi-sig and common authentication method, monetize your application, execute any transactions from smart wallets, and much more.
 
@@ -31,14 +31,14 @@ Import all required classes.
 
 ```js
 import {
-  convertToValidUserId,
-  useConnector,
-  useCreateFun,
-  configureNewFunStore,
-  MetamaskConnector,
-  usePrimaryAuth,
-} from "@funkit/react";
-import { useState } from "react";
+    convertToValidUserId,
+    useConnector,
+    useCreateFun,
+    configureNewFunStore,
+    MetamaskConnector,
+    usePrimaryAuth
+} from "@funkit/react"
+import { useState } from "react"
 ```
 
 ### 2. Configure wallet environment
@@ -52,15 +52,15 @@ Set your environment variables describing how your smart wallets interact with b
 
 ```jsx
 configureNewFunStore({
-  config: {
-    chain: CHAIN_ID,
-    apiKey: API_KEY,
-    gasSponsor: {
-      sponsorAddress: SPONSOR_ADDRESS,
+    config: {
+        chain: CHAIN_ID,
+        apiKey: API_KEY,
+        gasSponsor: {
+            sponsorAddress: SPONSOR_ADDRESS
+        }
     },
-  },
-  connectors: [MetamaskConnector()],
-});
+    connectors: [MetamaskConnector()]
+})
 ```
 
 ### 3. User login through connector
@@ -69,22 +69,22 @@ Next, users need to login through connectors to provide a way for fun account ab
 
 ```jsx
 const ConnectorButton = ({ index }) => {
-  const { active, activate, deactivate, connectorName, connector } = useConnector({ index });
-
-  return (
-    <button
-      onClick={() => {
-        if (active) {
-          deactivate(connector);
-          return;
-        }
-        activate(connector);
-      })
-    >
-      {active ? "Unconnected" : "Connect"} {connectorName}{" "}
-    </button>
-  );
-};
+    const { active, activate, deactivate, connectorName, connector } = useConnector({ index })
+    
+    return (
+        <button
+            onClick={() => {
+                if (active) {
+                    deactivate(connector)
+                    return
+                }
+                activate(connector)
+            }}
+        >
+            {active ? "Unconnected" : "Connect"} {connectorName}{" "}
+        </button>
+    )
+}
 ```
 
 ### 4. Initialize the FunWallet
@@ -96,22 +96,22 @@ With the Auth instance that you just created, you can now initialize your FunWal
 
 ```jsx
 const { account: connectorAccount } = useConnector({
-  index: 0,
-  autoConnect: true,
-});
-const { initializeFunAccount, funWallet } = useCreateFun();
-const [auth] = usePrimaryAuth();
+    index: 0,
+    autoConnect: true,
+})
+const { initializeFunAccount, funWallet } = useCreateFun()
+const [auth] = usePrimaryAuth()
 
 const initializeSingleAuthFunAccount = async () => {
-  if (!connectorAccount) {
-    console.log("Please connect your wallet first!");
-    return;
-  }
-  initializeFunAccount({
-    users: [{ userId: convertToValidUserId(connectorAccount) }],
-    uniqueId: await auth.getWalletUniqueId(),
-  }).catch();
-};
+    if (!connectorAccount) {
+        console.log("Please connect your wallet first!");
+        return
+    }
+    initializeFunAccount({
+        users: [{ userId: convertToValidUserId(connectorAccount) }],
+        uniqueId: await auth.getWalletUniqueId(),
+    }).catch()
+}
 ```
 
 ### 5. Initiate a Transfer
@@ -120,20 +120,20 @@ Now we have the wallet object, we will show how to transfer some basic ethers to
 
 ```jsx
 const transferEth = async () => {
-  if (!connectorAccount) {
-    console.log("Please connect your wallet first!");
-    return;
-  }
-  const op = await funWallet.transfer(auth, await auth.getUserId(), {
-    token: "eth",
-    to: await auth.getAddress(),
-    amount: AMOUNT,
-  });
-  setLoadings({ ...loadings, transfer: true });
-  const receipt = await funWallet.executeOperation(auth, op);
-  setTxIds({ ...txIds, transfer: receipt.txId });
-  setLoadings({ ...loadings, transfer: false });
-};
+    if (!connectorAccount) {
+        console.log("Please connect your wallet first!")
+        return
+    }
+    const op = await funWallet.transfer(auth, await auth.getUserId(), {
+        token: "eth",
+        to: await auth.getAddress(),
+        amount: AMOUNT,
+    })
+    setLoadings({ ...loadings, transfer: true })
+    const receipt = await funWallet.executeOperation(auth, op)
+    setTxIds({ ...txIds, transfer: receipt.txId })
+    setLoadings({ ...loadings, transfer: false })
+}
 ```
 
 ## <a id="testing"></a> **Testing**
@@ -144,15 +144,15 @@ You can test FunKit on Ethereum goerli testnet with the following configuration.
 
 ```jsx
 configureNewFunStore({
-  config: {
-    chain: "goerli",
-    apiKey: API_KEY,
-    gasSponsor: {
-      sponsorAddress: "0xCB5D0b4569A39C217c243a436AC3feEe5dFeb9Ad",
+    config: {
+        chain: "goerli",
+        apiKey: API_KEY,
+        gasSponsor: {
+            sponsorAddress: "0xCB5D0b4569A39C217c243a436AC3feEe5dFeb9Ad",
+        },
     },
-  },
-  connectors: [MetamaskConnector()],
-});
+    connectors: [MetamaskConnector()],
+})
 ```
 
 ## <a id="moreresources"></a> **More Resources**
