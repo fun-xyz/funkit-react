@@ -46,7 +46,6 @@ export const useOperations = () => {
     [operations]
   )
 
-  // this should check what signers need to still sign and try and sign with one of those or throw a Fun Error
   const signOperation = useCallback(
     async (operation: Operation, auth?: Auth, txOption?: EnvOption) => {
       if (wallet == null) return
@@ -104,7 +103,7 @@ export const useOperations = () => {
   const executeOperation = useCallback(
     async (operation: Operation, auth?: Auth, txOption?: EnvOption) => {
       if (wallet == null || activeUser == null) return
-      if (processing) return // don't allow it to return an error if its already processing
+      if (processing) return
       if (operation.status !== OperationStatus.PENDING_APPROVED && operation.status !== OperationStatus.APPROVED)
         return generateTransactionError(TransactionErrorNotPending, {
           operation,
@@ -112,7 +111,6 @@ export const useOperations = () => {
         })
 
       if (operation.groupId == null) {
-        // if its not a group transaction than check if the auth matches the operation userId and try and execute it
         if (convertToValidUserId(operation.proposer) !== convertToValidUserId(activeUser.userId))
           return generateTransactionError(TransactionErrorUserIdMismatch, {
             operation,
@@ -137,7 +135,6 @@ export const useOperations = () => {
         firstSigner: null,
       })
       console.log('remainingConnectedSigners', remainingConnectedSigners, signerCount, threshold)
-      // if there are no remaining signers to execute the operation  and if the threshold hasn't already been met
       if (remainingConnectedSigners.length === 0 && signerCount < threshold)
         return generateTransactionError(TransactionErrorRequiresSigners, {
           operation,

@@ -101,14 +101,6 @@ export interface GasValidationResponse {
   error?: FunError
   allowance?: bigint
 }
-
-// TODO allowance should be looked into for permit
-// ask caleb how to validate
-// validate allowance when needed on error
-// deposit tokens directly into paymaster
-// do they have enough balance to pay for tokens
-// can we simulate locally
-
 /**
  * Validates the gas behavior of a transaction and prepares it for execution.
  * @param config - The environment configuration object.
@@ -203,7 +195,6 @@ export const validateGasBehavior = async (config: EnvOption, wallet: FunWallet):
       return { valid: true }
     }
   } catch (err) {
-    console.log('========= Error:', err)
     return {
       valid: false,
       error: {
@@ -337,11 +328,8 @@ export const remainingConnectedSignersForOperation = ({
   const currentClients = activeClients.filter((client) => client.userId != null)
   const currentSigners = operation.signatures
   // if there are no signers then we need to sign with all the required signers
-  console.log('fetching Remaining Signers: ', currentSigners, currentClients)
-
   // handle the case where this is the first signature. It should return all the connected signers
   if (currentSigners == null || currentSigners.length == 0) {
-    console.log("First Signer, so we'll return all the connected signers")
     const remainingConnectedSigners = currentClients
       .map(({ userId, provider }) => {
         if (userId == firstSigner) return undefined
@@ -358,14 +346,12 @@ export const remainingConnectedSignersForOperation = ({
   }
   // if the number of signers is greater than or equal to the threshold then we don't need to sign anymore so no need to calculate additonal signers
   if (currentSigners?.length >= activeUser.groupInfo?.threshold) {
-    console.log('remainingSigners, Threshold met')
     return {
       remainingConnectedSigners: [],
       signerCount: currentSigners?.length,
       threshold: activeUser.groupInfo?.threshold,
     }
   }
-  console.log('returning all signers that are connected')
   const remainingConnectedSigners = currentClients
     .map(({ userId, provider }) => {
       if (userId == firstSigner) return undefined
@@ -407,7 +393,6 @@ export const signUntilExecute = async ({
   txOptions,
 }: SignUntilExecuteParams) => {
   if (threshold === 1) {
-    console.log('signing with first signer', firstSigner, operation)
     return await wallet.executeOperation(firstSigner, operation, txOptions)
   } else {
     let count = 1
@@ -415,10 +400,8 @@ export const signUntilExecute = async ({
       const currentAuth = remainingConnectedSigners[i].auth
 
       if (count + 1 >= threshold) {
-        console.log('Final signature, executing operation: ', currentAuth, operation)
         return await wallet.executeOperation(currentAuth, operation, txOptions)
       } else {
-        console.log('Signing with: ', currentAuth, operation)
         wallet
           .signOperation(currentAuth, operation, txOptions)
           .then(() => {
@@ -430,7 +413,6 @@ export const signUntilExecute = async ({
           })
       }
     }
-    console.log("returning operation because we didn't have enough signatures")
     return operation
   }
 }

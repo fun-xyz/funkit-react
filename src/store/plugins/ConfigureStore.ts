@@ -23,9 +23,6 @@ export const setConfig = async (newConfig: Partial<GlobalEnvOption>) => {
   return { config: newConfig }
 }
 
-// TODO add checking to the update config or set Config to verify that the chain is valid and synchronized with the state.
-// TODO add check to validate the fun wallet has been properly regenerated
-
 export const configureConfigurationStore = (
   get: () => ConfigureStoreInterface,
   set: (newValue: any) => void

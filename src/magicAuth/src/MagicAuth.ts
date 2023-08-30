@@ -215,7 +215,6 @@ export class MagicAuthConnector extends Connector {
       this.setEventListeners()
 
       if (await this.magic?.user.isLoggedIn()) {
-        // TODO URGENT - this is not working since it needs to wait for the redirect to happen
         this.completeActivation()
       }
     } catch (error) {
@@ -225,10 +224,8 @@ export class MagicAuthConnector extends Connector {
     }
   }
 
-  // "disconnect"
   override async deactivate(): Promise<void> {
     this.actions.resetState()
-    // await this.magic?.wallet.disconnect()
     await this.magic?.user.logout()
     this.removeEventListeners()
   }

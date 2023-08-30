@@ -23,8 +23,6 @@ const DEFAULT_FUN_WALLET_CONFIG: GlobalEnvOption = {
   chain: '5',
 }
 export const configureNewFunStore = async (params?: configureFunParams) => {
-  console.log('configureNewFunStore', params)
-  // if (useFun.getState().connectors.length > 0) return
   if (!params) {
     useFun.setState({ connectors: DEFAULT_CONNECTORS })
     useFun.setState({ supportedChains: [Optimism, Arbitrum, Polygon, Goerli] })
