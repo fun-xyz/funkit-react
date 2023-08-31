@@ -1,6 +1,6 @@
 {
   "name": "@funkit/react",
-  "version": "0.8.1",
+  "version": "0.8.2",
   "description": "React interface for the Funkit Core SDK",
   "repository": "git@github.com:fun-xyz/funkit-react.git",
   "author": "https://fun.xyz/",
@@ -26,7 +26,7 @@
   },
   "dependencies": {
     "@coinbase/wallet-sdk": "^3.6.6",
-    "@funkit/core": "^0.8.1",
+    "@funkit/core": "^0.8.2",
     "@magic-ext/oauth": "11.0.0",
     "@magic-sdk/commons": "^14.2.1",
     "@magic-sdk/provider": "^18.2.1",

@@ -866,10 +866,10 @@
     "@ethersproject/properties" "^5.7.0"
     "@ethersproject/strings" "^5.7.0"
 
-"@funkit/core@^0.8.1":
-  version "0.8.1"
-  resolved "https://registry.npmjs.org/@funkit/core/-/core-0.8.1.tgz"
-  integrity sha512-4rwyT2GVpazuwo+49FXcwncoVto6/CQfrizcyAowwwXyxDm+AwGgA9Ev6JU1DWReSXrZQ/9CtrDrVfv8x5a3mg==
+"@funkit/core@^0.8.2":
+  version "0.8.2"
+  resolved "https://registry.npmjs.org/@funkit/core/-/core-0.8.2.tgz"
+  integrity sha512-KMlOVPgRIvJCJ4H1Xq/l27TuXvAN2IJfc76Dg5JacFyMK8q0xH2aTCioWO5onrEzFdVX0hmwelNuViF19hTlWg==
   dependencies:
     "@aws-sdk/client-secrets-manager" "^3.315.0"
     "@ethersproject/contracts" "^5.7.0"
