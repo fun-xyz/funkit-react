@@ -32,13 +32,12 @@ export const useGroup = () => {
   const [result, setResult] = useState<ExecutionReceipt | Operation | null>(null)
   const [error, setTxError] = useState<FunError | null>(null)
 
-  // TODO should automatically add group as an owner of the wallet. if No RBAC is set which it will not be for now
   const createGroup = useCallback(
     async (userId: string, params: CreateGroupParams, auth?: Auth, txOptions?: EnvOption) => {
       if (loading) return
-      if (wallet == null) return // invalid tx params error
+      if (wallet == null) return
       const firstSigner = auth ?? primaryAuth[0]
-      if (firstSigner == null) return // no signer error
+      if (firstSigner == null) return
       setLoading(true)
       try {
         const Operation = await wallet.createGroup(firstSigner, userId, params as any, txOptions)
@@ -67,7 +66,6 @@ export const useGroup = () => {
         setResult(response)
         return response
       } catch (error) {
-        console.log('[createGroup Error] ', error)
         setTxError(generateTransactionError(TransactionErrorCatch, { userId, params }, error))
         return generateTransactionError(TransactionErrorCatch, { userId, params }, error)
       } finally {
@@ -80,9 +78,9 @@ export const useGroup = () => {
   const removeGroup = useCallback(
     async (userId: string, params: RemoveUserFromGroupParams, auth?: Auth, txOptions?: EnvOption) => {
       if (loading) return
-      if (wallet == null) return // invalid tx params error
+      if (wallet == null) return
       const firstSigner = auth ?? primaryAuth[0]
-      if (firstSigner == null) return // no signer error
+      if (firstSigner == null) return
       setLoading(true)
       try {
         const Operation = await wallet.removeGroup(firstSigner, userId, params as any, txOptions)
@@ -111,7 +109,6 @@ export const useGroup = () => {
         setResult(response)
         return response
       } catch (error) {
-        console.log('[createGroup Error] ', error)
         setTxError(generateTransactionError(TransactionErrorCatch, { userId, params }, error))
         return generateTransactionError(TransactionErrorCatch, { userId, params }, error)
       } finally {
@@ -124,9 +121,9 @@ export const useGroup = () => {
   const addUserToGroup = useCallback(
     async (userId: string, params: AddUserToGroupParams, auth?: Auth, txOptions?: EnvOption) => {
       if (loading) return
-      if (wallet == null) return // invalid tx params error
+      if (wallet == null) return
       const firstSigner = auth ?? primaryAuth[0]
-      if (firstSigner == null) return // no signer error
+      if (firstSigner == null) return
       setLoading(true)
       try {
         const Operation = await wallet.addUserToGroup(firstSigner, userId, params as any, txOptions)
@@ -136,7 +133,6 @@ export const useGroup = () => {
           activeClients,
           firstSigner: null,
         })
-        console.log('remainingConnectedSigners', remainingConnectedSigners)
         if (remainingConnectedSigners.length === 0) {
           const [receipt] = await Promise.all([
             wallet.executeOperation(firstSigner, Operation, txOptions),
@@ -156,7 +152,6 @@ export const useGroup = () => {
         setResult(response)
         return response
       } catch (error) {
-        console.log('[AddUserToGroup Error] ', error)
         setTxError(generateTransactionError(TransactionErrorCatch, { userId, params }, error))
         return generateTransactionError(TransactionErrorCatch, { userId, params }, error)
       } finally {
@@ -169,13 +164,12 @@ export const useGroup = () => {
   const removeUserFromGroup = useCallback(
     async (userId: string, params: RemoveUserFromGroupParams, auth?: Auth, txOptions?: EnvOption) => {
       if (loading) return
-      if (wallet == null) return // invalid tx params error
+      if (wallet == null) return
       const firstSigner = auth ?? primaryAuth[0]
-      if (firstSigner == null) return // no signer error
+      if (firstSigner == null) return
       setLoading(true)
       try {
         const Operation = await wallet.removeUserFromGroup(firstSigner, userId, params as any, txOptions)
-        // console.log('fetch remaining signers ', Operation, activeUser, activeClients, firstSigner)
         const { remainingConnectedSigners, threshold } = remainingConnectedSignersForOperation({
           operation: Operation,
           activeUser,
@@ -190,7 +184,6 @@ export const useGroup = () => {
           setResult(receipt)
           return receipt
         }
-        console.log("remove user execution decider didn't return Sign until execute ")
         const response = await signUntilExecute({
           firstSigner,
           operation: Operation,
@@ -215,9 +208,9 @@ export const useGroup = () => {
   const updateThresholdOfGroup = useCallback(
     async (userId: string, params: UpdateThresholdOfGroupParams, auth?: Auth, txOptions?: EnvOption) => {
       if (loading) return
-      if (wallet == null) return // invalid tx params error
+      if (wallet == null) return
       const firstSigner = auth ?? primaryAuth[0]
-      if (firstSigner == null) return // no signer error
+      if (firstSigner == null) return
       setLoading(true)
       try {
         const Operation = await wallet.updateThresholdOfGroup(firstSigner, userId, params as any, txOptions)

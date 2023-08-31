@@ -90,15 +90,12 @@ export const useCreateFun = () => {
         if (chainId instanceof Chain) {
           chainId = await chainId.getChainId()
         }
-
-        // explicitly defined User array
         if (typeof args === 'string') {
           console.warn("WARNING: You're logging into an existing wallet without a uniqueId.")
           console.warn('WARNING: if the wallet has not been initialized it will throw errors.')
 
           const newFunWallet = new FunWallet(args)
           const account = await newFunWallet.getAddress()
-          // if exists on chain and if it doesnt throw error if the uniqueID isnt also passed
           newFunWallet
             .getUsers(auth)
             .then((allUsers) => {
@@ -128,15 +125,12 @@ export const useCreateFun = () => {
 
           setLogin(newAccountAddress, newFunWallet)
           return newFunWallet
-        }
-        // login to a specific fun wallet
-        else if (args.uniqueId) {
+        } else if (args.uniqueId) {
           const newFunWallet = new FunWallet({
             users: [{ userId: await auth.getUserId() }],
             uniqueId: args.uniqueId,
           })
           const account = await newFunWallet.getAddress()
-          // if exists on chain and if it doesnt throw error if the uniqueID isnt also passed
           newFunWallet
             .getUsers(auth)
             .then((allUsers) => {
@@ -146,7 +140,6 @@ export const useCreateFun = () => {
           setLogin(account, newFunWallet)
           return newFunWallet
         } else {
-          // Default login as the primary auth
           const WALLET_UNIQUE_ID = await auth.getWalletUniqueId(args.index ?? 0)
           const newFunWallet = new FunWallet({
             users: [{ userId: await auth.getUserId() }],
@@ -177,8 +170,6 @@ export const useCreateFun = () => {
   return {
     funWallet: storedFunWallet,
     account,
-    // chainId:
-    //   config?.chain instanceof Chain ? config?.chain : Chain.getChain({ chainIdentifier: config?.chain.toString() }),
     error,
     loading: initializing,
     activeUser,
@@ -186,6 +177,5 @@ export const useCreateFun = () => {
     resetFunError,
     initializeFunAccount,
     groupIds,
-    // initializeFunMultiSigAccount,
   }
 }

@@ -42,10 +42,6 @@ export const useRBAC = () => {
       if (loading) return
 
       try {
-        console.log('ADDING NEW OWNER: ', primaryAuth[0], activeUser, {
-          ownerId: convertToValidUserId(newOwnerId) as `0x${string}`,
-          chainId,
-        })
         const operation = await wallet.addOwner(
           primaryAuth[0],
           activeUser?.userId,
@@ -97,10 +93,6 @@ export const useRBAC = () => {
       if (loading) return
 
       try {
-        console.log('ADDING NEW OWNER: ', primaryAuth[0], activeUser, {
-          ownerId: convertToValidUserId(ownerId) as `0x${string}`,
-          chainId,
-        })
         const operation = await wallet.removeOwner(primaryAuth[0], activeUser?.userId, {
           ownerId: ownerId as `0x${string}`,
         })
