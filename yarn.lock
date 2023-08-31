@@ -866,10 +866,10 @@
     "@ethersproject/properties" "^5.7.0"
     "@ethersproject/strings" "^5.7.0"
 
-"@funkit/core@^0.8.0":
-  version "0.8.0"
-  resolved "https://registry.npmjs.org/@funkit/core/-/core-0.8.0.tgz"
-  integrity sha512-n4h3mHCCekxb948UrqpAatYhuj4HV7g1gal1gOXqi5rmkmOtKuwIoIzEORMCHNSU99+jqrzjUCXegHBEehAj7Q==
+"@funkit/core@^0.8.1":
+  version "0.8.1"
+  resolved "https://registry.npmjs.org/@funkit/core/-/core-0.8.1.tgz"
+  integrity sha512-4rwyT2GVpazuwo+49FXcwncoVto6/CQfrizcyAowwwXyxDm+AwGgA9Ev6JU1DWReSXrZQ/9CtrDrVfv8x5a3mg==
   dependencies:
     "@aws-sdk/client-secrets-manager" "^3.315.0"
     "@ethersproject/contracts" "^5.7.0"
@@ -877,6 +877,7 @@
     "@uniswap/sdk" "^3.0.3"
     "@uniswap/v3-core" "^1.0.1"
     "@uniswap/v3-sdk" "^3.9.0"
+    "@uniswap/v3-staker" "^1.0.2"
     dotenv "^16.0.3"
     ethers "5.7.2"
     node-fetch "^2.6.11"
@@ -2271,6 +2272,15 @@
     "@uniswap/v3-staker" "1.0.0"
     tiny-invariant "^1.1.0"
     tiny-warning "^1.0.3"
+
+"@uniswap/v3-staker@^1.0.2":
+  version "1.0.2"
+  resolved "https://registry.npmjs.org/@uniswap/v3-staker/-/v3-staker-1.0.2.tgz"
+  integrity sha512-+swIh/yhY9GQGyQxT4Gz54aXYLK+uc3qsmIvaAX+FjvhcL9TGOvS9tXbQsCZM4AJW63vj6TLsmHIjGMIePL1BQ==
+  dependencies:
+    "@openzeppelin/contracts" "3.4.1-solc-0.7-2"
+    "@uniswap/v3-core" "1.0.0"
+    "@uniswap/v3-periphery" "^1.0.1"
 
 "@uniswap/v3-staker@1.0.0":
   version "1.0.0"
