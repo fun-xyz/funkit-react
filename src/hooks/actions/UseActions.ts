@@ -30,7 +30,7 @@ export const useAction = (args: FirstClassActionParams, txOptions?: EnvOption) =
       if (loading) return
       if (wallet == null || (activeUser == null && primaryAuth[0] == null))
         return generateTransactionError(MissingActiveSigner, { activeUser }) // invalid tx params error
-      const firstSigner = auth ?? primaryAuth[0]
+      const firstSigner = auth && auth instanceof Auth ? auth : primaryAuth[0]
       if (firstSigner == null) return generateTransactionError(MissingActiveSigner, { activeUser, primaryAuth, auth })
       setLoading(true)
       try {
