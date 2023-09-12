@@ -104,8 +104,21 @@ export const useCreateFun = () => {
             .catch()
           setLogin(account, newFunWallet)
           return newFunWallet
-        }
-        if (args.users) {
+        } else if (args.uniqueId && args.users) {
+          const newFunWallet = new FunWallet({
+            users: args.users,
+            uniqueId: args.uniqueId,
+          })
+          const account = await newFunWallet.getAddress()
+          newFunWallet
+            .getUsers(auth)
+            .then((allUsers) => {
+              setNewAccountUsers(allUsers, allUsers[0])
+            })
+            .catch()
+          setLogin(account, newFunWallet)
+          return newFunWallet
+        } else if (args.users) {
           const WALLET_UNIQUE_ID = await auth.getWalletUniqueId(args.index ?? 0)
           const newFunWallet = new FunWallet({
             users: args.users,
@@ -124,20 +137,6 @@ export const useCreateFun = () => {
             .catch()
 
           setLogin(newAccountAddress, newFunWallet)
-          return newFunWallet
-        } else if (args.uniqueId) {
-          const newFunWallet = new FunWallet({
-            users: [{ userId: await auth.getUserId() }],
-            uniqueId: args.uniqueId,
-          })
-          const account = await newFunWallet.getAddress()
-          newFunWallet
-            .getUsers(auth)
-            .then((allUsers) => {
-              setNewAccountUsers(allUsers, allUsers[0])
-            })
-            .catch()
-          setLogin(account, newFunWallet)
           return newFunWallet
         } else {
           const WALLET_UNIQUE_ID = await auth.getWalletUniqueId(args.index ?? 0)
@@ -164,7 +163,7 @@ export const useCreateFun = () => {
         })
       }
     },
-    [initializing, auth, handleBuildError, config, setLogin, setNewAccountUsers]
+    [initializing, auth, handleBuildError, config, setLogin, setNewAccountUsers, setGroupIds]
   )
 
   return {
