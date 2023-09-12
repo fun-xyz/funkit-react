@@ -62,6 +62,7 @@ export class MagicAuthConnector extends Connector {
     this.magic = magic
     this.chainId = chainId
     this.provider = provider
+    console.log('magic auth connector constructed')
   }
 
   private getMagic(): InstanceWithExtensions<SDKBase, OAuthExtension[]> | null {
@@ -140,7 +141,7 @@ export class MagicAuthConnector extends Connector {
 
     // Get the provider from magicInstance
     const provider = magic?.rpcProvider
-
+    console.log('initializing magic instance')
     // Set the chainId. If no chainId was passed as a parameter, use the chainId from networkOptions
     const chainId = activationArgs?.chainId || networkOptions.chainId
     this.isAuthorized().then((isAuthorized) => {
@@ -175,6 +176,7 @@ export class MagicAuthConnector extends Connector {
     const cancelActivation = this.actions.startActivation()
     const resetTimeout = setTimeout(cancelActivation, 5000)
     try {
+      console.log('Eagerly connecting to magic auth')
       const isLoggedIn = await this.isAuthorized()
       if (!isLoggedIn) {
         cancelActivation()
@@ -193,6 +195,7 @@ export class MagicAuthConnector extends Connector {
     const cancelActivation = this.actions.startActivation()
     const resetTimeout = setTimeout(cancelActivation, 5000)
     try {
+      console.log('activating magic auth manually')
       // Initialize the magic instance
       if (activateArgs.oAuthProvider == this.oAuthProvider && (await this.isAuthorized())) {
         this.completeActivation()
@@ -245,20 +248,22 @@ export class MagicAuthConnector extends Connector {
 
   async isAuthorized() {
     try {
+      console.log('trying isAuthorized')
       const magic = this.getMagic()
       if (magic == null) return false
       const isLoggedIn = await magic.user.isLoggedIn()
-
+      console.log('is magic auth logged in? ', isLoggedIn)
       const oauth = window.localStorage.getItem('oAuthProvider')
       this.oAuthProvider = oauth ? JSON.parse(oauth) : this.oAuthProvider
       if (isLoggedIn) {
         return true
       }
-
+      console.log('is oAuth result null? ', this.oAuthResult)
       if (this.oAuthResult) {
         return true
       }
       this.oAuthResult = await magic.oauth.getRedirectResult()
+      console.log('redirect result: ', this.oAuthResult)
 
       if (this.oAuthResult != null) {
         window.localStorage.setItem('oAuthProvider', JSON.stringify(this.oAuthResult.oauth.provider))
