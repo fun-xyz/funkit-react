@@ -5,7 +5,7 @@ import { GetAssetsError } from '../../store'
 import { useFunStoreInterface } from '../../store/CreateUseFunStore'
 import { useFun } from '../UseFun'
 
-export const useGetAssets = () => {
+export const useGetAssets = (chainId?: string | 'ALL' | undefined, onlyVerifiedTokens = false, checkStatus = false) => {
   const { userWallet, setAssets, assets, error, setTempError } = useFun(
     (state: useFunStoreInterface) => ({
       userWallet: state.FunWallet,
@@ -25,14 +25,14 @@ export const useGetAssets = () => {
       if (!wallet) {
         throw new Error('Wallet Not Initialized')
       }
-      const getAssetResult = await wallet.getAssets()
+      const getAssetResult = await wallet.getAssets(chainId, onlyVerifiedTokens, checkStatus)
       setAssets(getAssetResult)
       setLoading(false)
     } catch (e) {
       setTempError(GetAssetsError)
     }
     setLoading(false)
-  }, [setAssets, setTempError, userWallet])
+  }, [chainId, checkStatus, onlyVerifiedTokens, setAssets, setTempError, userWallet])
 
   return { assets, getAssets, loading, error }
 }
