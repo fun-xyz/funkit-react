@@ -56,13 +56,12 @@ export class MagicAuthConnector extends Connector {
       throw new Error('No supported OAuth providers were passed to the connector')
     this.oAuthProvider = options.supportedAuthProviders[0]
     this.redirectURI = options.redirectURI
-    if (!this.serverSide && window.location.href) this.redirectURI = window.location.href // TODO is this actually a good idea seems like it will totally invalidate the redirectURI option
+    if (!this.serverSide && window.location.href) this.redirectURI = window.location.href
     this.oAuthResult = null
     const { magic, chainId, provider } = this.initializeMagicInstance()
     this.magic = magic
     this.chainId = chainId
     this.provider = provider
-    console.log('magic auth connector constructed')
   }
 
   private getMagic(): InstanceWithExtensions<SDKBase, OAuthExtension[]> | null {
@@ -141,7 +140,6 @@ export class MagicAuthConnector extends Connector {
 
     // Get the provider from magicInstance
     const provider = magic?.rpcProvider
-    console.log('initializing magic instance')
     // Set the chainId. If no chainId was passed as a parameter, use the chainId from networkOptions
     const chainId = activationArgs?.chainId || networkOptions.chainId
     this.isAuthorized().then((isAuthorized) => {
@@ -176,9 +174,7 @@ export class MagicAuthConnector extends Connector {
     const cancelActivation = this.actions.startActivation()
     const resetTimeout = setTimeout(cancelActivation, 5000)
     try {
-      console.log('Eagerly connecting to magic auth')
       const isLoggedIn = await this.isAuthorized()
-      console.log('Eagerly connecting to magic auth, is logged in? ', isLoggedIn)
       if (!isLoggedIn) {
         cancelActivation()
         return
@@ -196,7 +192,6 @@ export class MagicAuthConnector extends Connector {
     const cancelActivation = this.actions.startActivation()
     const resetTimeout = setTimeout(cancelActivation, 5000)
     try {
-      console.log('activating magic auth manually')
       // Initialize the magic instance
       if (activateArgs.oAuthProvider == this.oAuthProvider && (await this.isAuthorized())) {
         this.completeActivation()
@@ -249,23 +244,18 @@ export class MagicAuthConnector extends Connector {
 
   async isAuthorized() {
     try {
-      console.log('trying isAuthorized')
       const magic = this.getMagic()
-      console.log('magic: ', magic)
       if (magic == null) return false
       const isLoggedIn = await magic.user.isLoggedIn()
-      console.log('is magic auth logged in? ', isLoggedIn)
       const oauth = window.localStorage.getItem('oAuthProvider')
       this.oAuthProvider = oauth ? JSON.parse(oauth) : this.oAuthProvider
       if (isLoggedIn) {
         return true
       }
-      console.log('is oAuth result null? ', this.oAuthResult)
       if (this.oAuthResult) {
         return true
       }
       this.oAuthResult = await magic.oauth.getRedirectResult()
-      console.log('redirect result: ', this.oAuthResult)
 
       if (this.oAuthResult != null) {
         window.localStorage.setItem('oAuthProvider', JSON.stringify(this.oAuthResult.oauth.provider))
@@ -274,7 +264,7 @@ export class MagicAuthConnector extends Connector {
         return false
       }
     } catch (err) {
-      console.log('ERROR IN IS AUTHORIZED: ', err)
+      console.log('oAuth authorization test ERROR: ', err)
       return false
     }
   }
