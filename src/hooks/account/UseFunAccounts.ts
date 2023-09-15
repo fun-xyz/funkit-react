@@ -1,4 +1,4 @@
-import { Auth, Wallet } from '@fun-xyz/core'
+import { Auth, Wallet } from '@funkit/core'
 import { useEffect } from 'react'
 import { shallow } from 'zustand/shallow'
 
@@ -26,17 +26,9 @@ export const useFunAccounts = (): IUseFunAccountsReturn => {
     }),
     shallow
   )
-
-  // TODO optimize this by making it only update when the connectors change
   const activeClients = useActiveClients()
-
-  // useTraceUpdate({ activeClients, PrimaryAuth, chainId, setFunGroupAccounts })
-
   useEffect(() => {
     if (chainId == null) return
-    /* TODO this function will fetch the same data multiple times if there are multiple connectors. We should cache the results by Account address
-     *  and only fetch if the results are not cached
-     */
     const updateWalletList = async () => {
       try {
         const wallets: Wallet[][] = []
@@ -50,10 +42,10 @@ export const useFunAccounts = (): IUseFunAccountsReturn => {
             console.error(error)
           }
         }
-
         if (wallets.flat().length === 0) return { sortedFunWallets: [] }
-        // sort the wallets
-        const WalletSet: { [account: string]: { wallet: Wallet; count: number } } = {}
+        const WalletSet: {
+          [account: string]: { wallet: Wallet; count: number }
+        } = {}
         wallets
           .concat()
           .flat()
@@ -68,8 +60,6 @@ export const useFunAccounts = (): IUseFunAccountsReturn => {
         const sortedFunWallets = Object.entries(WalletSet)
           .sort((a, b) => b[1].count - a[1].count)
           .map(([, val]) => val.wallet)
-        // setFunAccounts({ ...FunAccounts, ...WalletSet })
-
         return {
           sortedFunWallets,
         }

@@ -1,4 +1,4 @@
-import { Auth } from '@fun-xyz/core'
+import { Auth } from '@funkit/core'
 import { useCallback, useState } from 'react'
 import { shallow } from 'zustand/shallow'
 
@@ -30,10 +30,8 @@ export const useUserInfo = () => {
         const users = await wallet.getUsers(primaryAuth)
         if (users && users.length > 0) {
           setAllUsers(users)
-          console.log('users found', users)
           if (resetActiveUser) setActiveUser(users[0])
         }
-        console.log('no users found')
         const userId = await primaryAuth.getUserId()
         setActiveUser({ userId })
       } catch (err) {

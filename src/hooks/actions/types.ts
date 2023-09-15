@@ -10,10 +10,11 @@ import {
   RequestUnstakeParams,
   SessionKeyParams,
   StakeParams,
-  SwapParam,
+  SwapParams,
+  TransactionParams,
   TransferParams,
   UpdateThresholdOfGroupParams,
-} from '@fun-xyz/core'
+} from '@funkit/core'
 
 export type FirstClassActionParams =
   | ISwapParams
@@ -29,6 +30,7 @@ export type FirstClassActionParams =
   | IRemoveUserFromGroupParams
   | IUpdateThresholdOfGroupParams
   | IRemoveGroupParams
+  | ITransactionParams
 
 export enum ActionType {
   Swap = 'swap',
@@ -44,11 +46,17 @@ export enum ActionType {
   removeUserFromGroup = 'removeUserFromGroup',
   updateThresholdOfGroup = 'updateThresholdOfGroup',
   removeGroup = 'removeGroup',
+  createOperation = 'createOperation',
+}
+
+export interface ITransactionParams {
+  action: ActionType.createOperation
+  params: TransactionParams
 }
 
 export interface ISwapParams {
   action: ActionType.Swap
-  params: SwapParam
+  params: SwapParams
 }
 export interface ITransfer {
   action: ActionType.Transfer

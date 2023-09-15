@@ -1,4 +1,4 @@
-import { User, Wallet } from '@fun-xyz/core'
+import { User, Wallet } from '@funkit/core'
 
 export interface IActiveAuthList {
   active: boolean
@@ -8,7 +8,6 @@ export interface IActiveAuthList {
   userId: string
 }
 
-// should create a set opf FunWalletAccount Addresses and the connectors they come from. Then i can just sort by number of connections greatest to smallest.
 export interface IFunAuthStore {
   activeAuthClients: IActiveAuthList[]
   setActiveAuthClients: (newActiveAuthClients: IActiveAuthList[]) => void

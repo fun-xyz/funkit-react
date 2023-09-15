@@ -1,22 +1,20 @@
-import { Chain } from '@fun-xyz/core'
+import { Chain } from '@funkit/core'
 import { PublicClient } from 'viem'
 
+export const Ethereum = '1'
 export const Goerli = '5'
 export const Arbitrum = '42161'
 export const Polygon = '137'
 export const Optimism = '10'
-
-// Polygon
-// Arbitrum one
-// optimism
-// Goerli
+export const Base = '8453'
 
 export const chainNumber = {
-  // ethereum: Ethereum,
+  ethereum: Ethereum,
   polygon: Polygon,
   arbitrum: Arbitrum,
   optimism: Optimism,
   goerli: Goerli,
+  base: Base,
 }
 
 export const convertToChain = async (chain: string | number): Promise<Chain> => {

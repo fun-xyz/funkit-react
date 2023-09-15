@@ -1,4 +1,4 @@
-import { Operation, OperationStatus } from '@fun-xyz/core'
+import { Operation, OperationStatus } from '@funkit/core'
 import { useCallback, useEffect, useState } from 'react'
 import { shallow } from 'zustand/shallow'
 
@@ -36,11 +36,10 @@ export const useOperationStatus = (status: OperationStatus = OperationStatus.ALL
     } finally {
       setFetching(false)
     }
-    // console.log('fetched operations', operations, funWallet, await funWallet.getAddress())
   }, [fetching, funWallet, status])
 
   useEffect(() => {
-    if (prevAccount !== account && fetched) setFetched(false) // reset fetch if the account changed
+    if (prevAccount !== account && fetched) setFetched(false)
     if (operationStatuses.length > 0 || fetched || !funWallet) return
     fetchOperations()
     setFetched(true)

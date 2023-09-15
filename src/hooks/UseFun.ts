@@ -1,5 +1,5 @@
-import { Chain, configureEnvironment } from '@fun-xyz/core'
-import { GlobalEnvOption } from '@fun-xyz/core'
+import { Chain, configureEnvironment } from '@funkit/core'
+import { GlobalEnvOption } from '@funkit/core'
 import { shallow } from 'zustand/shallow'
 
 import { MetamaskConnector } from '../connectors'
@@ -23,8 +23,6 @@ const DEFAULT_FUN_WALLET_CONFIG: GlobalEnvOption = {
   chain: '5',
 }
 export const configureNewFunStore = async (params?: configureFunParams) => {
-  console.log('configureNewFunStore', params)
-  // if (useFun.getState().connectors.length > 0) return
   if (!params) {
     useFun.setState({ connectors: DEFAULT_CONNECTORS })
     useFun.setState({ supportedChains: [Optimism, Arbitrum, Polygon, Goerli] })
@@ -42,7 +40,9 @@ export const configureNewFunStore = async (params?: configureFunParams) => {
     if (params.supportedChains && params.supportedChains.length > 0) {
       useFun.setState({ supportedChains: params.supportedChains })
     } else {
-      useFun.setState({ supportedChains: [Optimism, Arbitrum, Polygon, Goerli] })
+      useFun.setState({
+        supportedChains: [Optimism, Arbitrum, Polygon, Goerli],
+      })
     }
 
     if (params.config) {
@@ -51,9 +51,14 @@ export const configureNewFunStore = async (params?: configureFunParams) => {
       useFun.setState({ config: params.config })
       if (params.config.chain) {
         if (params.config.chain instanceof Chain) {
-          useFun.setState({ chain: params.config.chain, chainId: Number(await params.config.chain.getChainId()) })
+          useFun.setState({
+            chain: params.config.chain,
+            chainId: Number(await params.config.chain.getChainId()),
+          })
         } else {
-          const chain = await Chain.getChain({ chainIdentifier: params.config.chain })
+          const chain = await Chain.getChain({
+            chainIdentifier: params.config.chain,
+          })
           useFun.setState({ chain, chainId: Number(await chain.getChainId()) })
         }
       } else {

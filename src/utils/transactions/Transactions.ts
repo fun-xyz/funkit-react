@@ -12,12 +12,13 @@ import {
   OperationType,
   RequestUnstakeParams,
   StakeParams,
-  SwapParam,
+  SwapParams,
   TokenSponsor,
   TransactionData,
   TransferParams,
   User,
-} from '@fun-xyz/core'
+} from '@funkit/core'
+import { Address } from 'viem'
 
 import { IActiveAuthList } from '@/hooks/util'
 
@@ -36,7 +37,7 @@ export type transactionTypes = 'transfer' | 'approve' | 'swap' | 'stake' | 'unst
 export type transactionParams =
   | TransferParams
   | ApproveParams
-  | SwapParam
+  | SwapParams
   | StakeParams
   | RequestUnstakeParams
   | FinishUnstakeParams
@@ -100,14 +101,6 @@ export interface GasValidationResponse {
   error?: FunError
   allowance?: bigint
 }
-
-// TODO allowance should be looked into for permit
-// ask caleb how to validate
-// validate allowance when needed on error
-// deposit tokens directly into paymaster
-// do they have enough balance to pay for tokens
-// can we simulate locally
-
 /**
  * Validates the gas behavior of a transaction and prepares it for execution.
  * @param config - The environment configuration object.
@@ -120,7 +113,9 @@ export const validateGasBehavior = async (config: EnvOption, wallet: FunWallet):
     const walletAddress = await wallet.getAddress()
     let currentChain = config.chain as Chain
     if (typeof config.chain === 'string' || typeof config.chain === 'number')
-      currentChain = await Chain.getChain({ chainIdentifier: `${config.chain}` })
+      currentChain = await Chain.getChain({
+        chainIdentifier: `${config.chain}`,
+      })
     const client = await currentChain.getClient()
     const iscontract = await isContract(walletAddress, client)
     if (config.gasSponsor) {
@@ -186,20 +181,27 @@ export const validateGasBehavior = async (config: EnvOption, wallet: FunWallet):
       if (etherBalance < gasPrice * 100000n)
         return {
           valid: false,
-          error: generateTransactionError(TransactionErrorLowFunWalletBalance, { amount: etherBalance }),
+          error: generateTransactionError(TransactionErrorLowFunWalletBalance, {
+            amount: etherBalance,
+          }),
         }
       if (iscontract && etherBalance < gasPrice * 1500000n)
         return {
           valid: false,
-          error: generateTransactionError(TransactionErrorLowFunWalletBalance, { amount: etherBalance }),
+          error: generateTransactionError(TransactionErrorLowFunWalletBalance, {
+            amount: etherBalance,
+          }),
         }
       return { valid: true }
     }
   } catch (err) {
-    console.log('========= Error:', err)
     return {
       valid: false,
-      error: { code: 0, message: 'Error Validating fetching sponsor Validation status', err },
+      error: {
+        code: 0,
+        message: 'Error Validating fetching sponsor Validation status',
+        err,
+      },
     }
   }
 }
@@ -220,11 +222,11 @@ export const validateGasSponsorMode = async (
   let getWhiteListedPromise: Promise<boolean>
 
   if (gasSponsor instanceof GaslessSponsor) {
-    getBlackListedPromise = gasSponsor.getSpenderBlacklistMode(walletAddress, sponsorAddress)
-    getWhiteListedPromise = gasSponsor.getSpenderWhitelistMode(walletAddress, sponsorAddress)
+    getBlackListedPromise = gasSponsor.getSpenderBlacklistMode(walletAddress as Address, sponsorAddress as Address)
+    getWhiteListedPromise = gasSponsor.getSpenderWhitelistMode(walletAddress as Address, sponsorAddress as Address)
   } else if (gasSponsor instanceof TokenSponsor) {
-    getBlackListedPromise = gasSponsor.getSpenderBlacklisted(walletAddress, sponsorAddress)
-    getWhiteListedPromise = gasSponsor.getSpenderWhitelisted(walletAddress, sponsorAddress)
+    getBlackListedPromise = gasSponsor.getSpenderBlacklisted(walletAddress as Address, sponsorAddress as Address)
+    getWhiteListedPromise = gasSponsor.getSpenderWhitelisted(walletAddress as Address, sponsorAddress as Address)
   } else {
     return {
       valid: false,
@@ -242,14 +244,20 @@ export const validateGasSponsorMode = async (
       if (isBlackListed) {
         return {
           valid: false,
-          error: generateTransactionError(TransactionErrorGasSponsorBlacklist, { sponsorAddress, walletAddress }),
+          error: generateTransactionError(TransactionErrorGasSponsorBlacklist, {
+            sponsorAddress,
+            walletAddress,
+          }),
         }
       }
     } else {
       if (!isWhiteListed) {
         return {
           valid: false,
-          error: generateTransactionError(TransactionErrorGasSponsorWhitelist, { sponsorAddress, walletAddress }),
+          error: generateTransactionError(TransactionErrorGasSponsorWhitelist, {
+            sponsorAddress,
+            walletAddress,
+          }),
         }
       }
     }
@@ -261,7 +269,11 @@ export const validateGasSponsorMode = async (
     console.log('Error:', err)
     return {
       valid: false,
-      error: { code: 0, message: 'Error validating fetching sponsor mode validation status', err },
+      error: {
+        code: 0,
+        message: 'Error validating fetching sponsor mode validation status',
+        err,
+      },
     }
   }
 }
@@ -272,7 +284,7 @@ export const estimateGas = async (build: IOperationsArgs, Auth: Auth, wallet: Fu
     if (wallet == null) reject('No wallet')
     FunWallet[build.type](
       Auth,
-      build.txParams as (((((TransferParams & ApproveParams) & SwapParam) & StakeParams) &
+      build.txParams as (((((TransferParams & ApproveParams) & SwapParams) & StakeParams) &
         (RequestUnstakeParams | FinishUnstakeParams)) &
         (EnvOption | undefined)) &
         TransactionData,
@@ -308,15 +320,16 @@ export const remainingConnectedSignersForOperation = ({
   firstSigner,
 }: IRemainingSigners): IRemainingSignersResponse => {
   if (operation.opType === OperationType.SINGLE_OPERATION || activeUser.groupInfo == null)
-    return { remainingConnectedSigners: [], signerCount: operation.signatures?.length ?? 0, threshold: 1 }
+    return {
+      remainingConnectedSigners: [],
+      signerCount: operation.signatures?.length ?? 0,
+      threshold: 1,
+    }
   const currentClients = activeClients.filter((client) => client.userId != null)
   const currentSigners = operation.signatures
   // if there are no signers then we need to sign with all the required signers
-  console.log('fetching Remaining Signers: ', currentSigners, currentClients)
-
   // handle the case where this is the first signature. It should return all the connected signers
   if (currentSigners == null || currentSigners.length == 0) {
-    console.log("First Signer, so we'll return all the connected signers")
     const remainingConnectedSigners = currentClients
       .map(({ userId, provider }) => {
         if (userId == firstSigner) return undefined
@@ -325,18 +338,20 @@ export const remainingConnectedSignersForOperation = ({
         else return undefined
       })
       .filter((signer) => signer != null) as { userId: string; auth: Auth }[]
-    return { remainingConnectedSigners, signerCount: 0, threshold: activeUser.groupInfo?.threshold }
+    return {
+      remainingConnectedSigners,
+      signerCount: 0,
+      threshold: activeUser.groupInfo?.threshold,
+    }
   }
   // if the number of signers is greater than or equal to the threshold then we don't need to sign anymore so no need to calculate additonal signers
   if (currentSigners?.length >= activeUser.groupInfo?.threshold) {
-    console.log('remainingSigners, Threshold met')
     return {
       remainingConnectedSigners: [],
       signerCount: currentSigners?.length,
       threshold: activeUser.groupInfo?.threshold,
     }
   }
-  console.log('returning all signers that are connected')
   const remainingConnectedSigners = currentClients
     .map(({ userId, provider }) => {
       if (userId == firstSigner) return undefined
@@ -378,7 +393,6 @@ export const signUntilExecute = async ({
   txOptions,
 }: SignUntilExecuteParams) => {
   if (threshold === 1) {
-    console.log('signing with first signer', firstSigner, operation)
     return await wallet.executeOperation(firstSigner, operation, txOptions)
   } else {
     let count = 1
@@ -386,10 +400,8 @@ export const signUntilExecute = async ({
       const currentAuth = remainingConnectedSigners[i].auth
 
       if (count + 1 >= threshold) {
-        console.log('Final signature, executing operation: ', currentAuth, operation)
         return await wallet.executeOperation(currentAuth, operation, txOptions)
       } else {
-        console.log('Signing with: ', currentAuth, operation)
         wallet
           .signOperation(currentAuth, operation, txOptions)
           .then(() => {
@@ -401,7 +413,6 @@ export const signUntilExecute = async ({
           })
       }
     }
-    console.log("returning operation because we didn't have enough signatures")
     return operation
   }
 }

@@ -4,7 +4,6 @@ import { WalletConnect as WalletConnectV2 } from '@web3-react/walletconnect-v2'
 import { useEffect, useState } from 'react'
 
 import { MagicAuthConnector } from '../magicAuth/src/MagicAuth'
-//
 import { ConnectorType } from './Types'
 
 export { CoinbaseWalletConnector } from './CoinbaseWallet'

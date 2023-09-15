@@ -1,4 +1,4 @@
-import { ExecutionReceipt, Operation } from '@fun-xyz/core'
+import { ExecutionReceipt, Operation } from '@funkit/core'
 
 const MAX_TRANSACTION_HISTORY = 10
 

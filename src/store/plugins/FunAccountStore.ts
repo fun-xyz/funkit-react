@@ -1,11 +1,11 @@
-import { FunWallet } from '@fun-xyz/core'
+import { FunWallet } from '@funkit/core'
 
 export interface FunAccountStoreInterface {
   FunWallet: FunWallet | null
   setFunWallet: (FunWallet: FunWallet) => void
   account: string | null
   setAccount: (account: string) => void
-  setLogin: (account: string, funWallet: FunWallet) => void
+  setLogin: (account: string, funWallet: FunWallet | null) => void
   ensName: string | null
   setEnsName: (ensName: string) => void
 }
@@ -15,7 +15,7 @@ export const configureFunAccountStore = (get: any, set: any): FunAccountStoreInt
   setFunWallet: (FunWallet: FunWallet) => set({ FunWallet }),
   account: null,
   setAccount: (account: string) => set({ account }),
-  setLogin: (account: string, funWallet: FunWallet) => {
+  setLogin: (account: string, funWallet: FunWallet | null) => {
     set({ account, FunWallet: funWallet })
   },
   ensName: null,

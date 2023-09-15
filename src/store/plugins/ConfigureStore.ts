@@ -1,4 +1,4 @@
-import { configureEnvironment, GlobalEnvOption } from '@fun-xyz/core'
+import { configureEnvironment, GlobalEnvOption } from '@funkit/core'
 
 export interface ConfigureStoreInterface {
   config: GlobalEnvOption | null
@@ -22,9 +22,6 @@ export const setConfig = async (newConfig: Partial<GlobalEnvOption>) => {
   await configureEnvironment(newConfig as GlobalEnvOption)
   return { config: newConfig }
 }
-
-// TODO add checking to the update config or set Config to verify that the chain is valid and synchronized with the state.
-// TODO add check to validate the fun wallet has been properly regenerated
 
 export const configureConfigurationStore = (
   get: () => ConfigureStoreInterface,
