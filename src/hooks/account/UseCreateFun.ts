@@ -38,8 +38,6 @@ export const useCreateFun = () => {
     activeUser,
     allUsers,
     setNewAccountUsers,
-    setGroupIds,
-    groupIds,
   } = useFun(
     (state) => ({
       storedFunWallet: state.FunWallet,
@@ -52,8 +50,6 @@ export const useCreateFun = () => {
       activeUser: state.activeUser,
       allUsers: state.allUsers,
       setNewAccountUsers: state.setNewAccountUsers,
-      setGroupIds: state.setGroupIds,
-      groupIds: state.groupIds,
     }),
     shallow
   )
@@ -124,10 +120,6 @@ export const useCreateFun = () => {
             users: args.users,
             uniqueId: walletUniqueId,
           })
-          const newGroupIds = args.users.map((user) => {
-            return user.userId
-          })
-          setGroupIds(newGroupIds)
           const newAccountAddress = await newFunWallet.getAddress()
           newFunWallet
             .getUsers(auth)
@@ -163,7 +155,7 @@ export const useCreateFun = () => {
         })
       }
     },
-    [initializing, auth, handleBuildError, config, setLogin, setNewAccountUsers, setGroupIds]
+    [initializing, auth, handleBuildError, config, setLogin, setNewAccountUsers]
   )
 
   const logout = () => {
@@ -180,6 +172,5 @@ export const useCreateFun = () => {
     resetFunError,
     initializeFunAccount,
     logout,
-    groupIds,
   }
 }
