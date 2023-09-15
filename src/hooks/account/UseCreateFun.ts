@@ -119,10 +119,10 @@ export const useCreateFun = () => {
           setLogin(account, newFunWallet)
           return newFunWallet
         } else if (args.users) {
-          const WALLET_UNIQUE_ID = await auth.getWalletUniqueId(args.index ?? 0)
+          const walletUniqueId = await auth.getWalletUniqueId(args.index ?? 0)
           const newFunWallet = new FunWallet({
             users: args.users,
-            uniqueId: WALLET_UNIQUE_ID,
+            uniqueId: walletUniqueId,
           })
           const newGroupIds = args.users.map((user) => {
             return user.userId
@@ -139,10 +139,10 @@ export const useCreateFun = () => {
           setLogin(newAccountAddress, newFunWallet)
           return newFunWallet
         } else {
-          const WALLET_UNIQUE_ID = await auth.getWalletUniqueId(args.index ?? 0)
+          const walletUniqueId = await auth.getWalletUniqueId(args.index ?? 0)
           const newFunWallet = new FunWallet({
             users: [{ userId: await auth.getUserId() }],
-            uniqueId: WALLET_UNIQUE_ID,
+            uniqueId: walletUniqueId,
           })
           const newAccountAddress = await newFunWallet.getAddress()
           newFunWallet
