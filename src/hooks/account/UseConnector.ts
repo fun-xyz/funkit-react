@@ -49,9 +49,8 @@ const deactivateConnector = (connector: Connector | ConnectorTuple) => {
     }
   }
 }
-const deactivateAllConnectors = async (connectors: ConnectorArray) => {
+export const deactivateAllConnectors = async (connectors: ConnectorArray) => {
   for (let i = 0; i < connectors.length; i++) {
-    console.log('deactivating connector', connectors[i])
     await deactivateConnector(connectors[i])
   }
 }

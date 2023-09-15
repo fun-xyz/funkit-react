@@ -28,6 +28,7 @@ export interface IInitializeMultiSigFunAccount {
  */
 export const useCreateFun = () => {
   const {
+    connectors,
     storedFunWallet,
     account,
     error,
@@ -42,6 +43,7 @@ export const useCreateFun = () => {
     groupIds,
   } = useFun(
     (state) => ({
+      connectors: state.connectors,
       storedFunWallet: state.FunWallet,
       account: state.account,
       error: state.error,
@@ -166,6 +168,10 @@ export const useCreateFun = () => {
     [initializing, auth, handleBuildError, config, setLogin, setNewAccountUsers, setGroupIds]
   )
 
+  const logout = () => {
+    setLogin('', null)
+  }
+
   return {
     funWallet: storedFunWallet,
     account,
@@ -175,6 +181,7 @@ export const useCreateFun = () => {
     allUsers,
     resetFunError,
     initializeFunAccount,
+    logout,
     groupIds,
   }
 }
