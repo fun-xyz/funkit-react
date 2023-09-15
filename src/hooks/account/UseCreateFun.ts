@@ -28,7 +28,6 @@ export interface IInitializeMultiSigFunAccount {
  */
 export const useCreateFun = () => {
   const {
-    connectors,
     storedFunWallet,
     account,
     error,
@@ -43,7 +42,6 @@ export const useCreateFun = () => {
     groupIds,
   } = useFun(
     (state) => ({
-      connectors: state.connectors,
       storedFunWallet: state.FunWallet,
       account: state.account,
       error: state.error,
