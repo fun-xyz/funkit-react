@@ -30,6 +30,7 @@ export {
   Chain,
   configureEnvironment,
   ExecutionReceipt,
+  FunWallet,
   generateRandomGroupId,
   GlobalEnvOption,
   Operation,

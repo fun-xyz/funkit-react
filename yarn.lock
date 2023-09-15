@@ -1199,9 +1199,9 @@
     "@ethersproject/properties" "^5.7.0"
     "@ethersproject/strings" "^5.7.0"
 
-"@funkit/core@file:../fun-wallet-sdk":
-  version "0.8.2"
-  resolved "file:../fun-wallet-sdk"
+"@funkit/core@file:../funkit-core":
+  version "0.8.3"
+  resolved "file:../funkit-core"
   dependencies:
     "@aws-sdk/client-secrets-manager" "^3.315.0"
     "@ethersproject/contracts" "^5.7.0"

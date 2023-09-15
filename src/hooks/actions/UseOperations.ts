@@ -228,15 +228,22 @@ export const useOperations = () => {
   )
 
   const removeOperation = useCallback(
-    async (operation: Operation, auth: Auth, txOption?: EnvOption) => {
+    async (operation: Operation, auth?: Auth, txOption?: EnvOption) => {
       if (wallet == null) return
       if (operation.opId == null)
         return generateTransactionError(TransactionErrorMissingOpId, {
           operation,
         })
+      const firstSigner = auth ?? primaryAuth[0]
+      if (firstSigner == null)
+        return generateTransactionError(TransactionErrorFailedToSign, {
+          operation,
+          auth,
+          primaryAuth,
+        })
       setProcessing(true)
       try {
-        const removedOperation = await wallet.removeOperation(auth, operation.opId, txOption)
+        const removedOperation = await wallet.removeOperation(firstSigner, operation.opId, txOption)
         setProcessing(false)
         fetchOperations()
         return removedOperation
@@ -246,7 +253,7 @@ export const useOperations = () => {
         return generateTransactionError(TransactionErrorRejectionOperation, { operation }, err)
       }
     },
-    [fetchOperations, wallet]
+    [fetchOperations, primaryAuth, wallet]
   )
 
   return {

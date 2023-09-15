@@ -178,6 +178,7 @@ export class MagicAuthConnector extends Connector {
     try {
       console.log('Eagerly connecting to magic auth')
       const isLoggedIn = await this.isAuthorized()
+      console.log('Eagerly connecting to magic auth, is logged in? ', isLoggedIn)
       if (!isLoggedIn) {
         cancelActivation()
         return
@@ -250,6 +251,7 @@ export class MagicAuthConnector extends Connector {
     try {
       console.log('trying isAuthorized')
       const magic = this.getMagic()
+      console.log('magic: ', magic)
       if (magic == null) return false
       const isLoggedIn = await magic.user.isLoggedIn()
       console.log('is magic auth logged in? ', isLoggedIn)
@@ -272,6 +274,7 @@ export class MagicAuthConnector extends Connector {
         return false
       }
     } catch (err) {
+      console.log('ERROR IN IS AUTHORIZED: ', err)
       return false
     }
   }
