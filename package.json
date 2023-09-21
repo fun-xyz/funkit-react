@@ -1,6 +1,6 @@
 {
   "name": "@funkit/react",
-  "version": "0.8.2",
+  "version": "0.8.4",
   "description": "React interface for the Funkit Core SDK",
   "repository": "git@github.com:fun-xyz/funkit-react.git",
   "author": "https://fun.xyz/",
