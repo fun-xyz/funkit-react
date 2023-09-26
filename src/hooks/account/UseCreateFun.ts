@@ -12,7 +12,7 @@ import {
 import { useFun } from '../index'
 import { usePrimaryAuth } from '../util'
 
-export interface IInitializeFunAccount extends FunWalletParams {
+export interface IInitializeFunAccount extends Partial<FunWalletParams> {
   index?: number
 }
 
