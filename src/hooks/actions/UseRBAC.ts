@@ -77,7 +77,7 @@ export const useRBAC = () => {
         return err
       } finally {
         setLoading(false)
-        fetchUsers()
+        void fetchUsers()
       }
     },
     [activeClients, activeUser, chainId, fetchUsers, loading, primaryAuth, wallet]
@@ -125,7 +125,7 @@ export const useRBAC = () => {
         return err
       } finally {
         setLoading(false)
-        fetchUsers()
+        void fetchUsers()
       }
     },
     [activeClients, activeUser, chainId, fetchUsers, loading, primaryAuth, wallet]

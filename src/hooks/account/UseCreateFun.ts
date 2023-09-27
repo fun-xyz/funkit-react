@@ -12,7 +12,7 @@ import {
 import { useFun } from '../index'
 import { usePrimaryAuth } from '../util'
 
-export interface IInitializeFunAccount extends FunWalletParams {
+export interface IInitializeFunAccount extends Partial<FunWalletParams> {
   index?: number
 }
 
@@ -97,7 +97,9 @@ export const useCreateFun = () => {
             .then((allUsers) => {
               setNewAccountUsers(allUsers, allUsers[0])
             })
-            .catch()
+            .catch((err) => {
+              console.error(err)
+            })
           setLogin(account, newFunWallet)
           return newFunWallet
         } else if (args.uniqueId && args.users) {
@@ -111,7 +113,9 @@ export const useCreateFun = () => {
             .then((allUsers) => {
               setNewAccountUsers(allUsers, allUsers[0])
             })
-            .catch()
+            .catch((err) => {
+              console.error(err)
+            })
           setLogin(account, newFunWallet)
           return newFunWallet
         } else if (args.users) {
@@ -126,7 +130,9 @@ export const useCreateFun = () => {
             .then((allUsers) => {
               setNewAccountUsers(allUsers, allUsers[0])
             })
-            .catch()
+            .catch((err) => {
+              console.error(err)
+            })
 
           setLogin(newAccountAddress, newFunWallet)
           return newFunWallet
@@ -142,7 +148,9 @@ export const useCreateFun = () => {
             .then((allUsers) => {
               setNewAccountUsers(allUsers, allUsers[0])
             })
-            .catch()
+            .catch((err) => {
+              console.error(err)
+            })
           setLogin(newAccountAddress, newFunWallet)
           return newFunWallet
         }
