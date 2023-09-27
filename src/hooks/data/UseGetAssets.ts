@@ -8,7 +8,7 @@ import { useFun } from '../UseFun'
 
 export interface useGetAssetsReturn {
   assets: FunkitAssets | null
-  getAssets: () => void
+  getAssets: () => Promise<FunkitAssets | null>
   loading: boolean
   error: FunError | null
 }
@@ -37,11 +37,13 @@ export const useGetAssets = (
       if (!wallet) {
         throw new Error('Wallet Not Initialized')
       }
-      const getAssetResult = await wallet.getAssets(chainId, onlyVerifiedTokens, checkStatus)
+      const getAssetResult = (await wallet.getAssets(chainId, onlyVerifiedTokens, checkStatus)) as FunkitAssets
       setAssets(getAssetResult)
       setLoading(false)
+      return getAssetResult
     } catch (e) {
       setTempError(GetAssetsError)
+      return null
     }
     setLoading(false)
   }, [chainId, checkStatus, onlyVerifiedTokens, setAssets, setTempError, userWallet])

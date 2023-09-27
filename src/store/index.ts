@@ -1,4 +1,5 @@
 export * from './CreateUseFunStore'
+export { AssetData, AssetStoreInterface, FunkitAssets, NFTData } from './plugins/AssetsStore'
 export * from './plugins/ChainStore'
 export * from './plugins/ConfigureStore'
 export * from './plugins/ConnectorStore'
