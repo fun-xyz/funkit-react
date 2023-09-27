@@ -89,7 +89,7 @@ export const useOperations = () => {
       try {
         const signedOperation = await wallet.signOperation(signer, operation, txOption)
         setProcessing(false)
-        fetchOperations()
+        void fetchOperations()
         return signedOperation
       } catch (err) {
         console.log('[useOperations ERROR] failed to sign operation', err)
@@ -119,7 +119,7 @@ export const useOperations = () => {
         const signer = auth ? auth : primaryAuth[0]
         const Operation = await wallet.executeOperation(signer, operation, txOption)
         setProcessing(false)
-        fetchOperations()
+        void fetchOperations()
         return Operation
       }
       if (operation.groupId !== activeUser.userId)
@@ -153,7 +153,7 @@ export const useOperations = () => {
       setProcessing(true)
       try {
         const Operation = await wallet.executeOperation(signer, operation, txOption)
-        fetchOperations()
+        void fetchOperations()
         return Operation
       } catch (err) {
         console.log('[useOperations ERROR] failed to sign operation', err)
@@ -206,7 +206,7 @@ export const useOperations = () => {
           firstSigner: null,
         })
         if (remainingConnectedSigners.length > 0) {
-          signUntilExecute({
+          await signUntilExecute({
             wallet,
             remainingConnectedSigners,
             threshold,
@@ -215,7 +215,7 @@ export const useOperations = () => {
             txOptions,
           })
         }
-        fetchOperations()
+        void fetchOperations()
         return rejectedOperation
       } catch (err) {
         console.log('[useOperations ERROR] failed to sign operation', err, operation, rejectionMessage, auth, txOptions)
@@ -245,7 +245,7 @@ export const useOperations = () => {
       try {
         const removedOperation = await wallet.removeOperation(firstSigner, operation.opId, txOption)
         setProcessing(false)
-        fetchOperations()
+        void fetchOperations()
         return removedOperation
       } catch (err) {
         console.log('[useOperations ERROR] failed to sign operation', err)

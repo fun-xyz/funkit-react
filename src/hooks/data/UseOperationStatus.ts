@@ -41,7 +41,7 @@ export const useOperationStatus = (status: OperationStatus = OperationStatus.ALL
   useEffect(() => {
     if (prevAccount !== account && fetched) setFetched(false)
     if (operationStatuses.length > 0 || fetched || !funWallet) return
-    fetchOperations()
+    void fetchOperations()
     setFetched(true)
   }, [account, fetchOperations, fetched, funWallet, operationStatuses.length, prevAccount])
 

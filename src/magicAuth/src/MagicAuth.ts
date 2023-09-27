@@ -142,9 +142,13 @@ export class MagicAuthConnector extends Connector {
     const provider = magic?.rpcProvider
     // Set the chainId. If no chainId was passed as a parameter, use the chainId from networkOptions
     const chainId = activationArgs?.chainId || networkOptions.chainId
-    this.isAuthorized().then((isAuthorized) => {
-      if (isAuthorized) this.completeActivation()
-    })
+    this.isAuthorized()
+      .then(async (isAuthorized) => {
+        if (isAuthorized) await this.completeActivation()
+      })
+      .catch((err) => {
+        console.log('oAuth authorization test ERROR: ', err)
+      })
     return { magic, chainId, provider }
   }
 
@@ -179,7 +183,7 @@ export class MagicAuthConnector extends Connector {
         cancelActivation()
         return
       }
-      this.completeActivation()
+      await this.completeActivation()
     } catch (err) {
       cancelActivation()
     } finally {
@@ -194,7 +198,7 @@ export class MagicAuthConnector extends Connector {
     try {
       // Initialize the magic instance
       if (activateArgs.oAuthProvider == this.oAuthProvider && (await this.isAuthorized())) {
-        this.completeActivation()
+        await this.completeActivation()
         return
       }
 
@@ -214,7 +218,7 @@ export class MagicAuthConnector extends Connector {
       this.setEventListeners()
 
       if (await this.magic?.user.isLoggedIn()) {
-        this.completeActivation()
+        await this.completeActivation()
       }
     } catch (error) {
       cancelActivation()

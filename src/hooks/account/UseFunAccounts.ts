@@ -68,11 +68,15 @@ export const useFunAccounts = (): IUseFunAccountsReturn => {
         return { error }
       }
     }
-    updateWalletList().then((res) => {
-      if (res.sortedFunWallets && res.sortedFunWallets.length > 0) {
-        setFunGroupAccounts(res.sortedFunWallets)
-      }
-    })
+    updateWalletList()
+      .then((res) => {
+        if (res.sortedFunWallets && res.sortedFunWallets.length > 0) {
+          setFunGroupAccounts(res.sortedFunWallets)
+        }
+      })
+      .catch((err) => {
+        console.error(err)
+      })
   }, [FunAccounts, activeClients, chainId, setFunAccounts, setFunGroupAccounts])
 
   return {
