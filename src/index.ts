@@ -15,6 +15,7 @@ export {
   WalletConnectConnector,
 } from './connectors'
 export * from './hooks'
+export * from './hooks/auth'
 export { MagicAuthConnector as SocialLoginConnector } from './magicAuth/src/MagicAuth'
 export * from './network/Networks'
 export * from './store'
