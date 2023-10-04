@@ -1,7 +1,7 @@
 import { Auth } from '@funkit/core'
 
-export interface socialLoginReturn {
-  auth: Auth
+export interface authHookReturn {
+  auth: Auth | undefined
   active: boolean
   activating: boolean
   authAddr: string | undefined

@@ -1,9 +1,10 @@
+import { Auth } from '@funkit/core'
 import { OAuthExtension, OAuthProvider } from '@magic-ext/oauth'
 import { InstanceWithExtensions, SDKBase } from '@magic-sdk/provider'
 import { Magic } from 'magic-sdk'
 import { useCallback, useEffect, useState } from 'react'
 
-import { socialLoginReturn } from '../../auth/types'
+import { authHookReturn } from '../../auth/types'
 
 export interface useSocialAuthBaseArgs {
   provider: OAuthProvider
@@ -15,7 +16,7 @@ export interface useSocialAuthBaseArgs {
   }
 }
 
-export const UseSocialAuthBase = ({ provider, name, networkOptions }: useSocialAuthBaseArgs): socialLoginReturn => {
+export const UseSocialAuthBase = ({ provider, name, networkOptions }: useSocialAuthBaseArgs): authHookReturn => {
   const [magic, setMagic] = useState<InstanceWithExtensions<SDKBase, OAuthExtension[]> | null>(null)
 
   const [activating, setActivating] = useState(false)
@@ -25,6 +26,7 @@ export const UseSocialAuthBase = ({ provider, name, networkOptions }: useSocialA
 
   useEffect(() => {
     if (!magic) {
+      console.log('initialize magic')
       const magicAuth = new Magic('pk_live_846F1095F0E1303C', {
         network: {
           chainId: networkOptions.chainId,
@@ -49,12 +51,13 @@ export const UseSocialAuthBase = ({ provider, name, networkOptions }: useSocialA
 
     const isAuthorized = async () => {
       if (!magic) return false
-      console.log('isAuthorized', magic)
+      console.log('check authorization', magic)
       const isLoggedIn = await magic.user.isLoggedIn()
       console.log('isLoggedIn', isLoggedIn)
       if (isLoggedIn) {
         return true
       }
+      console.log('getRedirectResult')
       const redirectResult = await magic.oauth.getRedirectResult()
       console.log('redirectResult', redirectResult)
       if (redirectResult) {
@@ -94,23 +97,7 @@ export const UseSocialAuthBase = ({ provider, name, networkOptions }: useSocialA
     setActivating(true)
 
     try {
-      localStorage.setItem('funConnecting', 'true')
-      console.log(
-        'setting test',
-        localStorage.getItem('funConnecting'),
-        localStorage.getItem('funConnecting') === 'true'
-      )
-
-      const result = await magic.oauth.loginWithRedirect({ provider, redirectURI: window.location.href })
-
-      if (await magic.user.isLoggedIn()) {
-        if (magic.rpcProvider) {
-          setWeb3Provider(magic.rpcProvider)
-          setActive(true)
-          setActivating(false)
-        }
-        // TODO handle this case since it would be an error
-      }
+      await magic.oauth.loginWithRedirect({ provider, redirectURI: window.location.href })
       return
     } catch (err) {
       console.log(err)
@@ -122,6 +109,7 @@ export const UseSocialAuthBase = ({ provider, name, networkOptions }: useSocialA
     if (!magic) return
     await magic.user.logout()
     setActive(false)
+    setWeb3Provider(undefined)
     if (web3Provider)
       web3Provider.off('accountsChanged', () => {
         setAuthAddr(undefined)
@@ -129,7 +117,7 @@ export const UseSocialAuthBase = ({ provider, name, networkOptions }: useSocialA
   }, [magic, web3Provider])
 
   return {
-    auth: web3Provider,
+    auth: web3Provider ? new Auth({ provider: web3Provider }) : undefined,
     name,
     active,
     activating,

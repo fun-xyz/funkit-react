@@ -1,2 +1,4 @@
 export * from './types'
-export * from './useSocialAuth'
+export { useInjectedAuth } from './UseInjectedAuth'
+export { useMetamaskAuth } from './UseMetamaskAuth'
+export { useAppleAuth, useDiscordAuth, useGoogleAuth, useTwitterAuth } from './useSocialAuth'
