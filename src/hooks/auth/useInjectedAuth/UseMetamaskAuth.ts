@@ -1,4 +1,4 @@
-import { authHookReturn } from './types'
+import { authHookReturn } from '../types'
 import { useInjectedAuth } from './UseInjectedAuth'
 
 export const useMetamaskAuth = (autoConnect = false): authHookReturn => {
