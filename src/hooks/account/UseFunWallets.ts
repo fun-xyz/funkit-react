@@ -11,7 +11,8 @@ interface IUseFunAccountsReturn {
   FunGroupAccounts: Wallet[]
 }
 
-export const useFunAccounts = (): IUseFunAccountsReturn => {
+// Special hook which uses Funkit/core to fetch all wallets for each active and connected auth and returns the list in order of most common connections.
+export const useFunWallets = (): IUseFunAccountsReturn => {
   const { chainId, FunGroupAccounts, setFunGroupAccounts, FunAccounts, setFunAccounts } = useFun(
     (state: useFunStoreInterface) => ({
       wallet: state.FunWallet,
@@ -27,6 +28,8 @@ export const useFunAccounts = (): IUseFunAccountsReturn => {
     shallow
   )
   const activeClients = useActiveClients()
+  console.log('useFunWallets Active clients: ', activeClients)
+
   useEffect(() => {
     if (chainId == null) return
     const updateWalletList = async () => {

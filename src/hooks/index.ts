@@ -1,7 +1,7 @@
 export * from './account/UseConfig'
 // export * from './account/UseConnector'
 export * from './account/UseCreateFun'
-export * from './account/UseFunAccounts'
+export * from './account/UseFunWallets'
 export * from './account/UseNetwork'
 export * from './account/UseUserInfo'
 export * from './actions'
