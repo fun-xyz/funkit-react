@@ -1,23 +1,27 @@
 import { Auth } from '@funkit/core'
+import { Web3ReactHooks } from '@web3-react/core'
+import { Web3ReactStore } from '@web3-react/types'
+import { WalletConnect } from '@web3-react/walletconnect-v2'
 import { useCallback, useEffect, useState } from 'react'
 
-import { useFunStoreInterface } from '@/store'
-import { convertToValidUserId } from '@/utils'
-
-import { WalletConnectConnector } from '../../connectors/WalletConnectV2'
+import { useFunStoreInterface } from '../../store'
+import { convertToValidUserId } from '../../utils'
 import { useFun } from '../UseFun'
 import { authHookReturn } from './types'
 
 const name = 'Wallet Connect'
 
 export interface useWalletConnectAuthArgs {
-  appName: string // project ID from walletconnect
+  WalletConnectConnector: [WalletConnect, Web3ReactHooks, Web3ReactStore]
   autoConnect?: boolean
 }
 
-export const useWalletConnectAuth = ({ appName, autoConnect }: useWalletConnectAuthArgs): authHookReturn => {
-  const [connector, hooks] = WalletConnectConnector(appName)
-  const { useAccount, useIsActivating, useIsActive, useProvider } = hooks
+export const useWalletConnectAuth = ({
+  WalletConnectConnector,
+  autoConnect,
+}: useWalletConnectAuthArgs): authHookReturn => {
+  const connector = WalletConnectConnector[0]
+  const { useAccount, useIsActivating, useIsActive, useProvider } = WalletConnectConnector[1]
   const account = useAccount()
   const activating = useIsActivating()
   const active = useIsActive()
@@ -47,6 +51,7 @@ export const useWalletConnectAuth = ({ appName, autoConnect }: useWalletConnectA
         account,
         provider,
         userId: convertToValidUserId(account),
+        auth: new Auth({ provider }),
       }
       if (auth.length === 0 || auth.find((item) => item.account === account) === undefined) {
         const updatedAuthList = auth.concat([authListItem])
@@ -55,8 +60,6 @@ export const useWalletConnectAuth = ({ appName, autoConnect }: useWalletConnectA
       return
     } else if (!active && update) {
       setUpdate(false)
-      const updatedAuthList = auth.filter((item) => item.account !== account)
-      setAuth(updatedAuthList)
     }
   }, [account, active, auth, provider, setAuth, update])
 
@@ -75,10 +78,13 @@ export const useWalletConnectAuth = ({ appName, autoConnect }: useWalletConnectA
       } else {
         await connector.resetState()
       }
+      const updatedAuthList = auth.filter((item) => item.account !== account)
+      if (updatedAuthList.length === auth.length) return // no change
+      setAuth(updatedAuthList)
     } catch (err) {
       console.error(err)
     }
-  }, [connector])
+  }, [account, auth, connector, setAuth])
 
   return {
     auth: provider ? new Auth({ provider }) : undefined,

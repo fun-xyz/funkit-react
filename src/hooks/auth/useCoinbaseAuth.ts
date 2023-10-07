@@ -1,23 +1,24 @@
 import { Auth } from '@funkit/core'
+import { CoinbaseWallet } from '@web3-react/coinbase-wallet'
+import { Web3ReactHooks } from '@web3-react/core'
+import { Web3ReactStore } from '@web3-react/types'
 import { useCallback, useEffect, useState } from 'react'
 
-import CoinbaseWalletConnector from '@/connectors/CoinbaseWallet'
-import { useFunStoreInterface } from '@/store'
-import { convertToValidUserId } from '@/utils'
-
+import { useFunStoreInterface } from '../../store'
+import { convertToValidUserId } from '../../utils'
 import { useFun } from '../UseFun'
 import { authHookReturn } from './types'
 
 const name = 'Coinbase Wallet'
 
 export interface useCoinbaseAuthArgs {
-  appName: string // project ID from walletconnect
+  CoinbaseWalletConnector: [CoinbaseWallet, Web3ReactHooks, Web3ReactStore]
   autoConnect?: boolean
 }
 
-export const useCoinbaseAuth = ({ appName, autoConnect }: useCoinbaseAuthArgs): authHookReturn => {
-  const [connector, hooks] = CoinbaseWalletConnector(appName)
-  const { useAccount, useIsActivating, useIsActive, useProvider } = hooks
+export const useCoinbaseAuth = ({ CoinbaseWalletConnector, autoConnect }: useCoinbaseAuthArgs): authHookReturn => {
+  const connector = CoinbaseWalletConnector[0]
+  const { useAccount, useIsActivating, useIsActive, useProvider } = CoinbaseWalletConnector[1]
   const account = useAccount()
   const activating = useIsActivating()
   const active = useIsActive()
@@ -29,7 +30,7 @@ export const useCoinbaseAuth = ({ appName, autoConnect }: useCoinbaseAuthArgs): 
   }))
 
   const [update, setUpdate] = useState(false)
-
+  console.log(connector)
   // attempt to connect eagerly on mount
   useEffect(() => {
     if (!autoConnect) return
@@ -47,6 +48,7 @@ export const useCoinbaseAuth = ({ appName, autoConnect }: useCoinbaseAuthArgs): 
         account,
         provider,
         userId: convertToValidUserId(account),
+        auth: new Auth({ provider }),
       }
       if (auth.length === 0 || auth.find((item) => item.account === account) === undefined) {
         const updatedAuthList = auth.concat([authListItem])
@@ -55,8 +57,6 @@ export const useCoinbaseAuth = ({ appName, autoConnect }: useCoinbaseAuthArgs): 
       return
     } else if (!active && update) {
       setUpdate(false)
-      const updatedAuthList = auth.filter((item) => item.account !== account)
-      setAuth(updatedAuthList)
     }
   }, [account, active, auth, provider, setAuth, update])
 
@@ -75,10 +75,13 @@ export const useCoinbaseAuth = ({ appName, autoConnect }: useCoinbaseAuthArgs): 
       } else {
         await connector.resetState()
       }
+      const updatedAuthList = auth.filter((item) => item.account !== account)
+      if (updatedAuthList.length === auth.length) return // no change
+      setAuth(updatedAuthList)
     } catch (err) {
       console.error(err)
     }
-  }, [connector])
+  }, [account, auth, connector, setAuth])
 
   return {
     auth: provider ? new Auth({ provider }) : undefined,

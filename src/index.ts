@@ -1,18 +1,14 @@
 import { GlobalEnvOption } from '@funkit/core'
 
 export {
-  CoinbaseWalletConnector,
   ConnectorArray,
   ConnectorTuple,
   ConnectorTupleWithStore,
   ConnectorType,
   FunWalletConnectorInterface,
-  MetamaskConnector,
+  InitCoinbaseWalletConnector,
+  InitWalletConnectConnector,
   OAuthProvider,
-  SocialOauthConnector,
-  SUPPORTED_OAUTH_PROVIDERS,
-  useGetName,
-  WalletConnectConnector,
 } from './connectors'
 export * from './hooks'
 export * from './hooks/auth'

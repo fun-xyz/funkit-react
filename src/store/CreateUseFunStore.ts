@@ -4,7 +4,6 @@ import { create } from 'zustand'
 
 import { ChainStoreInterface, configureChainStore } from './plugins/ChainStore'
 import { configureConfigurationStore, ConfigureStoreInterface } from './plugins/ConfigureStore'
-import { configureConnectorStore, ConnectorStoreInterface } from './plugins/ConnectorStore'
 import { configureErrorStore, ErrorStoreInterface } from './plugins/ErrorStore'
 import { configureFunAccountStore, FunAccountStoreInterface } from './plugins/FunAccountStore'
 import { configureAuthStore, IFunAuthStore } from './plugins/FunAuthStore'
@@ -13,7 +12,6 @@ import { configureTransactionStore, TransactionStoreState } from './plugins/Oper
 export interface useFunStoreInterface
   extends FunAccountStoreInterface,
     IFunAuthStore,
-    ConnectorStoreInterface,
     ChainStoreInterface,
     ConfigureStoreInterface,
     TransactionStoreState,
@@ -25,7 +23,6 @@ export interface useFunStoreInterface
 export const createUseFunStore = () => {
   return create(
     (set: any, get: any): useFunStoreInterface => ({
-      ...configureConnectorStore(get, set),
       ...configureFunAccountStore(get, set),
       ...configureAuthStore(get, set),
       ...configureChainStore(get, set),

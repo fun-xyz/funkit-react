@@ -1,10 +1,9 @@
 import { Auth } from '@funkit/core'
 import { useCallback, useEffect, useState } from 'react'
 
-import { useFunStoreInterface } from '@/store'
-import { convertToValidUserId } from '@/utils'
-
 import { connector, hooks } from '../../../connectors/MetaMask'
+import { useFunStoreInterface } from '../../../store'
+import { convertToValidUserId } from '../../../utils'
 import { useFun } from '../../UseFun'
 import { authHookReturn } from '../types'
 
@@ -44,6 +43,7 @@ export const useInjectedAuth = ({ name, autoConnect }: useInjectedAuthArgs): aut
         account,
         provider,
         userId: convertToValidUserId(account),
+        auth: new Auth({ provider }),
       }
       if (auth.length === 0 || auth.find((item) => item.account === account) === undefined) {
         const updatedAuthList = auth.concat([authListItem])
@@ -52,8 +52,6 @@ export const useInjectedAuth = ({ name, autoConnect }: useInjectedAuthArgs): aut
       return
     } else if (!active && update) {
       setUpdate(false)
-      const updatedAuthList = auth.filter((item) => item.account !== account)
-      setAuth(updatedAuthList)
     }
   }, [account, active, auth, name, provider, setAuth, update])
 
@@ -72,10 +70,13 @@ export const useInjectedAuth = ({ name, autoConnect }: useInjectedAuthArgs): aut
       } else {
         await connector.resetState()
       }
+      const updatedAuthList = auth.filter((item) => item.account !== account)
+      if (updatedAuthList.length === auth.length) return // no change
+      setAuth(updatedAuthList)
     } catch (err) {
       console.error(err)
     }
-  }, [])
+  }, [account, auth, setAuth])
 
   return {
     auth: provider ? new Auth({ provider }) : undefined,

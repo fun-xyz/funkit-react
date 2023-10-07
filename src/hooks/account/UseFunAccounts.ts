@@ -2,9 +2,9 @@ import { Auth, Wallet } from '@funkit/core'
 import { useEffect } from 'react'
 import { shallow } from 'zustand/shallow'
 
-import { useFunStoreInterface } from '../..'
+import { IActiveAuthList, useFunStoreInterface } from '../..'
 import { useFun } from '../UseFun'
-import { IActiveAuthList, useActiveClients } from '../util'
+import { useActiveClients } from '../util'
 
 interface IUseFunAccountsReturn {
   activeClients: IActiveAuthList[]
