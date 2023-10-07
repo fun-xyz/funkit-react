@@ -30,7 +30,7 @@ export const useCoinbaseAuth = ({ CoinbaseWalletConnector, autoConnect }: useCoi
   }))
 
   const [update, setUpdate] = useState(false)
-  console.log(connector)
+
   // attempt to connect eagerly on mount
   useEffect(() => {
     if (!autoConnect) return

@@ -1,9 +1,8 @@
-import { UseSocialAuthBase } from './UseSocialAuthBase'
+import { useSocialAuthConnectorBase } from './UseSocialAuthBase'
 
 export const useGoogleAuth = () => {
-  return UseSocialAuthBase({
-    provider: 'google',
+  return useSocialAuthConnectorBase({
+    oAuthProvider: 'google',
     name: 'Google',
-    networkOptions: { chainId: 1, rpcUrl: 'https://cloudflare-eth.com' },
   })
 }
