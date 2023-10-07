@@ -1,9 +1,8 @@
-import { UseSocialAuthBase } from './UseSocialAuthBase'
+import { useSocialAuthConnectorBase } from './UseSocialAuthBase'
 
 export const useDiscordAuth = () => {
-  return UseSocialAuthBase({
-    provider: 'discord',
+  return useSocialAuthConnectorBase({
+    oAuthProvider: 'discord',
     name: 'Discord',
-    networkOptions: { chainId: 1, rpcUrl: 'https://cloudflare-eth.com' },
   })
 }
