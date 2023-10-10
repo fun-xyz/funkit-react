@@ -1,9 +1,7 @@
 import { Auth } from '@funkit/core'
-import { CoinbaseWallet } from '@web3-react/coinbase-wallet'
-import { Web3ReactHooks } from '@web3-react/core'
-import { Web3ReactStore } from '@web3-react/types'
 import { useCallback, useEffect, useState } from 'react'
 
+import { CoinbaseWalletSDKOptions, InitCoinbaseWalletConnector } from '../../connectors/CoinbaseWallet'
 import { useFunStoreInterface } from '../../store'
 import { convertToValidUserId } from '../../utils'
 import { useFun } from '../UseFun'
@@ -12,12 +10,15 @@ import { authHookReturn } from './types'
 const name = 'Coinbase Wallet'
 
 export interface useCoinbaseAuthArgs {
-  CoinbaseWalletConnector: [CoinbaseWallet, Web3ReactHooks, Web3ReactStore]
+  // CoinbaseWalletConnector: [CoinbaseWallet, Web3ReactHooks, Web3ReactStore]
+  options: CoinbaseWalletSDKOptions
   autoConnect?: boolean
 }
 
-export const useCoinbaseAuth = ({ CoinbaseWalletConnector, autoConnect }: useCoinbaseAuthArgs): authHookReturn => {
-  const connector = CoinbaseWalletConnector[0]
+export const CoinbaseWalletConnector = InitCoinbaseWalletConnector()
+
+export const useCoinbaseAuth = ({ options, autoConnect }: useCoinbaseAuthArgs): authHookReturn => {
+  const connector = CoinbaseWalletConnector[0] //CoinbaseWalletConnector[0]
   const { useAccount, useIsActivating, useIsActive, useProvider } = CoinbaseWalletConnector[1]
   const account = useAccount()
   const activating = useIsActivating()
@@ -34,10 +35,10 @@ export const useCoinbaseAuth = ({ CoinbaseWalletConnector, autoConnect }: useCoi
   // attempt to connect eagerly on mount
   useEffect(() => {
     if (!autoConnect) return
-    void connector.connectEagerly().catch(() => {
+    void connector.connectEagerly(options).catch(() => {
       console.debug('Failed to connect eagerly to ', name)
     })
-  }, [autoConnect, connector])
+  }, [autoConnect, connector, options])
 
   useEffect(() => {
     if (active && account && !update) {
@@ -62,11 +63,11 @@ export const useCoinbaseAuth = ({ CoinbaseWalletConnector, autoConnect }: useCoi
 
   const login = useCallback(async () => {
     try {
-      await connector.activate()
+      await connector.activate(options)
     } catch (err) {
       console.log(err)
     }
-  }, [connector])
+  }, [connector, options])
 
   const logout = useCallback(async () => {
     try {
