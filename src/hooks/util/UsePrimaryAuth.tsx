@@ -45,7 +45,7 @@ export const usePrimaryAuth = (): Auth[] => {
         if (primary == null && !shallowCompare(authRef.current, [])) authRef.current = []
         else if (primary != null && !shallowCompare(authRef.current, [primary.auth])) {
           // console.log('setting default auth because no group auths found')
-          authRef.current = [primary.auth]
+          if (primary.auth) authRef.current = [primary.auth]
         }
       }
       // console.log('setting Group ID clients', memberAuths)
@@ -67,7 +67,7 @@ export const usePrimaryAuth = (): Auth[] => {
     // the default state if there is no active user is either an empty array or an array with the primary provider as auth
     if (primary == null && !shallowCompare(authRef.current, [])) authRef.current = []
     else if (primary != null && !shallowCompare(authRef.current, [primary.auth])) {
-      authRef.current = [primary.auth]
+      if (primary.auth) authRef.current = [primary.auth]
     }
   }
   return authRef.current
