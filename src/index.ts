@@ -33,6 +33,7 @@ export {
   Operation,
   OperationStatus,
   User,
+  Wallet,
 } from '@funkit/core'
 declare global {
   interface Window {
