@@ -100,6 +100,7 @@ export const useAction = (args: FirstClassActionParams, txOptions?: EnvOption) =
   )
 
   return {
+    ready: wallet != null && primaryAuth != null && primaryAuth.length > 0,
     loading,
     result,
     error,

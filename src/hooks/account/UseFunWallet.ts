@@ -27,7 +27,7 @@ interface useFunWalletHook {
  * @returns An object containing the created Fun wallet account, the account address, the chain ID, any errors that occurred, a boolean indicating whether the account is being initialized, a function to reset any errors, and a function to initialize a new Fun wallet account.
  */
 export const useFunWallet = (): useFunWalletHook => {
-  const { storedFunWallet, account, config, setLogin, setNewAccountUsers, updateConfig } = useFun(
+  const { storedFunWallet, account, config, setLogin, setNewAccountUsers, setFunGroupAccounts, updateConfig } = useFun(
     (state) => ({
       storedFunWallet: state.FunWallet,
       account: state.account,
@@ -37,6 +37,7 @@ export const useFunWallet = (): useFunWalletHook => {
       activeUser: state.activeUser,
       allUsers: state.allUsers,
       setNewAccountUsers: state.setNewAccountUsers,
+      setFunGroupAccounts: state.setFunGroupAccounts,
       updateConfig: state.updateConfig,
     }),
     shallow
@@ -121,6 +122,15 @@ export const useFunWallet = (): useFunWalletHook => {
           uniqueId: walletUniqueId,
         })
         const newAccountAddress = await newFunWallet.getAddress()
+        await newFunWallet.saveWalletToAuth(auth)
+        auth
+          .getWallets(chainId ? `${chainId}` : undefined)
+          .then((newWalletsArray) => {
+            setFunGroupAccounts(newWalletsArray)
+          })
+          .catch((err) => {
+            console.error('post create wallets fetch err: ', err)
+          })
         setNewAccountUsers([{ userId }], { userId })
         setLogin(newAccountAddress, newFunWallet)
 
@@ -133,7 +143,7 @@ export const useFunWallet = (): useFunWalletHook => {
         })
       }
     },
-    [config, handleBuildError, initializing, setLogin, setNewAccountUsers, updateConfig]
+    [config, handleBuildError, initializing, setFunGroupAccounts, setLogin, setNewAccountUsers, updateConfig]
   )
 
   const deactivateFunWallet = () => {
