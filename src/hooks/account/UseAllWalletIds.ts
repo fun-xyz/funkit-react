@@ -46,7 +46,7 @@ export const useFunWalletIds = (inputAuth?: Auth | Auth[], inputChain?: number):
   useEffect(() => {
     if (chainId == null && inputChain == null) return
     if (activeClients.length === 0) return
-    if (FunGroupAccounts && FunGroupAccounts.length > 0 && !activeClientsChanged(previousClients, activeClients)) return //
+    if (!activeClientsChanged(previousClients, activeClients)) return //
 
     const chain = inputChain ?? chainId
     const updateWalletList = async () => {
@@ -109,7 +109,7 @@ export const useFunWalletIds = (inputAuth?: Auth | Auth[], inputChain?: number):
     }
     updateWalletList()
       .then((res) => {
-        if (res.sortedFunWallets && res.sortedFunWallets.length > 0) {
+        if (res.sortedFunWallets) {
           setFunGroupAccounts(res.sortedFunWallets)
         }
       })
