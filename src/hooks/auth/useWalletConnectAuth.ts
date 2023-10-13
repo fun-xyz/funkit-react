@@ -15,11 +15,11 @@ export interface useCoinbaseAuthArgs {
   autoConnect?: boolean
 }
 
-export const CoinbaseWalletConnector = InitWalletConnectConnector()
+export const WalletConnectConnector = InitWalletConnectConnector()
 
 export const useWalletConnectAuth = ({ options, autoConnect }: useCoinbaseAuthArgs): authHookReturn => {
-  const connector = CoinbaseWalletConnector[0] //CoinbaseWalletConnector[0]
-  const { useAccount, useIsActivating, useIsActive, useProvider } = CoinbaseWalletConnector[1]
+  const connector = WalletConnectConnector[0]
+  const { useAccount, useIsActivating, useIsActive, useProvider } = WalletConnectConnector[1]
   const account = useAccount()
   const activating = useIsActivating()
   const active = useIsActive()

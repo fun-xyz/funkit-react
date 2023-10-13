@@ -4,7 +4,7 @@ import React, { useEffect } from 'react'
 
 import { authHookReturn } from './types'
 
-export const usePrivyAuth = (): authHookReturn => {
+export const usePrivyAuth = (readonly = false): authHookReturn => {
   const { login, logout, ready, user, createWallet } = usePrivy()
   const { wallets } = useWallets()
 
@@ -30,12 +30,11 @@ export const usePrivyAuth = (): authHookReturn => {
           console.log('error getting provider', e)
         })
     }
-  }, [auth, createWallet, ready, user, wallets])
+  }, [auth, createWallet, readonly, ready, user, wallets])
 
-  console.log('auth', auth, user)
   return {
     auth,
-    active: ready,
+    active: ready && user?.wallet?.address != null,
     activating: false,
     authAddr: user?.wallet?.address,
     name: 'Privy',
