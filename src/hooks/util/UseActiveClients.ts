@@ -4,7 +4,7 @@ import { Auth } from '@funkit/core'
 import { InjectedConnector } from '../../connectors/MetaMask'
 import { IActiveAuthList } from '../../store/plugins/FunAuthStore'
 import { convertToValidUserId } from '../../utils'
-import { CoinbaseWalletConnector } from '../auth/useCoinbaseAuth'
+import { CoinbaseWalletConnector } from '../auth/UseCoinbaseAuth'
 
 const connectors = [InjectedConnector, CoinbaseWalletConnector]
 

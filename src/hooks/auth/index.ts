@@ -1,5 +1,6 @@
 export * from './types'
-export { useCoinbaseAuth } from './useCoinbaseAuth'
+export { useCoinbaseAuth } from './UseCoinbaseAuth'
 export { useMetamaskAuth } from './useInjectedAuth/UseMetamaskAuth'
+export { FunContextProvider, usePrivyAuth } from './UsePrivyAuth'
 export { useAppleAuth, useDiscordAuth, useGoogleAuth, useTwitterAuth } from './useSocialAuth'
-export { useWalletConnectAuth } from './useWalletConnectAuth'
+export { useWalletConnectAuth } from './UseWalletConnectAuth'

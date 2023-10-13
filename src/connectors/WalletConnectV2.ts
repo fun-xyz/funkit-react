@@ -50,7 +50,7 @@ export class FunKitWalletConnect extends Connector {
   public override provider?: WalletConnectProvider
   public readonly events = new EventEmitter3()
 
-  private readonly options: Omit<WalletConnectOptions, 'rpcMap' | 'chains'>
+  private options: Omit<WalletConnectOptions, 'rpcMap' | 'chains'>
 
   private readonly rpcMap?: Record<number, string | string[]>
   private readonly chains: number[]
@@ -96,7 +96,11 @@ export class FunKitWalletConnect extends Connector {
 
     const rpcMap = this.rpcMap ? getBestUrlMap(this.rpcMap, this.timeout) : undefined
     const chains = desiredChainId ? getChainsWithDefault(this.chains, desiredChainId) : this.chains
-
+    if (this.options.projectId !== options.projectId)
+      this.options = {
+        ...this.options,
+        ...options,
+      }
     return (this.eagerConnection = import('@walletconnect/ethereum-provider').then(async (m) => {
       const provider = (this.provider = await m.default.init({
         ...this.options,
@@ -113,15 +117,11 @@ export class FunKitWalletConnect extends Connector {
   }
 
   /** {@inheritdoc Connector.connectEagerly} */
-  public override async connectEagerly(): Promise<void> {
+  public override async connectEagerly(options: WalletConnectOptions): Promise<void> {
     const cancelActivation = this.actions.startActivation()
 
     try {
-      const provider = await this.isomorphicInitialize({
-        projectId: '84012e566d88d63119afe996d7b327bc',
-        chains: [1],
-        showQrModal: true,
-      })
+      const provider = await this.isomorphicInitialize(options)
       // WalletConnect automatically persists and restores active sessions
       if (!provider.session) {
         throw new Error('No active session found. Connect your wallet first.')
@@ -137,15 +137,8 @@ export class FunKitWalletConnect extends Connector {
   /**
    * @param desiredChainId - The desired chainId to connect to.
    */
-  public async activate(desiredChainId?: number): Promise<void> {
-    const provider = await this.isomorphicInitialize(
-      {
-        projectId: '84012e566d88d63119afe996d7b327bc',
-        chains: [1],
-        showQrModal: true,
-      },
-      desiredChainId
-    )
+  public async activate(options: WalletConnectOptions, desiredChainId?: number): Promise<void> {
+    const provider = await this.isomorphicInitialize(options, desiredChainId)
 
     if (provider.session) {
       if (!desiredChainId || desiredChainId === provider.chainId) return
@@ -196,9 +189,9 @@ export class FunKitWalletConnect extends Connector {
 }
 
 export const InitWalletConnectConnector = (appId = '84012e566d88d63119afe996d7b327bc', chains = [1]) => {
-  return initializeConnector<WalletConnectV2>(
+  return initializeConnector<FunKitWalletConnect>(
     (actions) =>
-      new WalletConnectV2({
+      new FunKitWalletConnect({
         actions,
         options: {
           projectId: appId,

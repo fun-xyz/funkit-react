@@ -1,27 +1,25 @@
 import { Auth } from '@funkit/core'
-import { Web3ReactHooks } from '@web3-react/core'
-import { Web3ReactStore } from '@web3-react/types'
-import { WalletConnect } from '@web3-react/walletconnect-v2'
 import { useCallback, useEffect, useState } from 'react'
 
+import { InitWalletConnectConnector, WalletConnectOptions } from '../../connectors/WalletConnectV2'
 import { useFunStoreInterface } from '../../store'
 import { convertToValidUserId } from '../../utils'
 import { useFun } from '../UseFun'
 import { authHookReturn } from './types'
 
-const name = 'Wallet Connect'
+const name = 'WalletConnect'
 
-export interface useWalletConnectAuthArgs {
-  WalletConnectConnector: [WalletConnect, Web3ReactHooks, Web3ReactStore]
+export interface useCoinbaseAuthArgs {
+  // CoinbaseWalletConnector: [CoinbaseWallet, Web3ReactHooks, Web3ReactStore]
+  options: WalletConnectOptions
   autoConnect?: boolean
 }
 
-export const useWalletConnectAuth = ({
-  WalletConnectConnector,
-  autoConnect,
-}: useWalletConnectAuthArgs): authHookReturn => {
-  const connector = WalletConnectConnector[0]
-  const { useAccount, useIsActivating, useIsActive, useProvider } = WalletConnectConnector[1]
+export const CoinbaseWalletConnector = InitWalletConnectConnector()
+
+export const useWalletConnectAuth = ({ options, autoConnect }: useCoinbaseAuthArgs): authHookReturn => {
+  const connector = CoinbaseWalletConnector[0] //CoinbaseWalletConnector[0]
+  const { useAccount, useIsActivating, useIsActive, useProvider } = CoinbaseWalletConnector[1]
   const account = useAccount()
   const activating = useIsActivating()
   const active = useIsActive()
@@ -37,10 +35,10 @@ export const useWalletConnectAuth = ({
   // attempt to connect eagerly on mount
   useEffect(() => {
     if (!autoConnect) return
-    void connector.connectEagerly().catch(() => {
+    void connector.connectEagerly(options).catch(() => {
       console.debug('Failed to connect eagerly to ', name)
     })
-  }, [autoConnect, connector])
+  }, [autoConnect, connector, options])
 
   useEffect(() => {
     if (active && account && !update) {
@@ -65,11 +63,11 @@ export const useWalletConnectAuth = ({
 
   const login = useCallback(async () => {
     try {
-      await connector.activate()
+      await connector.activate(options)
     } catch (err) {
       console.log(err)
     }
-  }, [connector])
+  }, [connector, options])
 
   const logout = useCallback(async () => {
     try {
