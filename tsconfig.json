@@ -34,6 +34,6 @@
       "@/*": ["./src/*"]
     }
   },
-  "include": ["./**/*", "**/.eslintrc.js"],
+  "include": ["./**/*.ts", "./**/*.tsx", "**/.eslintrc.js"],
   "exclude": ["node_modules", "dist", "docs", "../example"]
 }

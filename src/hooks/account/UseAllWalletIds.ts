@@ -46,6 +46,7 @@ export const useFunWalletIds = (inputAuth?: Auth | Auth[], inputChain?: number):
   useEffect(() => {
     if (chainId == null && inputChain == null) return
     if (activeClients.length === 0) return
+    console.log('activeClients did they change', activeClientsChanged(previousClients, activeClients))
     if (!activeClientsChanged(previousClients, activeClients)) return //
 
     const chain = inputChain ?? chainId
