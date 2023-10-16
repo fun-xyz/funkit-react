@@ -6,9 +6,10 @@ import { IActiveAuthList } from '../../store/plugins/FunAuthStore'
 import { convertToValidUserId } from '../../utils'
 import { usePrivyAuth } from '../auth'
 import { CoinbaseWalletConnector } from '../auth/UseCoinbaseAuth'
+import { SocialAuthConnector } from '../auth/useSocialAuth/UseSocialAuthBase'
 import { WalletConnectConnector } from '../auth/UseWalletConnectAuth'
 
-const connectors = [InjectedConnector, CoinbaseWalletConnector, WalletConnectConnector]
+const connectors = [InjectedConnector, CoinbaseWalletConnector, WalletConnectConnector, SocialAuthConnector]
 
 export const useActiveClients = (): IActiveAuthList[] => {
   const { active, auth, authAddr } = usePrivyAuth(true)

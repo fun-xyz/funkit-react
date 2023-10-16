@@ -129,7 +129,7 @@ export const UseSocialAuthBase = ({ provider, name, networkOptions }: useSocialA
   }
 }
 
-const SocialAuthConnector = SocialOauthConnector(SUPPORTED_OAUTH_PROVIDERS)
+export const SocialAuthConnector = SocialOauthConnector(SUPPORTED_OAUTH_PROVIDERS)
 
 export interface useSocialAuthConnectorBaseArgs {
   // SocialAuthConnector: [SocialLoginConnector, Web3ReactHooks, Web3ReactStore]
