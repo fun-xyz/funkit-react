@@ -1,6 +1,6 @@
 // eslint-disable-next-line prettier/prettier
 "use client";
-import { create } from 'zustand'
+import { createWithEqualityFn } from 'zustand/traditional'
 
 import { ChainStoreInterface, configureChainStore } from './plugins/ChainStore'
 import { configureConfigurationStore, ConfigureStoreInterface } from './plugins/ConfigureStore'
@@ -21,7 +21,7 @@ export interface useFunStoreInterface
 }
 
 export const createUseFunStore = () => {
-  return create(
+  return createWithEqualityFn(
     (set: any, get: any): useFunStoreInterface => ({
       ...configureFunAccountStore(get, set),
       ...configureAuthStore(get, set),
