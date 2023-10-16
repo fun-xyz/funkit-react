@@ -31,6 +31,7 @@ export type FirstClassActionParams =
   | IUpdateThresholdOfGroupParams
   | IRemoveGroupParams
   | ITransactionParams
+  | ICreate
 
 export enum ActionType {
   Swap = 'swap',
@@ -47,6 +48,12 @@ export enum ActionType {
   updateThresholdOfGroup = 'updateThresholdOfGroup',
   removeGroup = 'removeGroup',
   createOperation = 'createOperation',
+  create = 'create',
+}
+
+export interface ICreate {
+  action: ActionType.create
+  params: null
 }
 
 export interface ITransactionParams {
