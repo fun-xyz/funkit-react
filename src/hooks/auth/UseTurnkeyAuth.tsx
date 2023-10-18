@@ -5,21 +5,8 @@ import { WebauthnStamper } from '@turnkey/webauthn-stamper'
 import axios from 'axios'
 import React, { useEffect, useState } from 'react'
 import { createWalletClient, http } from 'viem'
-import { sepolia } from 'viem/chains'
 
 import { authHookReturn } from './types'
-
-type subOrgFormData = {
-  subOrgName: string
-}
-
-type privateKeyFormData = {
-  privateKeyName: string
-}
-
-type signingFormData = {
-  messageToSign: string
-}
 
 const generateRandomBuffer = (): ArrayBuffer => {
   const arr = new Uint8Array(32)
@@ -100,7 +87,6 @@ export const useTurnkeyAuth = (readonly = false): authHookReturn => {
 
     const viemClient = createWalletClient({
       account: viemAccount,
-      chain: sepolia,
       transport: http(),
     })
 
@@ -149,9 +135,13 @@ export const useTurnkeyAuth = (readonly = false): authHookReturn => {
 
   // Should create a subOrg all the way to an auth
   const doEverything = async () => {
+    console.log('Creating Sub Org')
     await createSubOrg()
+    console.log('Creating Private Key')
     await createPrivateKey()
+    console.log('Creating Auth')
     await createAuth()
+    console.log('Created auth', await auth?.getAddress())
   }
 
   useEffect(() => {
