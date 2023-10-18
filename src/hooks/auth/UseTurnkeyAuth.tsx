@@ -88,10 +88,10 @@ export const useTurnkeyAuth = (readonly = false): authHookReturn => {
     const viemClient: WalletClient = createWalletClient({
       account: viemAccount,
       transport: http(),
-    }) as WalletClient
+    }) as any as WalletClient
 
     const auth = new Auth({
-      client: viemClient,
+      client: viemClient as any,
     })
     setAuth(auth)
   }
