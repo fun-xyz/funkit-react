@@ -1,5 +1,6 @@
 import { Auth } from '@funkit/core'
-import { getWebAuthnAttestation, TurnkeyClient } from '@turnkey/http'
+import { ApiKeyStamper } from '@turnkey/api-key-stamper'
+import { createActivityPoller, getWebAuthnAttestation, TurnkeyClient } from '@turnkey/http'
 import { createAccount } from '@turnkey/viem'
 import { WebauthnStamper } from '@turnkey/webauthn-stamper'
 import axios from 'axios'
@@ -7,6 +8,14 @@ import React, { useEffect, useState } from 'react'
 import { createWalletClient, http, WalletClient } from 'viem'
 
 import { authHookReturn } from './types'
+
+export function refineNonNull<T>(input: T | null | undefined, errorMessage?: string): T {
+  if (input == null) {
+    throw new Error(errorMessage ?? `Unexpected ${JSON.stringify(input)}`)
+  }
+
+  return input
+}
 
 const generateRandomBuffer = (): ArrayBuffer => {
   const arr = new Uint8Array(32)
@@ -65,11 +74,45 @@ export const useTurnkeyAuth = (readonly = false): authHookReturn => {
       },
     })
 
-    const response = await axios.post('/api/createKey', signedRequest)
+    const activityResponse = await axios.post(signedRequest.url, signedRequest.body, {
+      headers: {
+        [signedRequest.stamp.stampHeaderName]: signedRequest.stamp.stampHeaderValue,
+      },
+    })
+
+    if (activityResponse.status !== 200) {
+      throw new Error('Failed to get response')
+    }
+
+    const stamper = new ApiKeyStamper({
+      apiPublicKey: '0306bbf329c279010ddc2ad278cb05f64b9bb53cd869f5bce3b3e93d440b26166a',
+      apiPrivateKey: '43547e88f7a8b10adf81bf02071f4cfa89bfa5ad6c773f006301d8ee3a40ceb9',
+    })
+    const client = new TurnkeyClient({ baseUrl: 'https://api.turnkey.com' }, stamper)
+
+    const activityPoller = createActivityPoller({
+      client,
+      requestFn: client.getActivity,
+    })
+
+    const activityId = refineNonNull(activityResponse.data.activity?.id)
+    const newSubOrgId = refineNonNull(activityResponse.data.activity?.organizationId)
+
+    const completedActivity = await activityPoller({
+      activityId,
+      organizationId: newSubOrgId,
+    })
+
+    const privateKeys = completedActivity.result.createPrivateKeysResultV2?.privateKeys
+
+    // XXX: sorry for the ugly code! We expect a single key / address returned.
+    // If we have more than one key / address returned, or none, this would break.
+    const address = privateKeys?.map((pk) => pk.addresses?.map((addr) => addr.address).join('')).join('')
+    const privateKeyId = privateKeys?.map((pk) => pk.privateKeyId).join('')
 
     setPrivateKey({
-      id: response.data['privateKeyId'],
-      address: response.data['address'],
+      id: privateKeyId!,
+      address: address!,
     })
   }
 
@@ -124,13 +167,63 @@ export const useTurnkeyAuth = (readonly = false): authHookReturn => {
       },
     })
 
-    const res = await axios.post('/api/createSubOrg', {
+    const createSubOrgRequest = {
       subOrgName,
       attestation,
       challenge: base64UrlEncode(challenge),
+    }
+    const turnkeyClient = new TurnkeyClient(
+      { baseUrl: 'https://api.turnkey.com' },
+      new ApiKeyStamper({
+        apiPublicKey: '0306bbf329c279010ddc2ad278cb05f64b9bb53cd869f5bce3b3e93d440b26166a',
+        apiPrivateKey: '43547e88f7a8b10adf81bf02071f4cfa89bfa5ad6c773f006301d8ee3a40ceb9',
+      })
+    )
+
+    const activityPoller = createActivityPoller({
+      client: turnkeyClient,
+      requestFn: turnkeyClient.createSubOrganization,
     })
 
-    setSubOrgId(res.data.subOrgId)
+    const privateKeyName = `Default ETH Key`
+
+    const completedActivity = await activityPoller({
+      type: 'ACTIVITY_TYPE_CREATE_SUB_ORGANIZATION_V3',
+      timestampMs: String(Date.now()),
+      organizationId: 'c94f8969-92b8-4392-9ce7-5656653738eb',
+      parameters: {
+        subOrganizationName: createSubOrgRequest.subOrgName,
+        rootQuorumThreshold: 1,
+        rootUsers: [
+          {
+            userName: 'New user',
+            apiKeys: [],
+            authenticators: [
+              {
+                authenticatorName: 'Passkey',
+                challenge: createSubOrgRequest.challenge,
+                attestation: createSubOrgRequest.attestation,
+              },
+            ],
+          },
+        ],
+        privateKeys: [
+          {
+            privateKeyName,
+            curve: 'CURVE_SECP256K1',
+            addressFormats: ['ADDRESS_FORMAT_ETHEREUM'],
+            privateKeyTags: [],
+          },
+        ],
+      },
+    })
+
+    const subOrgId = refineNonNull(completedActivity.result.createSubOrganizationResultV3?.subOrganizationId)
+    const privateKeys = refineNonNull(completedActivity.result.createSubOrganizationResultV3?.privateKeys)
+    const privateKeyId = refineNonNull(privateKeys?.[0]?.privateKeyId)
+    const privateKeyAddress = refineNonNull(privateKeys?.[0]?.addresses?.[0]?.address)
+
+    setSubOrgId(subOrgId)
   }
 
   // Should create a subOrg all the way to an auth
