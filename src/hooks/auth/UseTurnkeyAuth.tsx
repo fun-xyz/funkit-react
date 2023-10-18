@@ -4,7 +4,7 @@ import { createAccount } from '@turnkey/viem'
 import { WebauthnStamper } from '@turnkey/webauthn-stamper'
 import axios from 'axios'
 import React, { useEffect, useState } from 'react'
-import { createWalletClient, http } from 'viem'
+import { createWalletClient, http, WalletClient } from 'viem'
 
 import { authHookReturn } from './types'
 
@@ -85,10 +85,10 @@ export const useTurnkeyAuth = (readonly = false): authHookReturn => {
       ethereumAddress: privateKey.address,
     })
 
-    const viemClient = createWalletClient({
+    const viemClient: WalletClient = createWalletClient({
       account: viemAccount,
       transport: http(),
-    })
+    }) as WalletClient
 
     const auth = new Auth({
       client: viemClient,
