@@ -2,9 +2,8 @@ import { Auth } from '@funkit/core'
 import { getWebAuthnAttestation, TurnkeyClient } from '@turnkey/http'
 import { createAccount } from '@turnkey/viem'
 import { WebauthnStamper } from '@turnkey/webauthn-stamper'
-import React, { useEffect } from 'react'
-import { useState } from 'react'
-import { useForm } from 'react-hook-form'
+import axios from 'axios'
+import React, { useEffect, useState } from 'react'
 import { createWalletClient, http } from 'viem'
 import { sepolia } from 'viem/chains'
 
@@ -37,16 +36,11 @@ type TPrivateKeyState = {
   address: string
 } | null
 
-type TSignedMessage = {
-  message: string
-  signature: string
-} | null
-
 const humanReadableDateTime = (): string => {
   return new Date().toLocaleString().replace(/\//g, '-').replace(/:/g, '.')
 }
 
-export const usePrivyAuth = (readonly = false): authHookReturn => {
+export const useTurnkeyAuth = (readonly = false): authHookReturn => {
   // Create an auth here so we can use it to sign messages
   const [auth, setAuth] = React.useState<Auth | undefined>(undefined)
   const [subOrgId, setSubOrgId] = useState<string | null>(null)
@@ -92,7 +86,7 @@ export const usePrivyAuth = (readonly = false): authHookReturn => {
     })
   }
 
-  const signMessage = async (data: signingFormData) => {
+  const createAuth = async () => {
     if (!subOrgId || !privateKey) {
       throw new Error('sub-org id or private key not found')
     }
@@ -109,6 +103,11 @@ export const usePrivyAuth = (readonly = false): authHookReturn => {
       chain: sepolia,
       transport: http(),
     })
+
+    const auth = new Auth({
+      client: viemClient,
+    })
+    setAuth(auth)
   }
 
   const createSubOrg = async () => {
@@ -150,7 +149,9 @@ export const usePrivyAuth = (readonly = false): authHookReturn => {
 
   // Should create a subOrg all the way to an auth
   const doEverything = async () => {
-    console.log('Reached doEverything')
+    await createSubOrg()
+    await createPrivateKey()
+    await createAuth()
   }
 
   useEffect(() => {

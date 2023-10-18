@@ -1,5 +1,5 @@
 Arguments: 
-  /Users/albertsu/.nvm/versions/node/v18.16.0/bin/node /Users/albertsu/.cache/node/corepack/yarn/1.22.19/bin/yarn.js add next
+  /Users/albertsu/.nvm/versions/node/v18.16.0/bin/node /Users/albertsu/.cache/node/corepack/yarn/1.22.19/bin/yarn.js add axios
 
 PATH: 
   /Users/albertsu/.nvm/versions/node/v18.16.0/bin:/usr/local/bin:/System/Cryptexes/App/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin:/Users/albertsu/Library/pnpm:/Users/albertsu/.nvm/versions/node/v18.16.0/bin:/Users/albertsu/.foundry/bin
@@ -50,6 +50,9 @@ npm manifest:
       "@magic-sdk/commons": "^14.2.1",
       "@magic-sdk/provider": "^18.2.1",
       "@privy-io/react-auth": "^1.43.3",
+      "@turnkey/http": "^1.3.0",
+      "@turnkey/viem": "^0.2.5",
+      "@turnkey/webauthn-stamper": "^0.2.0",
       "@walletconnect/modal": "^2.4.5",
       "@web3-react/coinbase-wallet": "^8.2.0",
       "@web3-react/core": "^8.2.0",
@@ -1138,6 +1141,37 @@ Lockfile:
     version "1.0.3"
     resolved "https://registry.npmjs.org/@tsconfig/recommended/-/recommended-1.0.3.tgz"
     integrity sha512-+jby/Guq9H8O7NWgCv6X8VAiQE8Dr/nccsCtL74xyHKhu2Knu5EAKmOZj3nLCnLm1KooUzKY+5DsnGVqhM8/wQ==
+  
+  "@turnkey/api-key-stamper@0.1.1":
+    version "0.1.1"
+    resolved "https://registry.npmjs.org/@turnkey/api-key-stamper/-/api-key-stamper-0.1.1.tgz"
+    integrity sha512-qs8fmWFiAhh7fAByx7j9/2F0VRe/qD7Yq3hi4FwD+jLU0CXdE+aim1cmJpAFFPKF1PBmPs6jh4XBODE40eqEEg==
+  
+  "@turnkey/http@^1.3.0", "@turnkey/http@1.3.0":
+    version "1.3.0"
+    resolved "https://registry.npmjs.org/@turnkey/http/-/http-1.3.0.tgz"
+    integrity sha512-vl/z3GSRY5ZvjHvb7gpfyq8HXj630yYViHqtstTRtGCv1QaNxgsDzZ/ECkN8fWiJJj/4SUiiKw6jSeHL0jTAew==
+    dependencies:
+      "@turnkey/api-key-stamper" "0.1.1"
+      "@turnkey/webauthn-stamper" "0.2.0"
+      cross-fetch "^3.1.5"
+  
+  "@turnkey/viem@^0.2.5":
+    version "0.2.5"
+    resolved "https://registry.npmjs.org/@turnkey/viem/-/viem-0.2.5.tgz"
+    integrity sha512-HdXI0oi/7MfEEHDtIUjjG27/WotZBVLb8NzmqKzSnyiDvBC0UX4toba6pobKngxtehg/5DznJW961d7CRAx2Gw==
+    dependencies:
+      "@turnkey/api-key-stamper" "0.1.1"
+      "@turnkey/http" "1.3.0"
+      cross-fetch "^4.0.0"
+      typescript "5.1"
+  
+  "@turnkey/webauthn-stamper@^0.2.0", "@turnkey/webauthn-stamper@0.2.0":
+    version "0.2.0"
+    resolved "https://registry.npmjs.org/@turnkey/webauthn-stamper/-/webauthn-stamper-0.2.0.tgz"
+    integrity sha512-BoHucuoTTmvqJzqSZs6XsLHSu1rwelSHUFBDlUfYX/QzK9BpkaxMxamOxk92OLpRb6qRUngrCQeS/jPHlWgQow==
+    dependencies:
+      buffer "^6.0.3"
   
   "@types/bn.js@^4.11.5":
     version "4.11.6"
@@ -5432,7 +5466,7 @@ Lockfile:
       minimatch "^9.0.0"
       shiki "^0.14.1"
   
-  typescript@^5.1.3:
+  typescript@^5.1.3, typescript@5.1:
     version "5.1.6"
     resolved "https://registry.npmjs.org/typescript/-/typescript-5.1.6.tgz"
     integrity sha512-zaWCozRZ6DLEWAWFrVDz1H6FVXzUSfTy5FUMWsQlU8Ym5JP9eO4xkTIROFCQvhQf61z6O/G6ugw3SgAnvvm+HA==
