@@ -1,4 +1,4 @@
-import { Auth, Wallet } from '@funkit/core'
+import { Auth, GlobalEnvOption, Wallet } from '@funkit/core'
 import { useEffect } from 'react'
 import { shallow } from 'zustand/shallow'
 
@@ -25,8 +25,12 @@ const activeClientsChanged = (
 // TODO configureEnvironment before updating the list is possible since the API key is required to fetch the list of wallets.
 // TODO make sure it doesn't fetch repeatedly when the list is already fetched.
 // Special hook which uses Funkit/core to fetch all wallets for each active and connected auth and returns the list in order of most common connections.
-export const useFunWalletIds = (inputAuth?: Auth | Auth[], inputChain?: number): IUseFunAccountsReturn => {
-  const { chainId, FunGroupAccounts, setFunGroupAccounts, FunAccounts, setFunAccounts } = useFun(
+export const useFunWalletIds = (
+  inputAuth?: Auth | Auth[],
+  options?: GlobalEnvOption,
+  inputChain?: number
+): IUseFunAccountsReturn => {
+  const { chainId, FunGroupAccounts, setFunGroupAccounts, FunAccounts, setFunAccounts, config, updateConfig } = useFun(
     (state: useFunStoreInterface) => ({
       wallet: state.FunWallet,
       chainId: state.chainId,
@@ -37,9 +41,18 @@ export const useFunWalletIds = (inputAuth?: Auth | Auth[], inputChain?: number):
       account: state.account,
       activeUser: state.activeUser,
       setActiveUser: state.setActiveUser,
+      config: state.config,
+      updateConfig: state.updateConfig,
     }),
     shallow
   )
+
+  useEffect(() => {
+    if (config == null && !options)
+      throw new Error('Config not set. Either pass in a config object or set it using the useConfig hook.')
+    if (config == null && options) updateConfig(options)
+  }, [config, options, updateConfig])
+
   const activeClients = useActiveClients()
   const previousClients = usePrevious(activeClients)
 

@@ -1,5 +1,5 @@
-import { Auth, Chain, FunWallet, Wallet } from '@funkit/core'
-import { useCallback, useState } from 'react'
+import { Auth, Chain, FunWallet, GlobalEnvOption, Wallet } from '@funkit/core'
+import { useCallback, useEffect, useState } from 'react'
 import { shallow } from 'zustand/shallow'
 
 import {
@@ -26,7 +26,7 @@ interface useFunWalletHook {
  * Custom hook that provides functionality to create a new Fun wallet account.
  * @returns An object containing the created Fun wallet account, the account address, the chain ID, any errors that occurred, a boolean indicating whether the account is being initialized, a function to reset any errors, and a function to initialize a new Fun wallet account.
  */
-export const useFunWallet = (): useFunWalletHook => {
+export const useFunWallet = (options?: GlobalEnvOption): useFunWalletHook => {
   const { storedFunWallet, account, config, setLogin, setNewAccountUsers, setFunGroupAccounts, updateConfig } = useFun(
     (state) => ({
       storedFunWallet: state.FunWallet,
@@ -42,6 +42,12 @@ export const useFunWallet = (): useFunWalletHook => {
     }),
     shallow
   )
+
+  useEffect(() => {
+    if (config == null && !options)
+      throw new Error('Config not set. Either pass in a config object or set it using the useConfig hook.')
+    if (config == null && options) updateConfig(options)
+  }, [config, options, updateConfig])
 
   const [initializing, setInitializing] = useState(false)
   const [primaryAuth] = usePrimaryAuth()
