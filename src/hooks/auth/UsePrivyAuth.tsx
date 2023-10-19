@@ -1,8 +1,9 @@
 'use client'
-import { Auth } from '@funkit/core'
+import { Auth, GlobalEnvOption } from '@funkit/core'
 import { PrivyProvider, usePrivy, useWallets } from '@privy-io/react-auth'
 import React, { useEffect, useState } from 'react'
 
+import { useConfig } from '../account/UseConfig'
 import { authHookReturn } from './types'
 
 export const usePrivyAuth = (readonly = false): authHookReturn => {
@@ -51,8 +52,17 @@ export const usePrivyAuth = (readonly = false): authHookReturn => {
 interface FunContextProviderProps {
   children: any
   appId: string
+  options: GlobalEnvOption
 }
-export const FunContextProvider = ({ children, appId }: FunContextProviderProps) => {
+export const FunContextProvider = ({ children, appId, options }: FunContextProviderProps) => {
+  const [set, setset] = useState(false)
+  const { setConfig } = useConfig()
+
+  if (set == false) {
+    setConfig(options)
+    setset(true)
+  }
+
   return (
     <div>
       <PrivyProvider
