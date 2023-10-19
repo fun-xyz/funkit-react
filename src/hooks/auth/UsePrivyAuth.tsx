@@ -1,6 +1,7 @@
+'use client'
 import { Auth } from '@funkit/core'
 import { PrivyProvider, usePrivy, useWallets } from '@privy-io/react-auth'
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 
 import { authHookReturn } from './types'
 
@@ -8,7 +9,7 @@ export const usePrivyAuth = (readonly = false): authHookReturn => {
   const { login, logout, ready, user, createWallet } = usePrivy()
   const { wallets } = useWallets()
 
-  const [auth, setAuth] = React.useState<Auth | undefined>(undefined)
+  const [auth, setAuth] = useState<Auth | undefined>(undefined)
 
   useEffect(() => {
     if (ready && user && !user.wallet) {

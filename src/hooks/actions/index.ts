@@ -4,6 +4,7 @@ export {
   IAddOwnerParams,
   IAddUserToGroupParams,
   IApprove,
+  ICreate,
   ICreateGroupParams,
   ICreateSessionKeyParams,
   IRemoveGroupParams,
