@@ -53,7 +53,7 @@ export const useTurnkeyAuth = (readonly = false): authHookReturn => {
     stamper
   )
 
-  const createPrivateKey = async () => {
+  const createPrivateKey = async (subOrgId: string): Promise<any> => {
     if (!subOrgId) {
       throw new Error('sub-org id not found')
     }
@@ -114,9 +114,13 @@ export const useTurnkeyAuth = (readonly = false): authHookReturn => {
       id: privateKeyId!,
       address: address!,
     })
+    return {
+      id: privateKeyId!,
+      address: address!,
+    }
   }
 
-  const createAuth = async () => {
+  const createAuth = async (subOrgId: string, privateKey: any) => {
     if (!subOrgId || !privateKey) {
       throw new Error('sub-org id or private key not found')
     }
@@ -139,7 +143,7 @@ export const useTurnkeyAuth = (readonly = false): authHookReturn => {
     setAuth(auth)
   }
 
-  const createSubOrg = async () => {
+  const createSubOrg = async (): Promise<string> => {
     const challenge = generateRandomBuffer()
     const subOrgName = `Turnkey Viem+Passkey Demo - ${humanReadableDateTime()}`
     const authenticatorUserId = generateRandomBuffer()
@@ -218,22 +222,19 @@ export const useTurnkeyAuth = (readonly = false): authHookReturn => {
       },
     })
 
-    const subOrgId = refineNonNull(completedActivity.result.createSubOrganizationResultV3?.subOrganizationId)
-    const privateKeys = refineNonNull(completedActivity.result.createSubOrganizationResultV3?.privateKeys)
-    const privateKeyId = refineNonNull(privateKeys?.[0]?.privateKeyId)
-    const privateKeyAddress = refineNonNull(privateKeys?.[0]?.addresses?.[0]?.address)
-
-    setSubOrgId(subOrgId)
+    const newSubOrgId = refineNonNull(completedActivity.result.createSubOrganizationResultV3?.subOrganizationId)
+    setSubOrgId(newSubOrgId)
+    return newSubOrgId
   }
 
   // Should create a subOrg all the way to an auth
   const doEverything = async () => {
     console.log('Creating Sub Org')
-    await createSubOrg()
+    const newSubOrgId = await createSubOrg()
     console.log('Creating Private Key')
-    await createPrivateKey()
+    const newPrivateKey = await createPrivateKey(newSubOrgId)
     console.log('Creating Auth')
-    await createAuth()
+    await createAuth(newSubOrgId, newPrivateKey)
     console.log('Created auth', await auth?.getAddress())
   }
 
