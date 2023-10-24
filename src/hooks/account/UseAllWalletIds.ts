@@ -67,18 +67,18 @@ export const useFunWalletIds = (
     const chain = inputChain ?? chainId
     const updateWalletList = async () => {
       try {
-        const wallets: Wallet[][] = []
+        const fetchedWalletLists: Wallet[][] = []
         if (inputAuth) {
           if (inputAuth instanceof Auth) {
             try {
-              wallets.push(await inputAuth.getWallets(`${chain}`))
+              fetchedWalletLists.push(await inputAuth.getWallets(`${chain}`))
             } catch (error) {
               console.error(error)
             }
           } else {
             inputAuth.forEach(async (auth) => {
               try {
-                wallets.push(await auth.getWallets(`${chain}`))
+                fetchedWalletLists.push(await auth.getWallets(`${chain}`))
               } catch (error) {
                 console.error(error)
               }
@@ -90,18 +90,18 @@ export const useFunWalletIds = (
             if (!currentClient.active) continue
             const currentAuth = new Auth({ provider: currentClient.provider })
             try {
-              wallets.push(await currentAuth.getWallets(`${chain}`))
+              fetchedWalletLists.push(await currentAuth.getWallets(`${chain}`))
             } catch (error) {
               console.error(error)
             }
           }
         }
 
-        if (wallets.flat().length === 0) return { sortedFunWallets: [] }
+        if (fetchedWalletLists.flat().length === 0) return { sortedFunWallets: [] }
         const WalletSet: {
           [account: string]: { wallet: Wallet; count: number }
         } = {}
-        wallets
+        fetchedWalletLists
           .concat()
           .flat()
           .forEach((wallet) => {

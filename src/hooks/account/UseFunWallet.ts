@@ -9,6 +9,7 @@ import {
   MissingConfigError,
   MissingInitializationArgs,
 } from '../../store'
+import { generateWalletUniqueId } from '../../utils'
 import { useFun } from '../index'
 import { usePrimaryAuth } from '../util'
 
@@ -121,7 +122,7 @@ export const useFunWallet = (options?: GlobalEnvOption): useFunWalletHook => {
       if (config == null || !config.chain) return handleBuildError(MissingConfigError)
       try {
         if (chainId && config.chain !== chainId) updateConfig({ chain: chainId })
-        const walletUniqueId = await auth.getWalletUniqueId(Math.floor(Math.random() * 10000000000))
+        const walletUniqueId = await generateWalletUniqueId(auth)
         const userId = await auth.getUserId()
         const newFunWallet = new FunWallet({
           users: [{ userId }],
@@ -135,6 +136,7 @@ export const useFunWallet = (options?: GlobalEnvOption): useFunWalletHook => {
             setFunGroupAccounts(newWalletsArray)
           })
           .catch((err) => {
+            // caught the error without crashing the function
             console.error('post create wallets fetch err: ', err)
           })
         setNewAccountUsers([{ userId }], { userId })

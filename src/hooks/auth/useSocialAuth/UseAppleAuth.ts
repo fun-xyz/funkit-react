@@ -1,8 +1,8 @@
-import { useSocialAuthConnectorBase } from './UseSocialAuthBase'
+import { SocialAuthProviders, useSocialAuthConnectorBase } from './UseSocialAuthBase'
 
 export const useAppleAuth = () => {
   return useSocialAuthConnectorBase({
-    oAuthProvider: 'apple',
+    oAuthProvider: SocialAuthProviders.Apple,
     name: 'Apple',
   })
 }
