@@ -1,13 +1,205 @@
-import { CoinbaseWallet } from '@web3-react/coinbase-wallet'
+import type { CoinbaseWalletProvider, CoinbaseWalletSDK } from '@coinbase/wallet-sdk'
 import { initializeConnector } from '@web3-react/core'
+import type {
+  Actions,
+  AddEthereumChainParameter,
+  ProviderConnectInfo,
+  ProviderRpcError,
+  WatchAssetParameters,
+} from '@web3-react/types'
+import { Connector } from '@web3-react/types'
 
-export const CoinbaseWalletConnector = (
-  appName = 'fun-wallet-react',
+function parseChainId(chainId: string | number) {
+  return typeof chainId === 'number' ? chainId : Number.parseInt(chainId, chainId.startsWith('0x') ? 16 : 10)
+}
+
+export type CoinbaseWalletSDKOptions = ConstructorParameters<typeof CoinbaseWalletSDK>[0] & { url: string }
+
+/**
+ * @param options - Options to pass to `@coinbase/wallet-sdk`.
+ * @param onError - Handler to report errors thrown from eventListeners.
+ */
+export interface CoinbaseWalletConstructorArgs {
+  actions: Actions
+  options: CoinbaseWalletSDKOptions
+  onError?: (error: Error) => void
+}
+
+export class FunKitCoinbaseWallet extends Connector {
+  /** {@inheritdoc Connector.provider} */
+  public override provider: CoinbaseWalletProvider | undefined
+
+  private options: CoinbaseWalletSDKOptions
+  private eagerConnection?: Promise<void>
+
+  /**
+   * A `CoinbaseWalletSDK` instance.
+   */
+  public coinbaseWallet: CoinbaseWalletSDK | undefined
+
+  constructor({ actions, options, onError }: CoinbaseWalletConstructorArgs) {
+    super(actions, onError)
+    this.options = options
+  }
+
+  // the `connected` property, is bugged, but this works as a hack to check connection status
+  private get connected() {
+    return !!this.provider?.selectedAddress
+  }
+
+  private async isomorphicInitialize(options: CoinbaseWalletSDKOptions): Promise<void> {
+    if (this.eagerConnection && this.options === options) return
+    this.options = {
+      ...this.options,
+      ...options,
+    }
+
+    await (this.eagerConnection = import('@coinbase/wallet-sdk').then((m) => {
+      const { url, ...options } = this.options
+      this.coinbaseWallet = new m.default(options)
+      this.provider = this.coinbaseWallet.makeWeb3Provider(url)
+      this.provider.on('connect', ({ chainId }: ProviderConnectInfo): void => {
+        this.actions.update({ chainId: parseChainId(chainId) })
+      })
+
+      this.provider.on('disconnect', (error: ProviderRpcError): void => {
+        this.actions.resetState()
+        this.onError?.(error)
+      })
+
+      this.provider.on('chainChanged', (chainId: string): void => {
+        this.actions.update({ chainId: parseChainId(chainId) })
+      })
+
+      this.provider.on('accountsChanged', (accounts: string[]): void => {
+        if (accounts.length === 0) {
+          // handle this edge case by disconnecting
+          this.actions.resetState()
+        } else {
+          this.actions.update({ accounts })
+        }
+      })
+    }))
+  }
+
+  /** {@inheritdoc Connector.connectEagerly} */
+  public override async connectEagerly(options: CoinbaseWalletSDKOptions): Promise<void> {
+    const cancelActivation = this.actions.startActivation()
+
+    try {
+      await this.isomorphicInitialize(options)
+
+      if (!this.provider || !this.connected) throw new Error('No existing connection')
+
+      // Wallets may resolve eth_chainId and hang on eth_accounts pending user interaction, which may include changing
+      // chains; they should be requested serially, with accounts first, so that the chainId can settle.
+      const accounts = await this.provider.request<string[]>({ method: 'eth_accounts' })
+      if (!accounts.length) throw new Error('No accounts returned')
+      const chainId = await this.provider.request<string>({ method: 'eth_chainId' })
+      this.actions.update({ chainId: parseChainId(chainId), accounts })
+    } catch (error) {
+      cancelActivation()
+      throw error
+    }
+  }
+
+  /**
+   * Initiates a connection.
+   *
+   * @param desiredChainIdOrChainParameters - If defined, indicates the desired chain to connect to. If the user is
+   * already connected to this chain, no additional steps will be taken. Otherwise, the user will be prompted to switch
+   * to the chain, if one of two conditions is met: either they already have it added, or the argument is of type
+   * AddEthereumChainParameter, in which case the user will be prompted to add the chain with the specified parameters
+   * first, before being prompted to switch.
+   */
+  public async activate(
+    options: CoinbaseWalletSDKOptions,
+    desiredChainIdOrChainParameters?: number | AddEthereumChainParameter
+  ): Promise<void> {
+    const desiredChainId =
+      typeof desiredChainIdOrChainParameters === 'number'
+        ? desiredChainIdOrChainParameters
+        : desiredChainIdOrChainParameters?.chainId
+    console.log('activate', this.provider && this.connected)
+    if (this.provider && this.connected) {
+      if (!desiredChainId || desiredChainId === parseChainId(this.provider.chainId)) return
+
+      const desiredChainIdHex = `0x${desiredChainId.toString(16)}`
+      return this.provider
+        .request<void>({
+          method: 'wallet_switchEthereumChain',
+          params: [{ chainId: desiredChainIdHex }],
+        })
+        .catch(async (error: ProviderRpcError) => {
+          if (error.code === 4902 && typeof desiredChainIdOrChainParameters !== 'number') {
+            if (!this.provider) throw new Error('No provider')
+            // if we're here, we can try to add a new network
+            return this.provider.request<void>({
+              method: 'wallet_addEthereumChain',
+              params: [{ ...desiredChainIdOrChainParameters, chainId: desiredChainIdHex }],
+            })
+          }
+
+          throw error
+        })
+    }
+
+    const cancelActivation = this.actions.startActivation()
+
+    try {
+      console.log('manual activation')
+      await this.isomorphicInitialize(options)
+      if (!this.provider) throw new Error('No provider')
+
+      const accounts = await this.provider.request<string[]>({ method: 'eth_requestAccounts' })
+
+      if (accounts) return this.actions.update({ accounts })
+    } catch (error) {
+      cancelActivation()
+      throw error
+    }
+  }
+
+  /** {@inheritdoc Connector.deactivate} */
+  public override deactivate(): void {
+    this.coinbaseWallet?.disconnect()
+  }
+
+  public override async watchAsset({
+    address,
+    symbol,
+    decimals,
+    image,
+  }: Pick<WatchAssetParameters, 'address'> & Partial<Omit<WatchAssetParameters, 'address'>>): Promise<true> {
+    if (!this.provider) throw new Error('No provider')
+
+    return this.provider
+      .request({
+        method: 'wallet_watchAsset',
+        params: {
+          type: 'ERC20',
+          options: {
+            address, // The address that the token is at.
+            symbol, // A ticker symbol or shorthand, up to 5 chars.
+            decimals, // The number of decimals in the token
+            image, // A string url of the token logo
+          },
+        },
+      })
+      .then((success) => {
+        if (!success) throw new Error('Rejected')
+        return true
+      })
+  }
+}
+
+export const InitCoinbaseWalletConnector = (
+  appName = 'funkit react app',
   rpcUrl = ['https://goerli.gateway.tenderly.co']
 ) => {
-  return initializeConnector<CoinbaseWallet>(
+  return initializeConnector<FunKitCoinbaseWallet>(
     (actions) =>
-      new CoinbaseWallet({
+      new FunKitCoinbaseWallet({
         actions,
         options: {
           url: rpcUrl[0],
@@ -16,6 +208,6 @@ export const CoinbaseWalletConnector = (
       })
   )
 }
-export const [coinbaseWallet, hooks] = CoinbaseWalletConnector()
+export const [coinbaseWallet, hooks] = InitCoinbaseWalletConnector()
 
-export default CoinbaseWalletConnector
+export default InitCoinbaseWalletConnector

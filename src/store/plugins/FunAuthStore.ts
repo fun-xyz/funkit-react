@@ -1,4 +1,4 @@
-import { User, Wallet } from '@funkit/core'
+import { Auth, User, Wallet } from '@funkit/core'
 
 export interface IActiveAuthList {
   active: boolean
@@ -6,6 +6,7 @@ export interface IActiveAuthList {
   account: string
   provider: any
   userId: string
+  auth: Auth
 }
 
 export interface IFunAuthStore {

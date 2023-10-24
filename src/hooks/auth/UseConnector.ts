@@ -4,11 +4,11 @@ import type { Connector } from '@web3-react/types'
 import { useCallback, useEffect, useState } from 'react'
 import { shallow } from 'zustand/shallow'
 
-import { useGetName } from '../..'
 import { ConnectorArray, ConnectorTuple } from '../../connectors/Types'
 import { NoMetaMaskError } from '../../store'
 import { FunError } from '../../store/plugins/ErrorStore'
 import { useFun } from '../index'
+import { connectors } from '../util/UseActiveClients'
 import { usePrimaryConnector } from '../util/UsePrimaryConnector'
 
 export enum CONNECTOR_BY_NAME {
@@ -59,11 +59,11 @@ export const deactivateAllConnectors = async (connectors: ConnectorArray) => {
 interface IUseConnector {
   index: number // optional index value if passed will only show changes for connectors at that index
   autoConnect?: boolean // optional if true the connector will try and automatically activate. default is false
+  options: any // optional options to pass to the connector
 }
 
 interface IUseConnectorReturn {
   connector: Connector
-  connectorName: string
   hooks: Web3ReactHooks
   active: boolean
   activating: boolean
@@ -77,14 +77,16 @@ interface IUseConnectorReturn {
   deactivate: (connector: Connector | ConnectorTuple) => void
 }
 
+/**
+ * @deprecated This function is deprecated and will be removed in future versions. Please use useConnectorWithAccount instead.
+ * @param args - The arguments object.
+ * @param args.index - The index of the connector to use.
+ * @param args.autoConnect - Whether to automatically connect to the connector.
+ * @param args.options - The options to pass to the connector.
+ * @returns An object containing the connector, hooks, and various properties and functions related to the connector.
+ */
 export const useConnector = (args: IUseConnector): IUseConnectorReturn => {
-  const { connector } = useFun((state) => {
-    return {
-      connector: state.connectors[args.index],
-    }
-  }, shallow)
-
-  const { useIsActive, useIsActivating, useAccount, useProvider, useENSNames, useChainId } = connector[1]
+  const { useIsActive, useIsActivating, useAccount, useProvider, useENSNames, useChainId } = connectors[args.index][1]
 
   const isActive = useIsActive()
   const isActivating = useIsActivating()
@@ -92,20 +94,18 @@ export const useConnector = (args: IUseConnector): IUseConnectorReturn => {
   const account = useAccount()
   const provider = useProvider()
   const ENSNames = useENSNames(provider)
-  const connectorName = useGetName(connector[0])
 
   const [error, setError] = useState<FunError | null>(null)
 
   useEffect(() => {
     if (!args.autoConnect) return
-    if (!connector || !connector[0].connectEagerly) return
-    const connectPromise = connector[0].connectEagerly()
+    const connectPromise = connectors[args.index][0].connectEagerly(args.options)
     if (connectPromise && typeof connectPromise.catch === 'function') {
       connectPromise.catch(() => {
-        console.debug(`Failed to connect eagerly to ${connectorName}`)
+        console.debug(`Failed to connect eagerly`)
       })
     }
-  }, [args.autoConnect, connector, connectorName])
+  }, [args.autoConnect, args.index, args.options])
 
   /**
    * Activates a connector.
@@ -118,9 +118,8 @@ export const useConnector = (args: IUseConnector): IUseConnectorReturn => {
   )
 
   return {
-    connector: connector[0],
-    connectorName,
-    hooks: connector[1],
+    connector: connectors[args.index][0],
+    hooks: connectors[args.index][1],
     active: isActive,
     activating: isActivating,
     chainId,
@@ -139,17 +138,21 @@ export interface IUseConnectors {
 }
 export interface IUseConnectorsReturn {
   connectors: ConnectorArray
-  activeConnectors: { active: boolean; name: string; account: string | undefined }[]
+  activeConnectors: { active: boolean; account: string | undefined }[]
   primaryConnector: Connector
   activate: (connector: Connector | ConnectorTuple, oAuthProvider?: OAuthProvider) => void
   deactivate: (connector: Connector | ConnectorTuple) => void
   deactivateAll: () => void
 }
-
+/**
+ * @deprecated This function is deprecated and will be removed in future versions. Please use useConnectorWithAccount instead.
+ * @param args - The arguments object.
+ * @param args.autoConnect - Whether to automatically connect to the connector.
+ * @returns An object containing the connector, hooks, and various properties and functions related to the connector.
+ */
 export const useConnectors = (args: IUseConnectors): IUseConnectorsReturn => {
-  const { connectors, setTempError } = useFun((state) => {
+  const { setTempError } = useFun((state) => {
     return {
-      connectors: state.connectors,
       setTempError: state.setTempError,
     }
   }, shallow)
@@ -160,37 +163,38 @@ export const useConnectors = (args: IUseConnectors): IUseConnectorsReturn => {
   useEffect(() => {
     if (!autoConnect) return
     connectors.map((connector) => {
-      if (connector[0].connectEagerly) {
-        const connectPromise = connector[0].connectEagerly()
-        if (connectPromise && typeof connectPromise.catch === 'function') {
-          connectPromise.catch(() => {
-            console.debug(`Failed to connect eagerly to ${connector[0].constructor.name}`)
-          })
-        }
+      const connectPromise = connector[0].connectEagerly({
+        appName: 'FunKit',
+        url: 'https://funkit.app',
+        projectId: 'funkit',
+        showQrModal: true,
+      })
+      if (connectPromise && typeof connectPromise.catch === 'function') {
+        connectPromise.catch(() => {
+          console.debug(`Failed to connect eagerly to ${connector[0].constructor.name}`)
+        })
       }
     })
     setAutoConnect(false)
-  }, [autoConnect, connectors])
+  }, [autoConnect])
 
   const activeConnectors = connectors.map((connector) => {
     const active = connector[1].useIsActive()
     const account = connector[1].useAccount()
     // eslint-disable-next-line react-hooks/rules-of-hooks
-    const name = useGetName(connector[0])
-
-    return { active, name, account }
+    return { active, account }
   })
 
   const activateConnectorNow = useCallback(
     (connector, oAuthProvider) => activateConnector(connector, setTempError, oAuthProvider),
     [setTempError]
   )
-  const deactivateAllConnectorsNow = useCallback(() => deactivateAllConnectors(connectors), [connectors])
+  const deactivateAllConnectorsNow = useCallback(() => deactivateAllConnectors(connectors), [])
 
   return {
     connectors,
     activeConnectors,
-    primaryConnector: activeConnector.connector,
+    primaryConnector: activeConnector ? activeConnector[0] : connectors[CONNECTOR_BY_NAME.METAMASK][0],
     activate: activateConnectorNow,
     deactivate: deactivateConnector,
     deactivateAll: deactivateAllConnectorsNow,

@@ -6,7 +6,7 @@ import { ExecutionReceipt, useFunStoreInterface, useUserInfo } from '../..'
 import { FunError, generateTransactionError, MissingActiveSigner, TransactionErrorCatch } from '../../store'
 import { useFun } from '../UseFun'
 import { usePrimaryAuth } from '../util'
-import { FirstClassActionParams } from './types'
+import { ActionType, FirstClassActionParams } from './types'
 
 export const useAction = (args: FirstClassActionParams, txOptions?: EnvOption) => {
   const { wallet } = useFun(
@@ -39,12 +39,13 @@ export const useAction = (args: FirstClassActionParams, txOptions?: EnvOption) =
         const ActiveUser = activeUser ?? {
           userId: await firstSigner.getUserId(),
         }
-        const operation: Operation = await wallet[args.action](
-          firstSigner,
-          ActiveUser.userId,
-          args.params as any,
-          txOptions
-        )
+        let operation: Operation
+        if (args.action === ActionType.create) {
+          operation = await wallet[args.action](firstSigner, ActiveUser.userId, txOptions)
+        } else {
+          operation = await wallet[args.action](firstSigner, ActiveUser.userId, args.params as any, txOptions)
+        }
+
         if (ActiveUser.groupInfo == null || ActiveUser.groupInfo.threshold === 1) {
           const receipt = await wallet.executeOperation(firstSigner, operation, txOptions)
           setResult(receipt)
@@ -100,6 +101,7 @@ export const useAction = (args: FirstClassActionParams, txOptions?: EnvOption) =
   )
 
   return {
+    ready: wallet != null && primaryAuth != null && primaryAuth.length > 0,
     loading,
     result,
     error,

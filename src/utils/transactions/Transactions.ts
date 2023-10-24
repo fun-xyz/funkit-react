@@ -20,7 +20,7 @@ import {
 } from '@funkit/core'
 import { Address } from 'viem'
 
-import { IActiveAuthList } from '@/hooks/util'
+import { IActiveAuthList } from '@/store/plugins/FunAuthStore'
 
 import {
   FunError,
