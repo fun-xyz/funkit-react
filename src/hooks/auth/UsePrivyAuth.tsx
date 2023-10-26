@@ -72,7 +72,9 @@ interface FunContextProviderProps {
   options: GlobalEnvOption
   loginMethods?: ('email' | 'google' | 'discord' | 'linkedin' | 'twitter' | 'apple' | 'sms' | 'github' | 'tiktok')[]
 }
+
 export const FunContextProvider = ({ children, privyAppId, loginMethods, options }: FunContextProviderProps) => {
+
   const [isConfigSet, setIsConfigSet] = useState(false)
   const { setConfig } = useConfig()
 
