@@ -41,12 +41,13 @@ import {
 
 ### 2. SDK Configuration
 
+During the initial setup for the SDK, you will need to provide a few configuration parameters. Once these are set initially they can be viewed or updated using the ``useConfig`` hook. 
+
 The following parameters are used to configure the behavior of the SDK in your app:
 
 1. `chain` - Fun wallets can be used on a number of supported [EVM-compatible blockchains](https://ethereum.org/en/developers/docs/evm/).
 2. `apiKey` - A FunKit API key. This can be retrieved from the [FunKit Dashboard](https://app.fun.xyz/onboarding).
 3. `gasSponsor` (optional) - A [gas sponsor](https://docs.fun.xyz/api-reference/gas-sponsor), used to configure the payment of transaction fees for user operations.
-4. `connectors` (optional) - The supported login methods for your users.
 
 Add your privy AppId as well to get full access to web2 sign in methods.
 
@@ -68,10 +69,10 @@ export default function AppWrapper() {
 
 ### 3. User login through Metamask
 
-Next, users need to login through connectors to provide a way for fun account abstraction to sign transactions. Here we add a button to activate/deactivate the connector upon click.
+Next, users need to login through an auth hook to provide a way for fun account abstraction to sign transactions. Here we add a button to activate/deactivate a Auth upon click.
 
 ```jsx
-const ConnectorButton = ({ index }) => {
+const AuthButton = ({ index }) => {
   const { auth, active, authAddr, login, logout } = useMetamaskAuth();
 
   return (
