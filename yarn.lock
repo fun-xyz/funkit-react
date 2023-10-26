@@ -588,7 +588,7 @@
     "@ethersproject/strings" "^5.7.0"
 
 "@funkit/core@file:../funkit-core":
-  version "0.8.3"
+  version "0.8.5"
   resolved "file:../funkit-core"
   dependencies:
     "@aws-sdk/client-secrets-manager" "^3.315.0"

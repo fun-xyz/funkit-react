@@ -67,7 +67,7 @@ type PrivyLoginOptions = (
 const DEFAULT_PRIVY_LOGIN_OPTIONS = ['email', 'google', 'discord', 'linkedin', 'twitter', 'apple']
 
 interface FunContextProviderProps {
-  children: React.ReactNode
+  children: React.ReactComponentElement<any> | React.ReactNode
   appId: string
   options: GlobalEnvOption
   loginMethods?: ('email' | 'google' | 'discord' | 'linkedin' | 'twitter' | 'apple' | 'sms' | 'github' | 'tiktok')[]

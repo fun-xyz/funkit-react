@@ -30,18 +30,16 @@ FunKit needs to be configured with an API key. Get a key by logging to our [dash
 Import all required classes.
 
 ```js
+"use client"; // All React hooks need to be used in a client context
 import {
-    convertToValidUserId,
-    useConnector,
-    useCreateFun,
-    configureNewFunStore,
-    MetamaskConnector,
-    usePrimaryAuth
-} from "@funkit/react"
-import { useState } from "react"
+  FunContextProvider,
+  Goerli,
+  useMetamaskAuth,
+  useFunWallet,
+} from "@funkit/react";
 ```
 
-### 2. Configure wallet environment
+### 2. Configure Funkit SDK
 
 Set your environment variables describing how your smart wallets interact with blockchains. This can include chain, apiKey, optional gasSponsor, and connectors.
 
@@ -50,38 +48,43 @@ Set your environment variables describing how your smart wallets interact with b
 3. `gasSponsor` - All wallets have to pay gas to execute transactions on a blockchain. You can pre-fund the wallet with native tokens or you can have third parties to pay for gas by specifying a [gasSponsor](https://docs.fun.xyz/api-reference/gas-sponsor).
 4. `connectors` - The login method for your users
 
+Add your privy AppId as well to get full access to web2 sign in methods.
+
 ```jsx
-configureNewFunStore({
-    config: {
-        chain: CHAIN_ID,
-        apiKey: API_KEY,
-        gasSponsor: {
-            sponsorAddress: SPONSOR_ADDRESS
-        }
-    },
-    connectors: [MetamaskConnector()]
-})
+const FUN_APP_ID = "clnatprpv00sfmi0fv3qc185b";
+const DEFAULT_FUN_WALLET_CONFIG = {
+  apiKey: "<YOUR_API_KEY>",
+  chain: Goerli,
+};
+
+export default function AppWrapper() {
+  return (
+    <FunContextProvider options={DEFAULT_FUN_WALLET_CONFIG} appId={FUN_APP_ID}>
+      <App />
+    </FunContextProvider>
+  );
+}
 ```
 
-### 3. User login through connector
+### 3. User login through Metamask
 
 Next, users need to login through connectors to provide a way for fun account abstraction to sign transactions. Here we add a button to activate/deactivate the connector upon click.
 
 ```jsx
 const ConnectorButton = ({ index }) => {
-    const { active, activate, deactivate, connectorName, connector } = useConnector({ index })
-    
+    const { auth, active, authAddr, login, logout } = useMetamaskAuth()
+
     return (
         <button
             onClick={() => {
                 if (active) {
-                    deactivate(connector)
+                    logout()
                     return
                 }
-                activate(connector)
+                login()
             }}
         >
-            {active ? "Unconnected" : "Connect"} {connectorName}{" "}
+            {active ? "Unconnected" : "Connect"} {"Metamask "}
         </button>
     )
 }
@@ -89,29 +92,18 @@ const ConnectorButton = ({ index }) => {
 
 ### 4. Initialize the FunWallet
 
-With the Auth instance that you just created, you can now initialize your FunWallet. Here are the FunWallet constructor parameters:
-
-1. `users` - This is a `User[]` that holds all `users` that can access your `FunWallet`. For simplicity, we’re only including 1 user here.
-2. `uniqueId` - This is a random seed that is generated from our `Auth` instance. The purpose of this seed is to generate the `address` of our `FunWallet`.
+With the Auth instance that you just created, you can now initialize your FunWallet. The useFunWallet hook returns functions used to create or initialize existing FunWallets. 
 
 ```jsx
-const { account: connectorAccount } = useConnector({
-    index: 0,
-    autoConnect: true,
-})
-const { initializeFunAccount, funWallet } = useCreateFun()
-const [auth] = usePrimaryAuth()
+const { auth, active, authAddr, login, logout } = useMetamaskAuth()
 
-const initializeSingleAuthFunAccount = async () => {
-    if (!connectorAccount) {
-        console.log("Please connect your wallet first!");
-        return
-    }
-    initializeFunAccount({
-        users: [{ userId: convertToValidUserId(connectorAccount) }],
-        uniqueId: await auth.getWalletUniqueId(),
-    }).catch()
-}
+const { wallet, address, createFunWallet } = useFunWallet();
+
+
+  async function CreateNewWallet() {
+    if (!active || !auth) return
+    createFunWallet(auth).catch();
+  }
 ```
 
 ### 5. Initiate a Transfer
@@ -119,20 +111,22 @@ const initializeSingleAuthFunAccount = async () => {
 Now we have the wallet object, we will show how to transfer some basic ethers to other addresses. Note that the smart wallet will only be created on the blockchain after executeOperation is finished.
 
 ```jsx
+
+  const {
+    executeOperation: executeTransferOperation,
+    ready: actionTransferReady,
+  } = useAction({
+    action: ActionType.Transfer,
+    params: {
+      token: "eth",
+      to: authAddr,
+      amount: 0.001,
+    },
+  });
+
 const transferEth = async () => {
-    if (!connectorAccount) {
-        console.log("Please connect your wallet first!")
-        return
-    }
-    const op = await funWallet.transfer(auth, await auth.getUserId(), {
-        token: "eth",
-        to: await auth.getAddress(),
-        amount: AMOUNT,
-    })
-    setLoadings({ ...loadings, transfer: true })
-    const receipt = await funWallet.executeOperation(auth, op)
-    setTxIds({ ...txIds, transfer: receipt.txId })
-    setLoadings({ ...loadings, transfer: false })
+    if (!wallet || !actionTransferReady) return;
+    await executeTransferOperation();
 }
 ```
 
@@ -143,16 +137,19 @@ const transferEth = async () => {
 You can test FunKit on Ethereum goerli testnet with the following configuration. We have a gas sponsor that will cover your gas cost for the first 200 operations so you don’t have to worry about pre-funding the wallet or setting up the gas sponsor to start.
 
 ```jsx
-configureNewFunStore({
-    config: {
-        chain: "goerli",
-        apiKey: API_KEY,
-        gasSponsor: {
-            sponsorAddress: "0xCB5D0b4569A39C217c243a436AC3feEe5dFeb9Ad",
-        },
-    },
-    connectors: [MetamaskConnector()],
-})
+
+const FUN_APP_ID = "clnatprpv00sfmi0fv3qc185b";
+const DEFAULT_FUN_WALLET_CONFIG = {
+  apiKey: "<YOUR_API_KEY>",
+  chain: Goerli,
+};
+export default function AppWrapper() {
+  return (
+    <FunContextProvider options={DEFAULT_FUN_WALLET_CONFIG} appId={FUN_APP_ID}>
+      <App />
+    </FunContextProvider>
+  );
+}
 ```
 
 ## <a id="moreresources"></a> **More Resources**
