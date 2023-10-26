@@ -2,9 +2,9 @@
 
 # **FunKit React**
 
-FunKit empowers you to create feature-rich and extensible smart wallets built on account abstraction. Leveraging the FunKit, you can customize gas behavior, adopt multi-sig and common authentication method, monetize your application, execute any transactions from smart wallets, and much more.
+FunKit empowers you to create feature-rich and extensible smart wallets built on account abstraction. Leveraging FunKit, you can customize gas behavior, implement multi-sig and other authentication schemes, monetize your application, execute any transactions from smart wallets, and much more.
 
-This repo only covers FunKit React SDK which means to simplify the development experience of using fun account abstraction wallet for frontend. Check our [Core SDK](https://github.com/fun-xyz/funkit-core) if you focus more on backend or do not want to use react hooks.
+Our React SDK offers a highly abstracted and streamlined developer experience for creating and interacting with Fun wallets using React hooks. Check out the [FunKit Core SDK](https://github.com/fun-xyz/funkit-core) if you want to use Fun wallets outside React, or need to access lower level APIs.
 
 ## **Table of Contents**
 
@@ -15,7 +15,7 @@ This repo only covers FunKit React SDK which means to simplify the development e
 
 ## <a id="installation"></a> **Installation**
 
-```
+```shell
 npm i @funkit/react --save
 # or
 yarn add @funkit/react
@@ -23,11 +23,11 @@ yarn add @funkit/react
 
 ## <a id="quickstart"></a> **Quick Start**
 
-FunKit needs to be configured with an API key. Get a key by logging to our [dashboard](https://app.fun.xyz/sign-in/request).
+The FunKit React SDK needs to be configured with an API key. Get an API key by signing up or logging in to the [FunKit Dashboard](https://app.fun.xyz/onboarding).
 
 ### 1. Import
 
-Import all required classes.
+Import everything we need to start using Fun wallets.
 
 ```js
 "use client"; // All React hooks need to be used in a client context
@@ -39,14 +39,14 @@ import {
 } from "@funkit/react";
 ```
 
-### 2. Configure Funkit SDK
+### 2. SDK Configuration
 
-Set your environment variables describing how your smart wallets interact with blockchains. This can include chain, apiKey, optional gasSponsor, and connectors.
+The following parameters are used to configure the behavior of the SDK in your app:
 
-1. `chain` - Each FunWallet exists on an [EVM-compatible blockchain](https://ethereum.org/en/developers/docs/evm/).
-2. `apiKey` - You can get an API key by logging to our [dashboard](https://app.fun.xyz/sign-in/request).
-3. `gasSponsor` - All wallets have to pay gas to execute transactions on a blockchain. You can pre-fund the wallet with native tokens or you can have third parties to pay for gas by specifying a [gasSponsor](https://docs.fun.xyz/api-reference/gas-sponsor).
-4. `connectors` - The login method for your users
+1. `chain` - Fun wallets can be used on a number of supported [EVM-compatible blockchains](https://ethereum.org/en/developers/docs/evm/).
+2. `apiKey` - A FunKit API key. This can be retrieved from the [FunKit Dashboard](https://app.fun.xyz/onboarding).
+3. `gasSponsor` (optional) - A [gas sponsor](https://docs.fun.xyz/api-reference/gas-sponsor), used to configure the payment of transaction fees for user operations.
+4. `connectors` (optional) - The supported login methods for your users.
 
 Add your privy AppId as well to get full access to web2 sign in methods.
 
