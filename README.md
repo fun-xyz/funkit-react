@@ -72,38 +72,37 @@ Next, users need to login through connectors to provide a way for fun account ab
 
 ```jsx
 const ConnectorButton = ({ index }) => {
-    const { auth, active, authAddr, login, logout } = useMetamaskAuth()
+  const { auth, active, authAddr, login, logout } = useMetamaskAuth();
 
-    return (
-        <button
-            onClick={() => {
-                if (active) {
-                    logout()
-                    return
-                }
-                login()
-            }}
-        >
-            {active ? "Unconnected" : "Connect"} {"Metamask "}
-        </button>
-    )
-}
+  return (
+    <button
+      onClick={() => {
+        if (active) {
+          logout();
+          return;
+        }
+        login();
+      }}
+    >
+      {active ? "Unconnected" : "Connect"} {"Metamask "}
+    </button>
+  );
+};
 ```
 
 ### 4. Initialize the FunWallet
 
-With the Auth instance that you just created, you can now initialize your FunWallet. The useFunWallet hook returns functions used to create or initialize existing FunWallets. 
+With the Auth instance that you just created, you can now initialize your FunWallet. The useFunWallet hook returns functions used to create or initialize existing FunWallets.
 
 ```jsx
-const { auth, active, authAddr, login, logout } = useMetamaskAuth()
+const { auth, active, authAddr, login, logout } = useMetamaskAuth();
 
 const { wallet, address, createFunWallet } = useFunWallet();
 
-
-  async function CreateNewWallet() {
-    if (!active || !auth) return
-    createFunWallet(auth).catch();
-  }
+async function CreateNewWallet() {
+  if (!active || !auth) return;
+  createFunWallet(auth).catch();
+}
 ```
 
 ### 5. Initiate a Transfer
@@ -111,23 +110,22 @@ const { wallet, address, createFunWallet } = useFunWallet();
 Now we have the wallet object, we will show how to transfer some basic ethers to other addresses. Note that the smart wallet will only be created on the blockchain after executeOperation is finished.
 
 ```jsx
-
-  const {
-    executeOperation: executeTransferOperation,
-    ready: actionTransferReady,
-  } = useAction({
-    action: ActionType.Transfer,
-    params: {
-      token: "eth",
-      to: authAddr,
-      amount: 0.001,
-    },
-  });
+const {
+  executeOperation: executeTransferOperation,
+  ready: actionTransferReady,
+} = useAction({
+  action: ActionType.Transfer,
+  params: {
+    token: "eth",
+    to: authAddr,
+    amount: 0.001,
+  },
+});
 
 const transferEth = async () => {
-    if (!wallet || !actionTransferReady) return;
-    await executeTransferOperation();
-}
+  if (!wallet || !actionTransferReady) return;
+  await executeTransferOperation();
+};
 ```
 
 ## <a id="testing"></a> **Testing**
@@ -137,7 +135,6 @@ const transferEth = async () => {
 You can test FunKit on Ethereum goerli testnet with the following configuration. We have a gas sponsor that will cover your gas cost for the first 200 operations so you don’t have to worry about pre-funding the wallet or setting up the gas sponsor to start.
 
 ```jsx
-
 const FUN_APP_ID = "clnatprpv00sfmi0fv3qc185b";
 const DEFAULT_FUN_WALLET_CONFIG = {
   apiKey: "<YOUR_API_KEY>",
