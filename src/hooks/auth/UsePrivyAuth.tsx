@@ -74,7 +74,6 @@ interface FunContextProviderProps {
 }
 
 export const FunContextProvider = ({ children, privyAppId, loginMethods, options }: FunContextProviderProps) => {
-
   const [isConfigSet, setIsConfigSet] = useState(false)
   const { setConfig } = useConfig()
 
