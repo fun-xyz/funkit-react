@@ -20,9 +20,11 @@
     "update": "./scripts/updateExamplePackage.sh",
     "lint": "eslint --ext .ts,.tsx './**/*.{ts,tsx}'",
     "lint:fix": "eslint --ext .ts,.tsx './**/*.{ts,tsx}' --fix",
-    "prepare": "husky install",
     "postinstall": "./handleOauth.sh",
     "local install": "cd ./node_modules/@magic-ext/oauth/dist/cjs  && touch core.js"
+  },
+  "peerDependencies": {
+    "react": "^18.2.0"
   },
   "dependencies": {
     "@coinbase/wallet-sdk": "^3.6.6",
@@ -39,7 +41,6 @@
     "@web3-react/types": "^8.2.0",
     "@web3-react/walletconnect-v2": "^8.3.2",
     "magic-sdk": "18.2.1",
-    "react": "^18.2.0",
     "viem": "^1.7.0",
     "web3-core": "^4.0.1",
     "zustand": "^4.3.8"
