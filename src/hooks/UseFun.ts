@@ -2,8 +2,6 @@ import { Chain, configureEnvironment } from '@funkit/core'
 import { GlobalEnvOption } from '@funkit/core'
 import { shallow } from 'zustand/shallow'
 
-import { MetamaskConnector } from '../connectors'
-import { ConnectorArray } from '../connectors/Types'
 import { Arbitrum, Goerli, Optimism, Polygon } from '../network/Networks'
 import { createUseFunStore } from '../store'
 
@@ -11,10 +9,7 @@ export const useFun = createUseFunStore()
 
 export const ShallowEqual = shallow
 
-const DEFAULT_CONNECTORS = [MetamaskConnector()]
-
 interface configureFunParams {
-  connectors: ConnectorArray
   supportedChains?: (number | string)[]
   config?: GlobalEnvOption
 }
@@ -24,19 +19,8 @@ const DEFAULT_FUN_WALLET_CONFIG: GlobalEnvOption = {
 }
 export const configureNewFunStore = async (params?: configureFunParams) => {
   if (!params) {
-    useFun.setState({ connectors: DEFAULT_CONNECTORS })
     useFun.setState({ supportedChains: [Optimism, Arbitrum, Polygon, Goerli] })
   } else {
-    if (params.connectors && params.connectors.length > 0) {
-      if (typeof params.connectors[0] === 'function')
-        throw new Error(
-          "Error connectors must be initialized. i.e. don't pass in MetamaskConnector but MetamaskConnector()"
-        )
-      useFun.setState({ connectors: params.connectors })
-    } else {
-      useFun.setState({ connectors: DEFAULT_CONNECTORS })
-    }
-
     if (params.supportedChains && params.supportedChains.length > 0) {
       useFun.setState({ supportedChains: params.supportedChains })
     } else {

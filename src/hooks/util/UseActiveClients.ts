@@ -1,54 +1,45 @@
-import { useRef } from 'react'
-import { shallow } from 'zustand/shallow'
+/* eslint-disable react-hooks/rules-of-hooks */
+import { Auth } from '@funkit/core'
 
-import { useGetName } from '../../connectors'
+import { InjectedConnector } from '../../connectors/MetaMask'
+import { IActiveAuthList } from '../../store/plugins/FunAuthStore'
 import { convertToValidUserId } from '../../utils'
-import { useFun } from '../UseFun'
+import { usePrivyAuth } from '../auth'
+import { CoinbaseWalletConnector } from '../auth/UseCoinbaseAuth'
+import { SocialAuthConnector } from '../auth/useSocialAuth/UseSocialAuthBase'
+import { WalletConnectConnector } from '../auth/UseWalletConnectAuth'
 
-export interface IActiveAuthList {
-  active: boolean
-  name: string
-  account: string
-  provider: any
-  userId: (Uint8Array | `0x${string}`) | undefined
-}
-// hook which returns the active state of all the connectors
+export const connectors = [InjectedConnector, CoinbaseWalletConnector, WalletConnectConnector, SocialAuthConnector]
+
 export const useActiveClients = (): IActiveAuthList[] => {
-  const { connectors } = useFun((state) => ({ connectors: state.connectors }), shallow)
+  const { active, auth, authAddr } = usePrivyAuth(true)
 
-  const activeConnectors = connectors.map((connector) => {
-    const provider = connector[1].useProvider()
-    const active = connector[1].useIsActive()
-    const account = connector[1].useAccount()
-    // eslint-disable-next-line react-hooks/rules-of-hooks
-    const name = useGetName(connector[0])
-
-    let userId: (Uint8Array | `0x${string}`) | undefined = undefined
-    if (account) userId = convertToValidUserId(account)
-    return {
-      active,
-      name,
-      account,
-      provider,
-      userId,
-    }
-  })
-
-  const oldConnectors = useRef<IActiveAuthList[]>([])
-  if (oldConnectors.current.length === activeConnectors.length) {
-    // check if any accounts have changed.
-    for (let i = 0; i < activeConnectors.length; i++) {
-      const currentConnector = activeConnectors[i]
-      const oldConnector = oldConnectors.current[i]
-      if (currentConnector.account !== oldConnector.account) {
-        oldConnectors.current = activeConnectors
-        return activeConnectors
+  const activeConnectors = connectors.map(([, hooks]) => {
+    const { useAccount, useIsActive, useProvider } = hooks
+    const account: string = useAccount() ?? ''
+    const active: boolean = useIsActive()
+    const provider = useProvider()
+    if (active)
+      return {
+        active,
+        name: '',
+        account,
+        provider,
+        userId: convertToValidUserId(account),
+        auth: provider ? new Auth({ provider }) : undefined,
       }
+    return null
+  }) as IActiveAuthList[]
+  if (active && authAddr && auth) {
+    const privyAuth: IActiveAuthList = {
+      active,
+      name: 'Privy',
+      account: authAddr,
+      provider: auth.client,
+      userId: convertToValidUserId(authAddr),
+      auth,
     }
-  } else {
-    oldConnectors.current = activeConnectors
-    return activeConnectors
+    activeConnectors.push(privyAuth)
   }
-
-  return oldConnectors.current
+  return activeConnectors.filter((item) => item !== null) as IActiveAuthList[]
 }

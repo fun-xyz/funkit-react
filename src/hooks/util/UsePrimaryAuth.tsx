@@ -13,7 +13,10 @@ const shallowCompare = (obj1: Record<string, any> | null | undefined, obj2: Reco
   )
 }
 
-// TODO it seems that this system will allow the primaryAuth to not be a part of the group?
+/*
+ * This hook is used to track which auth is the primary signer for a particular user.
+ * It will return an array of auth objects which are active signers for the current active user.
+ */
 export const usePrimaryAuth = (): Auth[] => {
   const primary = usePrimaryConnector()
   const activeClients = useActiveClients()
@@ -39,13 +42,10 @@ export const usePrimaryAuth = (): Auth[] => {
       if (memberAuths.length === 0) {
         // no valid auth found
         // console.log('no valid auth found for group members.length 0')
-        if (primary.provider == null && !shallowCompare(authRef.current, [])) authRef.current = []
-        else if (
-          primary.provider != null &&
-          !shallowCompare(authRef.current, [new Auth({ provider: primary.provider })])
-        ) {
+        if (primary == null && !shallowCompare(authRef.current, [])) authRef.current = []
+        else if (primary != null && !shallowCompare(authRef.current, [primary.auth])) {
           // console.log('setting default auth because no group auths found')
-          authRef.current = [new Auth({ provider: primary.provider })]
+          if (primary.auth) authRef.current = [primary.auth]
         }
       }
       // console.log('setting Group ID clients', memberAuths)
@@ -65,9 +65,9 @@ export const usePrimaryAuth = (): Auth[] => {
   } else {
     // console.log('default connector auth')
     // the default state if there is no active user is either an empty array or an array with the primary provider as auth
-    if (primary.provider == null && !shallowCompare(authRef.current, [])) authRef.current = []
-    else if (primary.provider != null && !shallowCompare(authRef.current, [new Auth({ provider: primary.provider })])) {
-      authRef.current = [new Auth({ provider: primary.provider })]
+    if (primary == null && !shallowCompare(authRef.current, [])) authRef.current = []
+    else if (primary != null && !shallowCompare(authRef.current, [primary.auth])) {
+      if (primary.auth) authRef.current = [primary.auth]
     }
   }
   return authRef.current

@@ -1,4 +1,3 @@
-import { Auth } from '@funkit/core'
 import { useCallback, useState } from 'react'
 import { shallow } from 'zustand/shallow'
 
@@ -24,8 +23,9 @@ export const useUserInfo = () => {
   const fetchUsers = useCallback(
     async (resetActiveUser = false) => {
       if (wallet == null || loading) return
+      if (primary == null) return
       setLoading(true)
-      const primaryAuth = new Auth({ provider: primary.provider })
+      const primaryAuth = primary.auth
       try {
         const users = await wallet.getUsers(primaryAuth)
         if (users && users.length > 0) {
@@ -40,7 +40,7 @@ export const useUserInfo = () => {
         setLoading(false)
       }
     },
-    [loading, primary.provider, setActiveUser, setAllUsers, wallet]
+    [loading, primary, setActiveUser, setAllUsers, wallet]
   )
 
   return {

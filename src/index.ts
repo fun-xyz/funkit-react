@@ -1,20 +1,17 @@
 import { GlobalEnvOption } from '@funkit/core'
 
 export {
-  CoinbaseWalletConnector,
   ConnectorArray,
   ConnectorTuple,
   ConnectorTupleWithStore,
   ConnectorType,
   FunWalletConnectorInterface,
-  MetamaskConnector,
+  InitCoinbaseWalletConnector,
+  InitWalletConnectConnector,
   OAuthProvider,
-  SocialOauthConnector,
-  SUPPORTED_OAUTH_PROVIDERS,
-  useGetName,
-  WalletConnectConnector,
 } from './connectors'
 export * from './hooks'
+export * from './hooks/auth'
 export { MagicAuthConnector as SocialLoginConnector } from './magicAuth/src/MagicAuth'
 export * from './network/Networks'
 export * from './store'
@@ -36,6 +33,7 @@ export {
   Operation,
   OperationStatus,
   User,
+  Wallet,
 } from '@funkit/core'
 declare global {
   interface Window {
