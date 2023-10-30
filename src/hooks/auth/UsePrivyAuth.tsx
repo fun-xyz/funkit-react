@@ -67,17 +67,17 @@ type PrivyLoginOptions = (
 const DEFAULT_PRIVY_LOGIN_OPTIONS = ['email', 'google', 'discord', 'linkedin', 'twitter', 'apple']
 
 interface FunContextProviderProps {
-  children: React.ReactNode
-  appId: string
+  privyAppId: string
   options: GlobalEnvOption
   loginMethods?: ('email' | 'google' | 'discord' | 'linkedin' | 'twitter' | 'apple' | 'sms' | 'github' | 'tiktok')[]
 }
-export const FunContextProvider: React.FC<FunContextProviderProps> = ({
+
+export function FunContextProvider({
   children,
-  appId,
+  privyAppId,
   loginMethods,
   options,
-}: FunContextProviderProps) => {
+}: React.PropsWithChildren<FunContextProviderProps>) {
   const [isConfigSet, setIsConfigSet] = useState(false)
   const { setConfig } = useConfig()
 
@@ -91,7 +91,7 @@ export const FunContextProvider: React.FC<FunContextProviderProps> = ({
   return (
     <div>
       <PrivyProvider
-        appId={appId}
+        appId={privyAppId}
         config={{
           loginMethods: loginOptions as PrivyLoginOptions,
           appearance: {

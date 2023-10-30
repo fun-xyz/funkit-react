@@ -9,7 +9,7 @@ import { authHookReturn } from './types'
 
 const name = 'WalletConnect'
 
-export interface useCoinbaseAuthArgs {
+export interface useWalletConnectAuthArgs {
   // CoinbaseWalletConnector: [CoinbaseWallet, Web3ReactHooks, Web3ReactStore]
   options: WalletConnectOptions
   autoConnect?: boolean
@@ -17,7 +17,7 @@ export interface useCoinbaseAuthArgs {
 
 export const WalletConnectConnector = InitWalletConnectConnector()
 
-export const useWalletConnectAuth = ({ options, autoConnect }: useCoinbaseAuthArgs): authHookReturn => {
+export const useWalletConnectAuth = ({ options, autoConnect }: useWalletConnectAuthArgs): authHookReturn => {
   const connector = WalletConnectConnector[0]
   const { useAccount, useIsActivating, useIsActive, useProvider } = WalletConnectConnector[1]
   const account = useAccount()
