@@ -73,6 +73,7 @@ export const useTurnkeyAuth = (readonly = false): authHookReturn => {
         ],
       },
     })
+    console.log('signedRequest', signedRequest)
 
     const activityResponse = await axios.post(signedRequest.url, signedRequest.body, {
       headers: {
@@ -176,6 +177,7 @@ export const useTurnkeyAuth = (readonly = false): authHookReturn => {
       attestation,
       challenge: base64UrlEncode(challenge),
     }
+    console.log('Create sub org request', createSubOrgRequest)
     const turnkeyClient = new TurnkeyClient(
       { baseUrl: 'https://api.turnkey.com' },
       new ApiKeyStamper({
