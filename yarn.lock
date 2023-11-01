@@ -510,9 +510,9 @@
     "@ethersproject/properties" "^5.7.0"
     "@ethersproject/strings" "^5.7.0"
 
-"@funkit/core@file:../funkit-core":
+"@funkit/core@file:../core":
   version "0.8.3"
-  resolved "file:../funkit-core"
+  resolved "file:../core"
   dependencies:
     "@aws-sdk/client-secrets-manager" "^3.315.0"
     "@ethersproject/contracts" "^5.7.0"

@@ -1,4 +1,4 @@
-import { Auth } from '@funkit/core'
+import { Auth, createSubOrg } from '@funkit/core'
 import { ApiKeyStamper } from '@turnkey/api-key-stamper'
 import { createActivityPoller, getWebAuthnAttestation, TurnkeyClient } from '@turnkey/http'
 import { createAccount } from '@turnkey/viem'
@@ -144,7 +144,7 @@ export const useTurnkeyAuth = (readonly = false): authHookReturn => {
     setAuth(auth)
   }
 
-  const createSubOrg = async (): Promise<string> => {
+  const createSubOrganization = async (): Promise<string> => {
     const challenge = generateRandomBuffer()
     const subOrgName = `Turnkey Viem+Passkey Demo - ${humanReadableDateTime()}`
     const authenticatorUserId = generateRandomBuffer()
@@ -177,63 +177,16 @@ export const useTurnkeyAuth = (readonly = false): authHookReturn => {
       attestation,
       challenge: base64UrlEncode(challenge),
     }
+
     console.log('Create sub org request', createSubOrgRequest)
-    const turnkeyClient = new TurnkeyClient(
-      { baseUrl: 'https://api.turnkey.com' },
-      new ApiKeyStamper({
-        apiPublicKey: '0306bbf329c279010ddc2ad278cb05f64b9bb53cd869f5bce3b3e93d440b26166a',
-        apiPrivateKey: '43547e88f7a8b10adf81bf02071f4cfa89bfa5ad6c773f006301d8ee3a40ceb9',
-      })
-    )
-
-    const activityPoller = createActivityPoller({
-      client: turnkeyClient,
-      requestFn: turnkeyClient.createSubOrganization,
-    })
-
-    const privateKeyName = `Default ETH Key`
-
-    const completedActivity = await activityPoller({
-      type: 'ACTIVITY_TYPE_CREATE_SUB_ORGANIZATION_V3',
-      timestampMs: String(Date.now()),
-      organizationId: 'c94f8969-92b8-4392-9ce7-5656653738eb',
-      parameters: {
-        subOrganizationName: createSubOrgRequest.subOrgName,
-        rootQuorumThreshold: 1,
-        rootUsers: [
-          {
-            userName: 'New user',
-            apiKeys: [],
-            authenticators: [
-              {
-                authenticatorName: 'Passkey',
-                challenge: createSubOrgRequest.challenge,
-                attestation: createSubOrgRequest.attestation,
-              },
-            ],
-          },
-        ],
-        privateKeys: [
-          {
-            privateKeyName,
-            curve: 'CURVE_SECP256K1',
-            addressFormats: ['ADDRESS_FORMAT_ETHEREUM'],
-            privateKeyTags: [],
-          },
-        ],
-      },
-    })
-
-    const newSubOrgId = refineNonNull(completedActivity.result.createSubOrganizationResultV3?.subOrganizationId)
-    setSubOrgId(newSubOrgId)
-    return newSubOrgId
+    return await createSubOrg(createSubOrgRequest)
   }
 
   // Should create a subOrg all the way to an auth
   const doEverything = async () => {
     console.log('Creating Sub Org')
-    const newSubOrgId = await createSubOrg()
-    console.log('Creating Private Key')
+    const newSubOrgId = await createSubOrganization()
+    console.log('Creating Private Key', newSubOrgId)
     const newPrivateKey = await createPrivateKey(newSubOrgId)
     console.log('Creating Auth')
     await createAuth(newSubOrgId, newPrivateKey)
