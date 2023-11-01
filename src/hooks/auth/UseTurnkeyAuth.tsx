@@ -6,6 +6,7 @@ import { WebauthnStamper } from '@turnkey/webauthn-stamper'
 import axios from 'axios'
 import React, { useEffect, useState } from 'react'
 import { createWalletClient, http, WalletClient } from 'viem'
+import { goerli } from 'viem/chains'
 
 import { authHookReturn } from './types'
 
@@ -135,6 +136,7 @@ export const useTurnkeyAuth = (readonly = false): authHookReturn => {
 
     const viemClient: WalletClient = createWalletClient({
       account: viemAccount,
+      chain: goerli,
       transport: http(),
     }) as any as WalletClient
 
@@ -188,7 +190,7 @@ export const useTurnkeyAuth = (readonly = false): authHookReturn => {
     const newSubOrgId = await createSubOrganization()
     console.log('Creating Private Key', newSubOrgId)
     const newPrivateKey = await createPrivateKey(newSubOrgId)
-    console.log('Creating Auth')
+    console.log('Creating Auth', newPrivateKey)
     await createAuth(newSubOrgId, newPrivateKey)
     console.log('Created auth', await auth?.getAddress())
   }
