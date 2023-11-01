@@ -74,7 +74,6 @@ export const useTurnkeyAuth = (readonly = false): authHookReturn => {
         ],
       },
     })
-    console.log('signedRequest', signedRequest)
 
     const activityResponse = await axios.post(signedRequest.url, signedRequest.body, {
       headers: {
@@ -180,19 +179,14 @@ export const useTurnkeyAuth = (readonly = false): authHookReturn => {
       challenge: base64UrlEncode(challenge),
     }
 
-    console.log('Create sub org request', createSubOrgRequest)
     return await createSubOrg(createSubOrgRequest)
   }
 
   // Should create a subOrg all the way to an auth
   const doEverything = async () => {
-    console.log('Creating Sub Org')
     const newSubOrgId = await createSubOrganization()
-    console.log('Creating Private Key', newSubOrgId)
     const newPrivateKey = await createPrivateKey(newSubOrgId)
-    console.log('Creating Auth', newPrivateKey)
     await createAuth(newSubOrgId, newPrivateKey)
-    console.log('Created auth', await auth?.getAddress())
   }
 
   useEffect(() => {
