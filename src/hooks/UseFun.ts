@@ -4,6 +4,7 @@ import { shallow } from 'zustand/shallow'
 
 import { Arbitrum, Goerli, Optimism, Polygon } from '../network/Networks'
 import { createUseFunStore } from '../store'
+import { withErrorLogging } from '@/utils/Logger'
 
 export const useFun = createUseFunStore()
 
@@ -17,7 +18,7 @@ const DEFAULT_FUN_WALLET_CONFIG: GlobalEnvOption = {
   apiKey: 'hnHevQR0y394nBprGrvNx4HgoZHUwMet5mXTOBhf',
   chain: '5',
 }
-export const configureNewFunStore = async (params?: configureFunParams) => {
+export const configureNewFunStore = withErrorLogging(async (params?: configureFunParams) => {
   if (!params) {
     useFun.setState({ supportedChains: [Optimism, Arbitrum, Polygon, Goerli] })
   } else {
@@ -57,4 +58,4 @@ export const configureNewFunStore = async (params?: configureFunParams) => {
       })
     }
   }
-}
+})
