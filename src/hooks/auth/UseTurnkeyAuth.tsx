@@ -35,14 +35,14 @@ const humanReadableDateTime = (): string => {
   return new Date().toLocaleString().replace(/\//g, '-').replace(/:/g, '.')
 }
 
-export const useTurnkeyAuth = (readonly = false): authHookReturn => {
+export const useTurnkeyAuth = (readonly = false, rpId: string): authHookReturn => {
   // Create an auth here so we can use it to sign messages
   const [auth, setAuth] = React.useState<Auth | undefined>(undefined)
   const [subOrgId, setSubOrgId] = useState<string | null>(null)
   const [privateKey, setPrivateKey] = useState<TPrivateKeyState>(null)
 
   const stamper = new WebauthnStamper({
-    rpId: 'localhost',
+    rpId,
   })
 
   const passkeyHttpClient = new TurnkeyClient(
