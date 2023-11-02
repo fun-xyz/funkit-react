@@ -31,9 +31,10 @@ export const createUseFunStore = () => {
     const errorStore = configureErrorStore(get, set)
 
     // Build the full store:
-    // Declaratively list out all substore variables instead of spreading
+    // 1. Declaratively list out all substore variables instead of spreading
     // to guard against same-name variables being declared across different stores
     // which would cause overriding and make things hard to maintain / debug.
+    // 2. Typecast to `useFunStoreInterface` to ensure no necessary variables are missed.
     const fullStore: useFunStoreInterface = {
       // Fun Account Store
       FunWallet: funAccountStore.FunWallet,
