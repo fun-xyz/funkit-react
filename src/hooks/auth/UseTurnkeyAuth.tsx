@@ -2,7 +2,7 @@ import { Auth, createPrivateKey, createSubOrg } from '@funkit/core'
 import { getWebAuthnAttestation, TurnkeyClient } from '@turnkey/http'
 import { createAccount } from '@turnkey/viem'
 import { WebauthnStamper } from '@turnkey/webauthn-stamper'
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import { createWalletClient, http, WalletClient } from 'viem'
 import { goerli } from 'viem/chains'
 
@@ -143,10 +143,6 @@ export const useTurnkeyAuth = (readonly = false): authHookReturn => {
     await createAuth(newSubOrgId, newPrivateKey)
   }
 
-  useEffect(() => {
-    // Create a new auth here like new Auth({...}) and call setAuth(auth)
-  }, [])
-
   return {
     auth,
     active: subOrgId != null && privateKey != null,
@@ -159,7 +155,7 @@ export const useTurnkeyAuth = (readonly = false): authHookReturn => {
       })
     },
     logout: async () => {
-      console.log('logout, you still need to implement this albert')
+      setAuth(undefined)
     },
   }
 }
