@@ -2,7 +2,7 @@ import * as Sentry from '@sentry/browser'
 
 // Init Sentry
 Sentry.init({
-  environment: 'development', // TODO: replace with 'production' in builds
+  environment: process.env.NODE_ENV,
   dsn: 'https://c7c82dd7e49a55b93890a4dabbd5d8b5@o4506162121867264.ingest.sentry.io/4506162233212928',
 })
 
