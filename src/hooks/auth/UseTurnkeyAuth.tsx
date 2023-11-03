@@ -1,4 +1,4 @@
-import { Auth, createPrivateKey, createSubOrg } from '@funkit/core'
+import { Auth, createTurnkeyPrivateKey, createTurnkeySubOrg } from '@funkit/core'
 import { getWebAuthnAttestation, TurnkeyClient } from '@turnkey/http'
 import { createAccount } from '@turnkey/viem'
 import { WebauthnStamper } from '@turnkey/webauthn-stamper'
@@ -35,7 +35,7 @@ const humanReadableDateTime = (): string => {
   return new Date().toLocaleString().replace(/\//g, '-').replace(/:/g, '.')
 }
 
-export const useTurnkeyAuth = (readonly = false, rpId: string): authHookReturn => {
+export const useTurnkeyAuth = (rpId: string): authHookReturn => {
   // Create an auth here so we can use it to sign messages
   const [auth, setAuth] = React.useState<Auth | undefined>(undefined)
   const [subOrgId, setSubOrgId] = useState<string | null>(null)
@@ -64,7 +64,7 @@ export const useTurnkeyAuth = (readonly = false, rpId: string): authHookReturn =
       parameters: {
         privateKeys: [
           {
-            privateKeyName: `ETH Key ${Math.floor(Math.random() * 1000)}`,
+            privateKeyName: `ETH Key ${Math.floor(Math.random() * 1_000_000_000)}`,
             curve: 'CURVE_SECP256K1',
             addressFormats: ['ADDRESS_FORMAT_ETHEREUM'],
             privateKeyTags: [],
@@ -72,7 +72,7 @@ export const useTurnkeyAuth = (readonly = false, rpId: string): authHookReturn =
         ],
       },
     })
-    return await createPrivateKey(signedRequest)
+    return await createTurnkeyPrivateKey(signedRequest)
   }
 
   const createAuth = async (subOrgId: string, privateKey: any) => {
@@ -107,8 +107,8 @@ export const useTurnkeyAuth = (readonly = false, rpId: string): authHookReturn =
     const attestation = await getWebAuthnAttestation({
       publicKey: {
         rp: {
-          id: 'localhost',
-          name: 'Turnkey Viem Passkey Demo',
+          id: rpId,
+          name: 'Fun.xyz Passkeys',
         },
         challenge,
         pubKeyCredParams: [
@@ -133,13 +133,15 @@ export const useTurnkeyAuth = (readonly = false, rpId: string): authHookReturn =
       challenge: base64UrlEncode(challenge),
     }
 
-    return await createSubOrg(createSubOrgRequest)
+    return await createTurnkeySubOrg(createSubOrgRequest)
   }
 
   // Should create a subOrg all the way to an auth
   const doEverything = async () => {
     const newSubOrgId = await createSubOrganization()
+    setSubOrgId(newSubOrgId)
     const newPrivateKey = await createPrivateKeyReact(newSubOrgId)
+    setPrivateKey(newPrivateKey)
     await createAuth(newSubOrgId, newPrivateKey)
   }
 
