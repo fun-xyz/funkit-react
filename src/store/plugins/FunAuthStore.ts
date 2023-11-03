@@ -28,7 +28,7 @@ export interface IFunAuthStore {
 }
 
 export const configureAuthStore = (get: any, set: any): IFunAuthStore => {
-  return withErrorLogging(() => ({
+  const configureAuthStoreCb = () => ({
     activeAuthClients: [],
     setActiveAuthClients: (newActiveAuthClients: IActiveAuthList[]) => {
       set({ activeAuthClients: newActiveAuthClients })
@@ -56,5 +56,6 @@ export const configureAuthStore = (get: any, set: any): IFunAuthStore => {
     setNewAccountUsers: (newAccountUsers: User[], activeUser: User) => {
       set({ allUsers: newAccountUsers, activeUser })
     },
-  }))
+  })
+  return withErrorLogging(configureAuthStoreCb)
 }
