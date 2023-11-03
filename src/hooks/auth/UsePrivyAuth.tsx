@@ -65,9 +65,10 @@ type PrivyLoginOptions = (
 )[]
 
 const DEFAULT_PRIVY_LOGIN_OPTIONS = ['email', 'google', 'discord', 'linkedin', 'twitter', 'apple']
+const DEFAULT_PRIVY_APP_ID = 'clnatprpv00sfmi0fv3qc185b'
 
 interface FunContextProviderProps {
-  privyAppId: string
+  privyAppId?: string
   options: GlobalEnvOption
   loginMethods?: ('email' | 'google' | 'discord' | 'linkedin' | 'twitter' | 'apple' | 'sms' | 'github' | 'tiktok')[]
 }
@@ -88,10 +89,12 @@ export function FunContextProvider({
 
   const loginOptions = loginMethods || DEFAULT_PRIVY_LOGIN_OPTIONS
 
+  const appId = privyAppId || DEFAULT_PRIVY_APP_ID
+
   return (
     <div>
       <PrivyProvider
-        appId={privyAppId}
+        appId={appId}
         config={{
           loginMethods: loginOptions as PrivyLoginOptions,
           appearance: {
