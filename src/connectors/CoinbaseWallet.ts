@@ -9,6 +9,8 @@ import type {
 } from '@web3-react/types'
 import { Connector } from '@web3-react/types'
 
+import { ErrorLoggingClass } from '../utils/Logger'
+
 function parseChainId(chainId: string | number) {
   return typeof chainId === 'number' ? chainId : Number.parseInt(chainId, chainId.startsWith('0x') ? 16 : 10)
 }
@@ -25,6 +27,7 @@ export interface CoinbaseWalletConstructorArgs {
   onError?: (error: Error) => void
 }
 
+@ErrorLoggingClass
 export class FunKitCoinbaseWallet extends Connector {
   /** {@inheritdoc Connector.provider} */
   public override provider: CoinbaseWalletProvider | undefined

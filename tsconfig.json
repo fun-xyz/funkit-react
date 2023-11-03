@@ -10,6 +10,7 @@
     "alwaysStrict": true,
     "strict": true,
     "removeComments": true,
+    "experimentalDecorators": true,
 
     // also should be true for production build
     "noUnusedLocals": false,
