@@ -1,40 +1,23 @@
+import * as Sentry from '@sentry/browser'
+
+// Init Sentry
+Sentry.init({
+  environment: 'development', // TODO: replace with 'production' in builds
+  dsn: 'https://c7c82dd7e49a55b93890a4dabbd5d8b5@o4506162121867264.ingest.sentry.io/4506162233212928',
+})
+
 export enum FunLogLevel {
   INFO = 'info',
   DEBUG = 'debug',
   ERROR = 'error',
 }
 
-interface FunLog {
-  logLevel: FunLogLevel
-  source: string
-  cbName: string | null
-  data: any
-}
-
-// FIXME: Kinda hacky
-function getCallbackName(callback) {
-  const name = callback.toString() || ''
-  const reg = /function ([^\\(]*)/
-  return reg.exec(name)?.[1] || ''
-}
-
 export function withErrorLogging(callback) {
-  console.log('withErrorLogging - info', callback)
   try {
     const result = callback?.()
     return result
   } catch (err) {
-    // Get the callback name
-    const cbName = getCallbackName(callback)
-    // Construct log object
-    const logObject: FunLog = {
-      logLevel: FunLogLevel.ERROR,
-      source: 'funkit/react',
-      cbName,
-      data: err,
-    }
-    // TODO: Send to sentry / log server
-    console.log('withErrorLogging - error', logObject)
+    Sentry.captureException(err, { level: FunLogLevel.ERROR, extra: { source: '@funkit/react' } })
     return null
   }
 }
