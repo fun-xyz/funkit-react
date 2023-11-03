@@ -48,15 +48,19 @@ class FunLogger {
   }
 }
 
+/**===============================
+ * INITIALIZATION
+ *================================*/
+
 // Init funLogger at top-level
 const funLogger = new FunLogger()
 
 /**
  * Handles the propagation of caught errors
- * @param error 
+ * @param {Error} error The error object
  * @param {boolean} silenced Whether the error should be silenced or not. If true, the error will just be written to console.error. Otherwise, the error will be thrown.
  */
-function handleErrorPropagation(error, silenced: boolean) {
+function handleErrorPropagation(error: Error, silenced: boolean) {
   if (silenced) {
     // If silenced, simply write it to console.error
     console.error('error-log', error)
@@ -71,12 +75,11 @@ function handleErrorPropagation(error, silenced: boolean) {
  *================================*/
 
 /**
- * HOF that takes in a targetFn and runs it in a try-catch.
- * @example
- * withErrorLogging(function yourFunction() { ... })
+ * HOF that takes in a `targetFn` and runs it in a try-catch.
  * @param {Function} targetFn The target function to be wrapped with error logging.
  * @param {boolean} silenced Whether the error should be silenced or not. If true, the error will just be written to console.error. Otherwise, the error will be thrown.
  * @returns {Function} A new function that wraps the target function with error handling. If an error occurs in the target function, it is logged, and `null` is returned.
+ * @example withErrorLogging(function yourFunction() { ... })
  */
 export function withErrorLogging(targetFn, silenced = false) {
   return function (...args) {
