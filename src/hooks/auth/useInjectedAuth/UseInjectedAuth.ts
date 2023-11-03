@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { connector, hooks } from '../../../connectors/MetaMask'
 import { useFunStoreInterface } from '../../../store'
 import { convertToValidUserId } from '../../../utils'
+import { withErrorLogging } from '../../../utils/Logger'
 import { useFun } from '../../UseFun'
 import { authHookReturn } from '../types'
 
@@ -55,16 +56,14 @@ export const useInjectedAuth = ({ name, autoConnect }: useInjectedAuthArgs): aut
     }
   }, [account, active, auth, name, provider, setAuth, update])
 
-  const login = useCallback(async () => {
-    try {
+  const login = withErrorLogging(
+    useCallback(async () => {
       await connector.activate()
-    } catch (err) {
-      console.log(err)
-    }
-  }, [])
+    }, [])
+  )
 
-  const logout = useCallback(async () => {
-    try {
+  const logout = withErrorLogging(
+    useCallback(async () => {
       if (connector?.deactivate) {
         await connector.deactivate()
       } else {
@@ -73,10 +72,10 @@ export const useInjectedAuth = ({ name, autoConnect }: useInjectedAuthArgs): aut
       const updatedAuthList = auth.filter((item) => item.account !== account)
       if (updatedAuthList.length === auth.length) return // no change
       setAuth(updatedAuthList)
-    } catch (err) {
-      console.error(err)
-    }
-  }, [account, auth, setAuth])
+    }, [account, auth, setAuth]),
+    // Prevents errors from being thrown. Shows up in console.
+    true
+  )
 
   return {
     auth: provider ? new Auth({ provider }) : undefined,

@@ -34,17 +34,37 @@ class FunLogger {
     })
   }
 
+  // TODO:
+  // public log() { // handles error, debug, info, etc }
+  // private onDebug() {}
+  // private onInfo() {}
+
   /**
-   * On receiving an error, write it to sentry and then throw it back up to ensure it is not silenced on client side.
+   * On receiving an error, write it to sentry
+   * TODO: Make this a private function
    */
   public onError(error: Error, otherData?: object) {
     this.writeErrorToSentry(error, otherData)
-    throw error
   }
 }
 
 // Init funLogger at top-level
 const funLogger = new FunLogger()
+
+/**
+ * Handles the propagation of caught errors
+ * @param error 
+ * @param {boolean} silenced Whether the error should be silenced or not. If true, the error will just be written to console.error. Otherwise, the error will be thrown.
+ */
+function handleErrorPropagation(error, silenced: boolean) {
+  if (silenced) {
+    // If silenced, simply write it to console.error
+    console.error('error-log', error)
+  } else {
+    // Otherwise, propagate the error as per normal
+    throw error
+  }
+}
 
 /**===============================
  * HIGHER ORDER FUNCTIONS (HOF)
@@ -55,14 +75,16 @@ const funLogger = new FunLogger()
  * @example
  * withErrorLogging(function yourFunction() { ... })
  * @param {Function} targetFn The target function to be wrapped with error logging.
+ * @param {boolean} silenced Whether the error should be silenced or not. If true, the error will just be written to console.error. Otherwise, the error will be thrown.
  * @returns {Function} A new function that wraps the target function with error handling. If an error occurs in the target function, it is logged, and `null` is returned.
  */
-export function withErrorLogging(targetFn) {
+export function withErrorLogging(targetFn, silenced = false) {
   return function (...args) {
     try {
       return targetFn(...args)
     } catch (error: any) {
       funLogger.onError(error, { source: 'regular function' })
+      handleErrorPropagation(error, silenced)
     }
   }
 }
@@ -88,6 +110,8 @@ export function ErrorLoggingClass(constructor) {
           return originalMethod.apply(this, args)
         } catch (error: any) {
           funLogger.onError(error, { source: 'class function' })
+          // For now, class function logging should not silence errors
+          handleErrorPropagation(error, false)
         }
       }
     }
