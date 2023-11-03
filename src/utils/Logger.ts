@@ -23,18 +23,22 @@ class FunLogger {
     return !!Sentry.getCurrentHub().getClient()
   }
 
-  private writeErrorToSentry(error, functionName) {
+  /**
+   * Writes to sentry
+   */
+  private writeErrorToSentry(error: Error, otherData?: object) {
+    const otherDataSafe = otherData ? otherData : {}
     Sentry.captureException(error, {
       level: FunLogLevel.ERROR,
-      extra: { source: '@funkit/react', functionName },
+      extra: { package: '@funkit/react', ...otherDataSafe },
     })
   }
 
   /**
-   * On receiving an error, write it to sentry and then throw it to ensure it is not silenced on client side
+   * On receiving an error, write it to sentry and then throw it back up to ensure it is not silenced on client side.
    */
-  public onError(error, functionName) {
-    this.writeErrorToSentry(error, functionName)
+  public onError(error: Error, otherData?: object) {
+    this.writeErrorToSentry(error, otherData)
     throw error
   }
 }
@@ -57,8 +61,8 @@ export function withErrorLogging(targetFn) {
   return function (...args) {
     try {
       return targetFn(...args)
-    } catch (error) {
-      funLogger.onError(error, targetFn.name)
+    } catch (error: any) {
+      funLogger.onError(error, { source: 'regular function' })
     }
   }
 }
@@ -66,7 +70,7 @@ export function withErrorLogging(targetFn) {
 /**
  * Class decorator HOF equivalent of `withErrorLogging`
  * @example
- * // Applied to all functions in the class
+ * // Applies error logging to all functions within the class
  * @ErrorLoggingClass
  * class YourClass {
  *   functionA() {...}
@@ -75,37 +79,41 @@ export function withErrorLogging(targetFn) {
  */
 export function ErrorLoggingClass(constructor) {
   for (const methodName of Object.getOwnPropertyNames(constructor.prototype)) {
+    // For all functions in the class
     if (typeof constructor.prototype[methodName] === 'function') {
       const originalMethod = constructor.prototype[methodName]
+      // Apply error logging
       constructor.prototype[methodName] = function (...args: any[]) {
         try {
           return originalMethod.apply(this, args)
         } catch (error: any) {
-          funLogger.onError(error, methodName)
+          funLogger.onError(error, { source: 'class function' })
         }
       }
     }
   }
 }
 
-/**
- * Method decorator HOF equivalent of `withErrorLogging`
- * - Make use of class decorator instead  of declaring this on all functions
- *
- * @example
- * class YourClass {
- *   @ErrorLogging
- *   yourFunction() { ... }
- * }
- */
-export function ErrorLogging(target: any, propertyKey: string, descriptor: PropertyDescriptor) {
-  const originalMethod = descriptor.value
-  descriptor.value = function (...args) {
-    try {
-      return originalMethod.apply(this, args)
-    } catch (error: any) {
-      funLogger.onError(error, propertyKey)
-    }
-  }
-  return descriptor
-}
+// Optionally, we can also declare a method level decorator for use.
+// But there isnt really a strong use case for this since we ideally want all functions to be logged anyways.
+// For now, make use of class decorator @ErrorLoggingClass
+
+// /**
+//  * Method decorator HOF equivalent of `withErrorLogging`
+//  * @example
+//  * class YourClass {
+//  *   @ErrorLogging
+//  *   yourFunction() { ... }
+//  * }
+//  */
+// export function ErrorLogging(target: any, propertyKey: string, descriptor: PropertyDescriptor) {
+//   const originalMethod = descriptor.value
+//   descriptor.value = function (...args) {
+//     try {
+//       return originalMethod.apply(this, args)
+//     } catch (error: any) {
+//       funLogger.onError(error)
+//     }
+//   }
+//   return descriptor
+// }

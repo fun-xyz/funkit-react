@@ -12,11 +12,8 @@ export interface FunAccountStoreInterface {
   setEnsName: (ensName: string) => void
 }
 
-export const configureFunAccountStore = withErrorLogging((get: any, set: any): FunAccountStoreInterface => {
-  // This should throw error
-  // @ts-ignore
-  someUnavailableFn()
-  return {
+export const configureFunAccountStore = withErrorLogging(
+  (get: any, set: any): FunAccountStoreInterface => ({
     FunWallet: null,
     setFunWallet: (FunWallet: FunWallet) => set({ FunWallet }),
     account: null,
@@ -26,5 +23,5 @@ export const configureFunAccountStore = withErrorLogging((get: any, set: any): F
     },
     ensName: null,
     setEnsName: (ensName: string) => set({ ensName }),
-  }
-})
+  })
+)
