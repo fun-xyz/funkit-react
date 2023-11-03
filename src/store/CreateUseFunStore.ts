@@ -1,23 +1,14 @@
 // eslint-disable-next-line prettier/prettier
 "use client";
-import { createWithEqualityFn } from "zustand/traditional";
+import { createWithEqualityFn } from 'zustand/traditional'
 
-import { ChainStoreInterface, configureChainStore } from "./plugins/ChainStore";
-import {
-  configureConfigurationStore,
-  ConfigureStoreInterface,
-} from "./plugins/ConfigureStore";
-import { configureErrorStore, ErrorStoreInterface } from "./plugins/ErrorStore";
-import {
-  configureFunAccountStore,
-  FunAccountStoreInterface,
-} from "./plugins/FunAccountStore";
-import { configureAuthStore, IFunAuthStore } from "./plugins/FunAuthStore";
-import {
-  configureTransactionStore,
-  TransactionStoreState,
-} from "./plugins/OperationsStore";
-import { withErrorLogging } from "../utils/Logger";
+import { withErrorLogging } from '../utils/Logger'
+import { ChainStoreInterface, configureChainStore } from './plugins/ChainStore'
+import { configureConfigurationStore, ConfigureStoreInterface } from './plugins/ConfigureStore'
+import { configureErrorStore, ErrorStoreInterface } from './plugins/ErrorStore'
+import { configureFunAccountStore, FunAccountStoreInterface } from './plugins/FunAccountStore'
+import { configureAuthStore, IFunAuthStore } from './plugins/FunAuthStore'
+import { configureTransactionStore, TransactionStoreState } from './plugins/OperationsStore'
 
 export interface useFunStoreInterface
   extends FunAccountStoreInterface,
@@ -26,20 +17,20 @@ export interface useFunStoreInterface
     ConfigureStoreInterface,
     TransactionStoreState,
     ErrorStoreInterface {
-  setAssets: (assets: object) => void;
-  assets: object | null;
+  setAssets: (assets: object) => void
+  assets: object | null
 }
 
 export const createUseFunStore = () => {
   return withErrorLogging(() => {
     return createWithEqualityFn((set: any, get: any): useFunStoreInterface => {
       // Substores
-      const funAccountStore = configureFunAccountStore(get, set);
-      const authStore = configureAuthStore(get, set);
-      const chainStore = configureChainStore(get, set);
-      const configStore = configureConfigurationStore(get, set);
-      const txnStore = configureTransactionStore(get, set);
-      const errorStore = configureErrorStore(get, set);
+      const funAccountStore = configureFunAccountStore(get, set)
+      const authStore = configureAuthStore(get, set)
+      const chainStore = configureChainStore(get, set)
+      const configStore = configureConfigurationStore(get, set)
+      const txnStore = configureTransactionStore(get, set)
+      const errorStore = configureErrorStore(get, set)
 
       // Build the full store:
       // 1. Declaratively list out all substore variables instead of spreading
@@ -104,9 +95,9 @@ export const createUseFunStore = () => {
         // Misc
         setAssets: (assets) => set({ assets }),
         assets: null,
-      };
+      }
 
-      return fullStore as useFunStoreInterface;
-    });
-  });
-};
+      return fullStore as useFunStoreInterface
+    })
+  })
+}

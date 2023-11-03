@@ -1,5 +1,6 @@
-import { withErrorLogging } from '../../utils/Logger'
 import { Auth, User, Wallet } from '@funkit/core'
+
+import { withErrorLogging } from '../../utils/Logger'
 
 export interface IActiveAuthList {
   active: boolean
