@@ -1,5 +1,7 @@
 import { FunWallet } from '@funkit/core'
 
+import { withErrorLogging } from '../../utils/Logger'
+
 export interface FunAccountStoreInterface {
   FunWallet: FunWallet | null
   setFunWallet: (FunWallet: FunWallet) => void
@@ -10,14 +12,16 @@ export interface FunAccountStoreInterface {
   setEnsName: (ensName: string) => void
 }
 
-export const configureFunAccountStore = (get: any, set: any): FunAccountStoreInterface => ({
-  FunWallet: null,
-  setFunWallet: (FunWallet: FunWallet) => set({ FunWallet }),
-  account: null,
-  setAccount: (account: string) => set({ account }),
-  setLogin: (account: string, funWallet: FunWallet | null) => {
-    set({ account, FunWallet: funWallet })
-  },
-  ensName: null,
-  setEnsName: (ensName: string) => set({ ensName }),
-})
+export const configureFunAccountStore = (get: any, set: any): FunAccountStoreInterface => {
+  return withErrorLogging(() => ({
+    FunWallet: null,
+    setFunWallet: (FunWallet: FunWallet) => set({ FunWallet }),
+    account: null,
+    setAccount: (account: string) => set({ account }),
+    setLogin: (account: string, funWallet: FunWallet | null) => {
+      set({ account, FunWallet: funWallet })
+    },
+    ensName: null,
+    setEnsName: (ensName: string) => set({ ensName }),
+  }))
+}
