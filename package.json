@@ -16,7 +16,8 @@
   },
   "scripts": {
     "dev": "cd ./example && npm run dev",
-    "build": "NODE_ENV=production && rm -rf dist && tsc",
+    "build-test": "rm -rf dist && tsc",
+    "build": "NODE_ENV=production && rm -rf dist && tsc && yarn sentry:sourcemaps",
     "build-dev": "NODE_ENV=development && rm -rf dist && tsc",
     "update": "./scripts/updateExamplePackage.sh",
     "lint": "eslint --ext .ts,.tsx './**/*.{ts,tsx}'",
