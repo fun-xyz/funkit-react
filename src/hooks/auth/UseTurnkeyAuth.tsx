@@ -100,6 +100,12 @@ export const useTurnkeyAuth = (rpId: string): authHookReturn => {
   }
 
   const createSubOrganization = async (): Promise<string> => {
+    // const res = await passkeyHttpClient.getWhoami({
+    //   organizationId: 'c94f8969-92b8-4392-9ce7-5656653738eb',
+    // })
+    // if (res && res.organizationId) {
+    //   return res.organizationId
+    // }
     const challenge = generateRandomBuffer()
     const subOrgName = `Turnkey Viem+Passkey Demo - ${humanReadableDateTime()}`
     const authenticatorUserId = generateRandomBuffer()
