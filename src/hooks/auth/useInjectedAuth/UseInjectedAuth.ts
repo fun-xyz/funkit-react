@@ -4,10 +4,11 @@ import { useCallback, useEffect, useState } from 'react'
 import { connector, hooks } from '../../../connectors/MetaMask'
 import { useFunStoreInterface } from '../../../store'
 import { convertToValidUserId } from '../../../utils'
-import { withErrorLogging } from '../../../utils/Logger'
+import { FunLogger, withErrorLogging } from '../../../utils/Logger'
 import { useFun } from '../../UseFun'
 import { authHookReturn } from '../types'
 
+const funLogger = new FunLogger()
 export interface useInjectedAuthArgs {
   name: string
   autoConnect?: boolean
@@ -58,23 +59,29 @@ export const useInjectedAuth = ({ name, autoConnect }: useInjectedAuthArgs): aut
 
   const login = withErrorLogging(
     useCallback(async () => {
-      await connector.activate()
+      try {
+        await connector.activate()
+      } catch (err) {
+        console.log(err)
+      }
     }, [])
   )
 
   const logout = withErrorLogging(
     useCallback(async () => {
-      if (connector?.deactivate) {
-        await connector.deactivate()
-      } else {
-        await connector.resetState()
+      try {
+        if (connector?.deactivate) {
+          await connector.deactivate()
+        } else {
+          await connector.resetState()
+        }
+        const updatedAuthList = auth.filter((item) => item.account !== account)
+        if (updatedAuthList.length === auth.length) return // no change
+        setAuth(updatedAuthList)
+      } catch (err) {
+        console.error(err)
       }
-      const updatedAuthList = auth.filter((item) => item.account !== account)
-      if (updatedAuthList.length === auth.length) return // no change
-      setAuth(updatedAuthList)
-    }, [account, auth, setAuth]),
-    // Prevents errors from being thrown. Shows up in console.
-    true
+    }, [account, auth, setAuth])
   )
 
   return {

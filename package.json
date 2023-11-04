@@ -17,13 +17,14 @@
   "scripts": {
     "dev": "cd ./example && npm run dev",
     "build-test": "rm -rf dist && tsc",
-    "build": "NODE_ENV=production && rm -rf dist && tsc && yarn sentry:sourcemaps",
-    "build-dev": "NODE_ENV=development && rm -rf dist && tsc",
+    "build": "NODE_ENV=development && rm -rf dist && tsc",
+    "build-prod": "NODE_ENV=production && rm -rf dist && tsc && yarn sentry:sourcemaps",
     "update": "./scripts/updateExamplePackage.sh",
     "lint": "eslint --ext .ts,.tsx './**/*.{ts,tsx}'",
     "lint:fix": "eslint --ext .ts,.tsx './**/*.{ts,tsx}' --fix",
     "postinstall": "./handleOauth.sh",
-    "local install": "cd ./node_modules/@magic-ext/oauth/dist/cjs  && touch core.js"
+    "local install": "cd ./node_modules/@magic-ext/oauth/dist/cjs  && touch core.js",
+    "sentry:sourcemaps": "sentry-cli sourcemaps inject --org funxyz --project funkit-react ./dist && sentry-cli sourcemaps upload --org funxyz --project javascript ./dist"
   },
   "peerDependencies": {
     "react": "^18.2.0",
@@ -37,6 +38,7 @@
     "@magic-sdk/provider": "^18.2.1",
     "@privy-io/react-auth": "^1.43.3",
     "@sentry/browser": "^7.77.0",
+    "@sentry/cli": "^2.21.2",
     "@walletconnect/modal": "^2.4.5",
     "@web3-react/coinbase-wallet": "^8.2.0",
     "@web3-react/core": "^8.2.0",

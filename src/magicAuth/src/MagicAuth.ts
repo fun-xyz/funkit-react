@@ -150,7 +150,7 @@ export class MagicAuthConnector extends Connector {
         if (isAuthorized) await this.completeActivation()
       })
       .catch((err) => {
-        console.log('oAuth authorization test ERROR: ', err)
+        console.log('initializeMagicInstance - oAuth authorization test ERROR: ', err)
       })
     return { magic, chainId, provider }
   }
@@ -271,7 +271,7 @@ export class MagicAuthConnector extends Connector {
         return false
       }
     } catch (err) {
-      console.log('oAuth authorization test ERROR: ', err)
+      console.log('isAuthorized - oAuth authorization test ERROR: ', err)
       return false
     }
   }
