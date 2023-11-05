@@ -8,7 +8,7 @@ import { FunLogger, withErrorLogging } from '../../../utils/Logger'
 import { useFun } from '../../UseFun'
 import { authHookReturn } from '../types'
 
-const funLogger = new FunLogger()
+const logger = new FunLogger()
 export interface useInjectedAuthArgs {
   name: string
   autoConnect?: boolean
@@ -32,7 +32,7 @@ export const useInjectedAuth = ({ name, autoConnect }: useInjectedAuthArgs): aut
   useEffect(() => {
     if (!autoConnect) return
     void connector.connectEagerly().catch(() => {
-      console.debug('Failed to connect eagerly to ', name)
+      logger.debug('Failed to connect eagerly to ', name)
     })
   }, [autoConnect, name])
 

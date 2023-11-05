@@ -45,6 +45,7 @@ export class FunLogger {
    * On receiving an info log, write it to console.log
    */
   private onInfo(title, data) {
+    // TODO: Consider writing to sentry logs too
     console.log(title, data)
   }
 
@@ -53,10 +54,16 @@ export class FunLogger {
    */
   private onError(title, data) {
     console.error(title, data)
-    const copyData = { ...data }
-    const errorObj = copyData?.error
-    delete copyData.error
-    this.writeErrorToSentry(errorObj, { title, ...copyData })
+    // Prepare sentry log
+    let otherData
+    const errorObj = data?.error || new Error(title) // fallback error if an error object isnt passed in
+    if (typeof data === 'object') {
+      otherData = { title, ...data }
+      delete otherData?.error
+    } else {
+      otherData = { title, data }
+    }
+    this.writeErrorToSentry(errorObj, otherData)
   }
 
   /**========================
@@ -115,7 +122,7 @@ export function withErrorLogging(targetFn) {
     try {
       return targetFn(...args)
     } catch (error: any) {
-      logger.error('error_detected', { error, source: 'regular function' })
+      logger.error('error_logged', { error, source: 'regular function' })
       throw error
     }
   }
@@ -141,7 +148,7 @@ export function ErrorLoggingClass(constructor) {
         try {
           return originalMethod.apply(this, args)
         } catch (error: any) {
-          logger.error('error_detected', { error, source: 'class function' })
+          logger.error('error_logged', { error, source: 'class function' })
           throw error
         }
       }
