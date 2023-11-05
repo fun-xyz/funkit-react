@@ -40,7 +40,6 @@ export const useTurnkeyAuth = (rpId: string, existingPasskey = false): authHookR
   const [auth, setAuth] = React.useState<Auth | undefined>(undefined)
   const [subOrgId, setSubOrgId] = useState<string | null>(null)
   const [privateKey, setPrivateKey] = useState<TPrivateKeyState>(null)
-  console.log(rpId)
 
   const stamper = new WebauthnStamper({
     rpId,
@@ -156,7 +155,6 @@ export const useTurnkeyAuth = (rpId: string, existingPasskey = false): authHookR
   // Should create a subOrg all the way to an auth
   const doEverything = async () => {
     const newSubOrgId = await createSubOrganization()
-    console.log('newSubOrgId', newSubOrgId)
     setSubOrgId(newSubOrgId)
     const newPrivateKey = await createPrivateKeyReact(newSubOrgId)
     setPrivateKey(newPrivateKey)
