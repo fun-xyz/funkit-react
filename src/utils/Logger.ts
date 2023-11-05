@@ -34,17 +34,62 @@ export class FunLogger {
     })
   }
 
-  // TODO:
-  // public log() { // handles error, debug, info, etc }
-  // private onDebug() {}
-  // private onInfo() {}
+  /**
+   * On receiving an debug log, write it to console.debug
+   */
+  private onDebug(title, data) {
+    console.debug(title, data)
+  }
 
   /**
-   * On receiving an error, write it to sentry
-   * TODO: Make this a private function
+   * On receiving an info log, write it to console.log
    */
-  public onError(error: Error, otherData?: object) {
-    this.writeErrorToSentry(error, otherData)
+  private onInfo(title, data) {
+    console.log(title, data)
+  }
+
+  /**
+   * On receiving an error log, write it to console.error and sentry
+   */
+  private onError(title, data) {
+    console.error(title, data)
+    const copyData = { ...data }
+    const errorObj = copyData?.error
+    delete copyData.error
+    this.writeErrorToSentry(errorObj, { title, ...copyData })
+  }
+
+  /**========================
+   * PUBLIC LOGGER FUNCTIONS
+   *=========================*/
+
+  public info(title, data) {
+    this.onInfo(title, data)
+  }
+
+  public debug(title, data) {
+    this.onDebug(title, data)
+  }
+
+  public error(title, data) {
+    this.onError(title, data)
+  }
+
+  // Generic log() function supporting different logLevels (default info)
+  public log(title: string, data: any, logLevel: FunLogLevel = FunLogLevel.INFO) {
+    switch (logLevel) {
+      case FunLogLevel.DEBUG:
+        this.debug(title, data)
+        break
+      case FunLogLevel.INFO:
+        this.info(title, data)
+        break
+      case FunLogLevel.ERROR:
+        this.error(title, data)
+        break
+      default:
+        this.info(title, data)
+    }
   }
 }
 
@@ -53,7 +98,7 @@ export class FunLogger {
  *================================*/
 
 // Init funLogger at top-level
-const funLogger = new FunLogger()
+const logger = new FunLogger()
 
 /**===============================
  * HIGHER ORDER FUNCTIONS (HOF)
@@ -70,7 +115,7 @@ export function withErrorLogging(targetFn) {
     try {
       return targetFn(...args)
     } catch (error: any) {
-      funLogger.onError(error, { source: 'regular function' })
+      logger.error('error_detected', { error, source: 'regular function' })
       throw error
     }
   }
@@ -96,7 +141,7 @@ export function ErrorLoggingClass(constructor) {
         try {
           return originalMethod.apply(this, args)
         } catch (error: any) {
-          funLogger.onError(error, { source: 'class function' })
+          logger.error('error_detected', { error, source: 'class function' })
           throw error
         }
       }
