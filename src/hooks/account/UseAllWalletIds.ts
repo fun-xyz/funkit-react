@@ -3,9 +3,9 @@ import { useEffect } from 'react'
 import { shallow } from 'zustand/shallow'
 
 import { IActiveAuthList, useFunStoreInterface } from '../..'
+import { FunLogger } from '../../utils/Logger'
 import { useFun } from '../UseFun'
 import { useActiveClients, usePrevious } from '../util'
-import { FunLogger } from '../../utils/Logger'
 
 const logger = new FunLogger()
 
