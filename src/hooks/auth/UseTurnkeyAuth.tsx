@@ -35,7 +35,7 @@ const humanReadableDateTime = (): string => {
   return new Date().toLocaleString().replace(/\//g, '-').replace(/:/g, '.')
 }
 
-export const useTurnkeyAuth = (rpId: string): authHookReturn => {
+export const useTurnkeyAuth = (rpId: string, existingPasskey = false): authHookReturn => {
   // Create an auth here so we can use it to sign messages
   const [auth, setAuth] = React.useState<Auth | undefined>(undefined)
   const [subOrgId, setSubOrgId] = useState<string | null>(null)
@@ -56,6 +56,14 @@ export const useTurnkeyAuth = (rpId: string): authHookReturn => {
   const createPrivateKeyReact = async (subOrgId: string): Promise<any> => {
     if (!subOrgId) {
       throw new Error('sub-org id not found')
+    }
+
+    if (existingPasskey) {
+      const keys = await passkeyHttpClient.getPrivateKeys({ organizationId: subOrgId })
+      return {
+        id: keys.privateKeys[0].privateKeyId,
+        address: keys.privateKeys[0].addresses[0].address,
+      }
     }
 
     const signedRequest = await passkeyHttpClient.stampCreatePrivateKeys({
@@ -101,12 +109,14 @@ export const useTurnkeyAuth = (rpId: string): authHookReturn => {
   }
 
   const createSubOrganization = async (): Promise<string> => {
-    // const res = await passkeyHttpClient.getWhoami({
-    //   organizationId: 'c94f8969-92b8-4392-9ce7-5656653738eb',
-    // })
-    // if (res && res.organizationId) {
-    //   return res.organizationId
-    // }
+    if (existingPasskey) {
+      const res = await passkeyHttpClient.getWhoami({
+        organizationId: 'c40bb53d-ee4c-4c01-aaac-c4cca03734f8',
+      })
+      if (res && res.organizationId) {
+        return res.organizationId
+      }
+    }
     const challenge = generateRandomBuffer()
     const subOrgName = `Fun.xyz - ${humanReadableDateTime()}`
     const authenticatorUserId = generateRandomBuffer()
