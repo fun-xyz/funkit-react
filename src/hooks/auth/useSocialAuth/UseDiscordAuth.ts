@@ -1,8 +1,8 @@
-import { useSocialAuthConnectorBase } from './UseSocialAuthBase'
+import { SocialAuthProviders, useSocialAuthConnectorBase } from './UseSocialAuthBase'
 
 export const useDiscordAuth = () => {
   return useSocialAuthConnectorBase({
-    oAuthProvider: 'discord',
+    oAuthProvider: SocialAuthProviders.Discord,
     name: 'Discord',
   })
 }

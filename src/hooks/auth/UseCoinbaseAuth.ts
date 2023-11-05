@@ -65,7 +65,7 @@ export const useCoinbaseAuth = ({ options, autoConnect }: useCoinbaseAuthArgs): 
     try {
       await connector.activate(options)
     } catch (err) {
-      console.log(err)
+      console.error(err)
     }
   }, [connector, options])
 

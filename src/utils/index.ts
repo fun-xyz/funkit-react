@@ -1,3 +1,4 @@
+export { generateWalletUniqueId } from './account'
 export { convertToValidUserId } from './MultiAuth'
 export {
   GasValidationResponse,

@@ -1,14 +1,18 @@
-import { Auth } from '@funkit/core'
+'use client'
+import { Auth, GlobalEnvOption } from '@funkit/core'
 import { PrivyProvider, usePrivy, useWallets } from '@privy-io/react-auth'
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 
+import { useConfig } from '../account/UseConfig'
 import { authHookReturn } from './types'
+
+const PRIVY_EMBEDDED_WALLET_IDENTIFIER = 'privy' // embedded wallets in privy are identified by this string to separate them from external wallets like metamask
 
 export const usePrivyAuth = (readonly = false): authHookReturn => {
   const { login, logout, ready, user, createWallet } = usePrivy()
   const { wallets } = useWallets()
 
-  const [auth, setAuth] = React.useState<Auth | undefined>(undefined)
+  const [auth, setAuth] = useState<Auth | undefined>(undefined)
 
   useEffect(() => {
     if (ready && user && !user.wallet) {
@@ -17,7 +21,7 @@ export const usePrivyAuth = (readonly = false): authHookReturn => {
       })
     }
     if (wallets && auth == undefined) {
-      const embeddedWallet = wallets.find((wallet) => wallet.walletClientType === 'privy')
+      const embeddedWallet = wallets.find((wallet) => wallet.walletClientType === PRIVY_EMBEDDED_WALLET_IDENTIFIER)
       if (embeddedWallet == null) return
       embeddedWallet
         .getEthereumProvider()
@@ -47,17 +51,49 @@ export const usePrivyAuth = (readonly = false): authHookReturn => {
   }
 }
 
+type PrivyLoginOptions = (
+  | 'wallet'
+  | 'email'
+  | 'google'
+  | 'discord'
+  | 'linkedin'
+  | 'twitter'
+  | 'apple'
+  | 'sms'
+  | 'github'
+  | 'tiktok'
+)[]
+
+const DEFAULT_PRIVY_LOGIN_OPTIONS = ['email', 'google', 'discord', 'linkedin', 'twitter', 'apple']
+
 interface FunContextProviderProps {
-  children: any
-  appId: string
+  privyAppId: string
+  options: GlobalEnvOption
+  loginMethods?: ('email' | 'google' | 'discord' | 'linkedin' | 'twitter' | 'apple' | 'sms' | 'github' | 'tiktok')[]
 }
-export const FunContextProvider = ({ children, appId }: FunContextProviderProps) => {
+
+export function FunContextProvider({
+  children,
+  privyAppId,
+  loginMethods,
+  options,
+}: React.PropsWithChildren<FunContextProviderProps>) {
+  const [isConfigSet, setIsConfigSet] = useState(false)
+  const { setConfig } = useConfig()
+
+  if (!isConfigSet) {
+    setConfig(options)
+    setIsConfigSet(true)
+  }
+
+  const loginOptions = loginMethods || DEFAULT_PRIVY_LOGIN_OPTIONS
+
   return (
     <div>
       <PrivyProvider
-        appId={appId}
+        appId={privyAppId}
         config={{
-          loginMethods: ['email', 'google', 'discord', 'linkedin', 'twitter', 'apple'],
+          loginMethods: loginOptions as PrivyLoginOptions,
           appearance: {
             theme: 'light',
             accentColor: '#676FFF',

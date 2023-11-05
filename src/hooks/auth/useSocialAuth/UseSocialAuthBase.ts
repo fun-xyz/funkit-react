@@ -7,6 +7,13 @@ import SocialOauthConnector, { SUPPORTED_OAUTH_PROVIDERS } from '../../../connec
 import { convertToValidUserId, useFun, useFunStoreInterface } from '../../../index'
 import { authHookReturn } from '../../auth/types'
 
+export enum SocialAuthProviders {
+  Google = 'google',
+  Twitter = 'twitter',
+  Discord = 'discord',
+  Apple = 'apple',
+}
+
 export interface useSocialAuthBaseArgs {
   provider: OAuthProvider
   name: string

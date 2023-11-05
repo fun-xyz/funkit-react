@@ -2,7 +2,6 @@ import type WalletConnectProvider from '@walletconnect/ethereum-provider'
 import { initializeConnector } from '@web3-react/core'
 import type { Actions, ProviderRpcError } from '@web3-react/types'
 import { Connector } from '@web3-react/types'
-import { WalletConnect as WalletConnectV2 } from '@web3-react/walletconnect-v2'
 import EventEmitter3 from 'eventemitter3'
 
 import { getBestUrlMap, getChainsWithDefault } from './utils'

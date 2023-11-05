@@ -1,3 +1,3 @@
-export { InitCoinbaseWalletConnector } from './CoinbaseWallet'
+export { CoinbaseWalletSDKOptions, InitCoinbaseWalletConnector } from './CoinbaseWallet'
 export * from './Types'
-export { InitWalletConnectConnector } from './WalletConnectV2'
+export { InitWalletConnectConnector, WalletConnectOptions } from './WalletConnectV2'

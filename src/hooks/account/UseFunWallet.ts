@@ -1,5 +1,5 @@
-import { Auth, Chain, FunWallet, Wallet } from '@funkit/core'
-import { useCallback, useState } from 'react'
+import { Auth, Chain, FunWallet, GlobalEnvOption, Wallet } from '@funkit/core'
+import { useCallback, useEffect, useState } from 'react'
 import { shallow } from 'zustand/shallow'
 
 import {
@@ -9,6 +9,7 @@ import {
   MissingConfigError,
   MissingInitializationArgs,
 } from '../../store'
+import { generateWalletUniqueId } from '../../utils'
 import { useFun } from '../index'
 import { usePrimaryAuth } from '../util'
 
@@ -26,7 +27,7 @@ interface useFunWalletHook {
  * Custom hook that provides functionality to create a new Fun wallet account.
  * @returns An object containing the created Fun wallet account, the account address, the chain ID, any errors that occurred, a boolean indicating whether the account is being initialized, a function to reset any errors, and a function to initialize a new Fun wallet account.
  */
-export const useFunWallet = (): useFunWalletHook => {
+export const useFunWallet = (options?: GlobalEnvOption): useFunWalletHook => {
   const { storedFunWallet, account, config, setLogin, setNewAccountUsers, setFunGroupAccounts, updateConfig } = useFun(
     (state) => ({
       storedFunWallet: state.FunWallet,
@@ -42,6 +43,12 @@ export const useFunWallet = (): useFunWalletHook => {
     }),
     shallow
   )
+
+  useEffect(() => {
+    if (config == null && !options)
+      throw new Error('Config not set. Either pass in a config object or set it using the useConfig hook.')
+    if (config == null && options) updateConfig(options)
+  }, [config, options, updateConfig])
 
   const [initializing, setInitializing] = useState(false)
   const [primaryAuth] = usePrimaryAuth()
@@ -115,7 +122,7 @@ export const useFunWallet = (): useFunWalletHook => {
       if (config == null || !config.chain) return handleBuildError(MissingConfigError)
       try {
         if (chainId && config.chain !== chainId) updateConfig({ chain: chainId })
-        const walletUniqueId = await auth.getWalletUniqueId(Math.floor(Math.random() * 10000000000))
+        const walletUniqueId = await generateWalletUniqueId(auth)
         const userId = await auth.getUserId()
         const newFunWallet = new FunWallet({
           users: [{ userId }],
@@ -129,6 +136,7 @@ export const useFunWallet = (): useFunWalletHook => {
             setFunGroupAccounts(newWalletsArray)
           })
           .catch((err) => {
+            // caught the error without crashing the function
             console.error('post create wallets fetch err: ', err)
           })
         setNewAccountUsers([{ userId }], { userId })

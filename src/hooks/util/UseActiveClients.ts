@@ -9,7 +9,7 @@ import { CoinbaseWalletConnector } from '../auth/UseCoinbaseAuth'
 import { SocialAuthConnector } from '../auth/useSocialAuth/UseSocialAuthBase'
 import { WalletConnectConnector } from '../auth/UseWalletConnectAuth'
 
-const connectors = [InjectedConnector, CoinbaseWalletConnector, WalletConnectConnector, SocialAuthConnector]
+export const connectors = [InjectedConnector, CoinbaseWalletConnector, WalletConnectConnector, SocialAuthConnector]
 
 export const useActiveClients = (): IActiveAuthList[] => {
   const { active, auth, authAddr } = usePrivyAuth(true)
