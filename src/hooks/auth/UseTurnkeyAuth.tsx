@@ -40,6 +40,7 @@ export const useTurnkeyAuth = (rpId: string): authHookReturn => {
   const [auth, setAuth] = React.useState<Auth | undefined>(undefined)
   const [subOrgId, setSubOrgId] = useState<string | null>(null)
   const [privateKey, setPrivateKey] = useState<TPrivateKeyState>(null)
+  console.log(rpId)
 
   const stamper = new WebauthnStamper({
     rpId,
@@ -107,7 +108,7 @@ export const useTurnkeyAuth = (rpId: string): authHookReturn => {
     //   return res.organizationId
     // }
     const challenge = generateRandomBuffer()
-    const subOrgName = `Turnkey Viem+Passkey Demo - ${humanReadableDateTime()}`
+    const subOrgName = `Fun.xyz - ${humanReadableDateTime()}`
     const authenticatorUserId = generateRandomBuffer()
 
     const attestation = await getWebAuthnAttestation({
@@ -145,6 +146,7 @@ export const useTurnkeyAuth = (rpId: string): authHookReturn => {
   // Should create a subOrg all the way to an auth
   const doEverything = async () => {
     const newSubOrgId = await createSubOrganization()
+    console.log('newSubOrgId', newSubOrgId)
     setSubOrgId(newSubOrgId)
     const newPrivateKey = await createPrivateKeyReact(newSubOrgId)
     setPrivateKey(newPrivateKey)
