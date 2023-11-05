@@ -9,7 +9,9 @@ import type {
 } from '@web3-react/types'
 import { Connector } from '@web3-react/types'
 
-import { ErrorLoggingClass } from '../utils/Logger'
+import { ErrorLoggingClass, FunLogger } from '../utils/Logger'
+
+const logger = new FunLogger()
 
 function parseChainId(chainId: string | number) {
   return typeof chainId === 'number' ? chainId : Number.parseInt(chainId, chainId.startsWith('0x') ? 16 : 10)
@@ -123,7 +125,7 @@ export class FunKitCoinbaseWallet extends Connector {
       typeof desiredChainIdOrChainParameters === 'number'
         ? desiredChainIdOrChainParameters
         : desiredChainIdOrChainParameters?.chainId
-    console.log('activate', this.provider && this.connected)
+    logger.log('activate', this.provider && this.connected)
     if (this.provider && this.connected) {
       if (!desiredChainId || desiredChainId === parseChainId(this.provider.chainId)) return
 
@@ -150,7 +152,7 @@ export class FunKitCoinbaseWallet extends Connector {
     const cancelActivation = this.actions.startActivation()
 
     try {
-      console.log('manual activation')
+      logger.log('manual activation')
       await this.isomorphicInitialize(options)
       if (!this.provider) throw new Error('No provider')
 

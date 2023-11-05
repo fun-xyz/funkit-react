@@ -2,8 +2,11 @@ import { useCallback, useState } from 'react'
 import { shallow } from 'zustand/shallow'
 
 import { useFunStoreInterface } from '../../store'
+import { FunLogger } from '../../utils/Logger'
 import { useFun } from '../UseFun'
 import { usePrimaryConnector } from '../util'
+
+const logger = new FunLogger()
 
 export const useUserInfo = () => {
   const { wallet, activeUser, setActiveUser, allUsers, setAllUsers } = useFun(
@@ -35,7 +38,7 @@ export const useUserInfo = () => {
         const userId = await primaryAuth.getUserId()
         setActiveUser({ userId })
       } catch (err) {
-        console.log('error fetching Users', err)
+        logger.error('error fetching Users', err)
       } finally {
         setLoading(false)
       }

@@ -7,13 +7,12 @@ export enum FunLogLevel {
 }
 
 /**===============================
- * FUN LOGGER CLASS WITH SENTRY
+ * FUN LOGGER CLASS
  *================================*/
 
 export class FunLogger {
   constructor() {
     Sentry.init({
-      // TODO: process.env.NODE_ENV
       environment: 'development',
       dsn: 'https://c7c82dd7e49a55b93890a4dabbd5d8b5@o4506162121867264.ingest.sentry.io/4506162233212928',
     })
@@ -52,51 +51,42 @@ export class FunLogger {
   /**
    * On receiving an error log, write it to console.error and sentry
    */
-  private onError(title, data) {
-    console.error(title, data)
-    // Prepare sentry log
-    let otherData
-    const errorObj = data?.error || new Error(title) // fallback error if an error object isnt passed in
-    if (typeof data === 'object') {
-      otherData = { title, ...data }
-      delete otherData?.error
-    } else {
-      otherData = { title, data }
-    }
-    this.writeErrorToSentry(errorObj, otherData)
+  private onError(title, error, data) {
+    console.error(title, { error, data })
+    this.writeErrorToSentry(error, { title, data })
   }
 
   /**========================
    * PUBLIC LOGGER FUNCTIONS
    *=========================*/
 
-  public info(title, data) {
+  /**
+   * Writes an info log to console. Same as .info().
+   */
+  public log(title: string, data?: any) {
     this.onInfo(title, data)
   }
 
-  public debug(title, data) {
+  /**
+   * Writes an info log to console. Same as .log().
+   */
+  public info(title: string, data?: any) {
+    this.onInfo(title, data)
+  }
+
+  /**
+   * Writes a debug log to console
+   */
+  public debug(title: string, data?: any) {
     this.onDebug(title, data)
   }
 
-  public error(title, data) {
-    this.onError(title, data)
-  }
-
-  // Generic log() function supporting different logLevels (default info)
-  public log(title: string, data: any, logLevel: FunLogLevel = FunLogLevel.INFO) {
-    switch (logLevel) {
-      case FunLogLevel.DEBUG:
-        this.debug(title, data)
-        break
-      case FunLogLevel.INFO:
-        this.info(title, data)
-        break
-      case FunLogLevel.ERROR:
-        this.error(title, data)
-        break
-      default:
-        this.info(title, data)
-    }
+  /**
+   * Writes an error log to console and sentry
+   * Just for error(), data should be an `object` type instead of `any` type
+   */
+  public error(title: string, error: Error, data?: object) {
+    this.onError(title, error, data)
   }
 }
 
@@ -122,14 +112,19 @@ export function withErrorLogging(targetFn) {
     try {
       return targetFn(...args)
     } catch (error: any) {
-      logger.error('error_logged', { error, source: 'regular function' })
+      logger.error('error_logged', error, { source: 'regular function' })
       throw error
     }
   }
 }
 
 /**
- * Class decorator HOF equivalent of `withErrorLogging`
+ * Class decorator for adding error logging to class methods (equivalent to `withErrorLogging` HOF).
+ *
+ * This decorator adds error logging to all methods of a class. If an error occurs
+ * within a method, it logs the error and then rethrows it.
+ *
+ * @param {Function} constructor - The constructor function of the class.
  * @example
  * // Applies error logging to all functions within the class
  * @ErrorLoggingClass
@@ -148,7 +143,7 @@ export function ErrorLoggingClass(constructor) {
         try {
           return originalMethod.apply(this, args)
         } catch (error: any) {
-          logger.error('error_logged', { error, source: 'class function' })
+          logger.error('error_logged', error, { source: 'class function' })
           throw error
         }
       }

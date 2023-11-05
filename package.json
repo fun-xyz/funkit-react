@@ -16,15 +16,14 @@
   },
   "scripts": {
     "dev": "cd ./example && npm run dev",
-    "build-test": "rm -rf dist && tsc",
-    "build": "NODE_ENV=development && rm -rf dist && tsc",
-    "build-prod": "NODE_ENV=production && rm -rf dist && tsc && yarn sentry:sourcemaps",
+    "build": "rm -rf dist && tsc",
+    "build-prod": "rm -rf dist && tsc && yarn sentry:sourcemaps",
     "update": "./scripts/updateExamplePackage.sh",
     "lint": "eslint --ext .ts,.tsx './**/*.{ts,tsx}'",
     "lint:fix": "eslint --ext .ts,.tsx './**/*.{ts,tsx}' --fix",
     "postinstall": "./handleOauth.sh",
     "local install": "cd ./node_modules/@magic-ext/oauth/dist/cjs  && touch core.js",
-    "sentry:sourcemaps": "sentry-cli sourcemaps inject --org funxyz --project funkit-react ./dist && sentry-cli sourcemaps upload --org funxyz --project javascript ./dist"
+    "sentry:sourcemaps": "sentry-cli sourcemaps inject --org funxyz --project funkit-react ./dist && sentry-cli sourcemaps upload --org funxyz --project funkit-react ./dist"
   },
   "peerDependencies": {
     "react": "^18.2.0",
