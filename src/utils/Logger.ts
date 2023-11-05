@@ -85,7 +85,7 @@ export class FunLogger {
    * Writes an error log to console and sentry
    * Just for error(), data should be an `object` type instead of `any` type
    */
-  public error(title: string, error: Error, data?: object) {
+  public error(title: string, error: any, data?: object) {
     this.onError(title, error, data)
   }
 }

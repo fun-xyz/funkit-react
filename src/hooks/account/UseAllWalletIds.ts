@@ -74,7 +74,7 @@ export const useFunWalletIds = (
         if (inputAuth instanceof Auth) {
           try {
             fetchedWalletLists.push(await inputAuth.getWallets(`${chain}`))
-          } catch (error) {
+          } catch (error: any) {
             logger.error('inputAuth.getWallets_error', error)
           }
         } else {

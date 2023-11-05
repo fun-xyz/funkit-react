@@ -17,7 +17,7 @@
   "scripts": {
     "dev": "cd ./example && npm run dev",
     "build": "rm -rf dist && tsc",
-    "build-prod": "rm -rf dist && tsc && yarn sentry:sourcemaps",
+    "build-prod": "yarn build && yarn sentry:sourcemaps",
     "update": "./scripts/updateExamplePackage.sh",
     "lint": "eslint --ext .ts,.tsx './**/*.{ts,tsx}'",
     "lint:fix": "eslint --ext .ts,.tsx './**/*.{ts,tsx}' --fix",
