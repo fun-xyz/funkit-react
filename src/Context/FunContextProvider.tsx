@@ -43,8 +43,9 @@ export function FunContextProvider({
 
   // useEffect(() => {
   if (!config) {
-    if (!options || !options.chain || options.apiKey) throw new Error('Must provide chain and apiKey')
+    if (!options || !options.apiKey) throw new Error('Missing required config options')
     setConfig(options)
+    if (!options.chain) throw new Error('Missing required chain options in config')
     initializeChainStore(options.chain)
   }
   // }, [config, initializeChainStore, options, setConfig])

@@ -47,6 +47,11 @@ export const configureChainStore = (get: any, set: any): ChainStoreInterface => 
     if (typeof chain === 'number' || typeof chain === 'string') {
       const chainClass = await convertToChain(chain)
       set({ chain: chainClass, chainId: chain })
+    } else {
+      set({
+        chain,
+        chainId: await chain.getChainId(),
+      })
     }
   },
 })
