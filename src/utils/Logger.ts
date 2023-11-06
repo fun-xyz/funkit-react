@@ -15,11 +15,20 @@ const SENTRY_DSN = 'https://c7c82dd7e49a55b93890a4dabbd5d8b5@o4506162121867264.i
 const ENVIRONMENT = 'production'
 
 class FunLogger {
+  protected apiKey: string | null
+
   constructor() {
     Sentry.init({
       environment: ENVIRONMENT,
       dsn: SENTRY_DSN,
     })
+    this.apiKey = null
+  }
+
+  init(config: any) {
+    if (config.apiKey) {
+      this.apiKey = config.apiKey
+    }
   }
 
   private isSentryReady() {
@@ -30,7 +39,8 @@ class FunLogger {
    * Writes to sentry if in production mode
    */
   private writeErrorToSentry(error: Error, otherData?: object) {
-    if (ENVIRONMENT === 'production') {
+    // TODO: Check if API key is the dev key, and then don't use sentry.
+    if (this.apiKey && ENVIRONMENT === 'production') {
       const otherDataSafe = otherData ? otherData : {}
       Sentry.captureException(error, {
         level: FunLogLevel.ERROR,

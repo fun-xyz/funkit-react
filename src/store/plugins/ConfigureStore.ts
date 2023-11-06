@@ -1,4 +1,5 @@
 import { configureEnvironment, GlobalEnvOption } from '@funkit/core'
+import { logger } from '../../utils/Logger'
 
 export interface ConfigureStoreInterface {
   config: GlobalEnvOption | null
@@ -29,11 +30,13 @@ export const configureConfigurationStore = (
 ): ConfigureStoreInterface => ({
   config: null,
   updateConfig: async (newConfig: any) => {
+    logger.init(newConfig)
     const oldConfig = get().config
     const update = await buildAndUpdateConfig(newConfig, oldConfig || {})
     return set(update)
   },
   setConfig: async (newConfig: any) => {
+    logger.init(newConfig)
     return set(await setConfig(newConfig))
   },
 })
