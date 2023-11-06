@@ -100,7 +100,7 @@ const { auth, active, authAddr, login, logout } = useMetamaskAuth();
 
 const { wallet, address, createFunWallet } = useFunWallet();
 
-async function CreateNewWallet() {
+async function createNewWallet() {
   if (!active || !auth) return;
   createFunWallet(auth).catch();
 }
@@ -143,7 +143,7 @@ const DEFAULT_FUN_WALLET_CONFIG = {
 };
 export default function AppWrapper() {
   return (
-    <FunContextProvider options={DEFAULT_FUN_WALLET_CONFIG} appId={FUN_APP_ID}>
+    <FunContextProvider options={DEFAULT_FUN_WALLET_CONFIG} privyAppId={FUN_APP_ID}>
       <App />
     </FunContextProvider>
   );
