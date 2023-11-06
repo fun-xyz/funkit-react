@@ -124,7 +124,6 @@ class FunLogger {
 
   /**
    * Sets the apiKey and re-inits sentry
-   * @param config
    */
   public setFunApiKey(apiKey: string | null) {
     this.apiKey = apiKey
