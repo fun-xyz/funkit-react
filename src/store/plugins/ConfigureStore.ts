@@ -1,4 +1,5 @@
 import { configureEnvironment, GlobalEnvOption } from '@funkit/core'
+
 import { logger } from '../../utils/Logger'
 
 export interface ConfigureStoreInterface {
