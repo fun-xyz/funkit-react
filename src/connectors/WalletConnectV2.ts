@@ -4,8 +4,9 @@ import type { Actions, ProviderRpcError } from '@web3-react/types'
 import { Connector } from '@web3-react/types'
 import EventEmitter3 from 'eventemitter3'
 
-import { getBestUrlMap, getChainsWithDefault } from './utils'
 import { ErrorLoggingClass } from '@/utils/Logger'
+
+import { getBestUrlMap, getChainsWithDefault } from './utils'
 
 export const URI_AVAILABLE = 'URI_AVAILABLE'
 const DEFAULT_TIMEOUT = 5000

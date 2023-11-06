@@ -1,13 +1,12 @@
 import { Auth } from '@funkit/core'
 import { useRef } from 'react'
 
-import { FunLogger } from '@/utils/Logger'
-
+// import { FunLogger } from '@/utils/Logger'
 import { useUserInfo } from '../account/UseUserInfo'
 import { useActiveClients } from './UseActiveClients'
 import { usePrimaryConnector } from './UsePrimaryConnector'
 
-const logger = new FunLogger()
+// const logger = new FunLogger()
 
 const shallowCompare = (obj1: Record<string, any> | null | undefined, obj2: Record<string, any>): boolean => {
   if (obj1 == null) return false
