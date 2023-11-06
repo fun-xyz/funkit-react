@@ -3,7 +3,9 @@ import { Auth, GlobalEnvOption } from '@funkit/core'
 import { PrivyProvider, usePrivy, useWallets } from '@privy-io/react-auth'
 import React, { useEffect, useState } from 'react'
 
-import { useConfig } from '../account/UseConfig'
+import { useFunStoreInterface } from '@/store'
+
+import { useFun } from '../UseFun'
 import { authHookReturn } from './types'
 
 const PRIVY_EMBEDDED_WALLET_IDENTIFIER = 'privy' // embedded wallets in privy are identified by this string to separate them from external wallets like metamask
@@ -79,13 +81,19 @@ export function FunContextProvider({
   loginMethods,
   options,
 }: React.PropsWithChildren<FunContextProviderProps>) {
-  const [isConfigSet, setIsConfigSet] = useState(false)
-  const { setConfig } = useConfig()
+  const { config, setConfig, initializeChainStore } = useFun((state: useFunStoreInterface) => ({
+    config: state.config,
+    setConfig: state.setConfig,
+    initializeChainStore: state.initializeChainStore,
+  }))
 
-  if (!isConfigSet) {
-    setConfig(options)
-    setIsConfigSet(true)
-  }
+  useEffect(() => {
+    if (!config) {
+      if (!options || !options.chain || options.apiKey) throw new Error('Must provide chain and apiKey')
+      setConfig(options)
+      initializeChainStore(options.chain)
+    }
+  }, [config, initializeChainStore, options, setConfig])
 
   const loginOptions = loginMethods || DEFAULT_PRIVY_LOGIN_OPTIONS
 

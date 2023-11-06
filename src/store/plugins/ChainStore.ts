@@ -10,6 +10,7 @@ export interface ChainStoreInterface {
   supportedChains: (number | string)[]
   setSupportedChains: (chains: (number | string)[]) => void
   switchChain: (chain: number | string) => void
+  initializeChainStore: (chain: number | string | Chain) => void
 }
 
 export const handleChainSwitching = async (newChain: number | string, oldConfig: Partial<GlobalEnvOption> | null) => {
@@ -40,6 +41,12 @@ export const configureChainStore = (get: any, set: any): ChainStoreInterface => 
           error
         ),
       })
+    }
+  },
+  initializeChainStore: async (chain: number | string | Chain) => {
+    if (typeof chain === 'number' || typeof chain === 'string') {
+      const chainClass = await convertToChain(chain)
+      set({ chain: chainClass, chainId: chain })
     }
   },
 })
