@@ -2,7 +2,7 @@ name: Build package without publishing
 on:
   push:
     # default: only "staging".
-    branches: ["staging", "chloe/error-HOC"]
+    branches: ["staging"]
 jobs:
   build:
     runs-on: ubuntu-latest
