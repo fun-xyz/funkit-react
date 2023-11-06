@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { InitWalletConnectConnector, WalletConnectOptions } from '../../connectors/WalletConnectV2'
 import { useFunStoreInterface } from '../../store'
 import { convertToValidUserId } from '../../utils'
+import { logger } from '../../utils/Logger'
 import { useFun } from '../UseFun'
 import { authHookReturn } from './types'
 
@@ -35,8 +36,8 @@ export const useWalletConnectAuth = ({ options, autoConnect }: useWalletConnectA
   // attempt to connect eagerly on mount
   useEffect(() => {
     if (!autoConnect) return
-    void connector.connectEagerly(options).catch(() => {
-      console.debug('Failed to connect eagerly to ', name)
+    void connector.connectEagerly(options).catch((error) => {
+      logger.error('useWalletConnectAuth_connectEagerly_error', error)
     })
   }, [autoConnect, connector, options])
 
@@ -65,7 +66,7 @@ export const useWalletConnectAuth = ({ options, autoConnect }: useWalletConnectA
     try {
       await connector.activate(options)
     } catch (err) {
-      console.log(err)
+      logger.error('useWalletConnectAuth_login_error', err)
     }
   }, [connector, options])
 
@@ -80,7 +81,7 @@ export const useWalletConnectAuth = ({ options, autoConnect }: useWalletConnectA
       if (updatedAuthList.length === auth.length) return // no change
       setAuth(updatedAuthList)
     } catch (err) {
-      console.error(err)
+      logger.error('useWalletConnectAuth_logout_error', err)
     }
   }, [account, auth, connector, setAuth])
 

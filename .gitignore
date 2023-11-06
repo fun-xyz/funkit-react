@@ -8,3 +8,6 @@ test.js
 test.ts
 utils.sh
 **/dist
+
+# Sentry Config File
+.sentryclirc

@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { CoinbaseWalletSDKOptions, InitCoinbaseWalletConnector } from '../../connectors/CoinbaseWallet'
 import { useFunStoreInterface } from '../../store'
 import { convertToValidUserId } from '../../utils'
+import { logger } from '../../utils/Logger'
 import { useFun } from '../UseFun'
 import { authHookReturn } from './types'
 
@@ -36,7 +37,7 @@ export const useCoinbaseAuth = ({ options, autoConnect }: useCoinbaseAuthArgs): 
   useEffect(() => {
     if (!autoConnect) return
     void connector.connectEagerly(options).catch(() => {
-      console.debug('Failed to connect eagerly to ', name)
+      logger.debug('Failed to connect eagerly to ', name)
     })
   }, [autoConnect, connector, options])
 
@@ -65,7 +66,7 @@ export const useCoinbaseAuth = ({ options, autoConnect }: useCoinbaseAuthArgs): 
     try {
       await connector.activate(options)
     } catch (err) {
-      console.error(err)
+      logger.error('useCoinbaseAuth_login_error', err)
     }
   }, [connector, options])
 
@@ -80,7 +81,7 @@ export const useCoinbaseAuth = ({ options, autoConnect }: useCoinbaseAuthArgs): 
       if (updatedAuthList.length === auth.length) return // no change
       setAuth(updatedAuthList)
     } catch (err) {
-      console.error(err)
+      logger.error('useCoinbaseAuth_logout_error', err)
     }
   }, [account, auth, connector, setAuth])
 
