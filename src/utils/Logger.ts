@@ -6,38 +6,63 @@ enum FunLogLevel {
   ERROR = 'error',
 }
 
+enum FunLogEnv {
+  DEVELOPMENT = 'development',
+  PRODUCTION = 'production',
+}
+
 /**===============================
  * FUN LOGGER CLASS
  *================================*/
 
 const SENTRY_DSN = 'https://c7c82dd7e49a55b93890a4dabbd5d8b5@o4506162121867264.ingest.sentry.io/4506162233212928'
-// TODO: Support env split. For now, fun-devs should change this to 'development' to prevent writing to sentry in local development.
-const ENVIRONMENT = 'production'
+const FUN_DEV_API_KEYS = ['hnHevQR0y394nBprGrvNx4HgoZHUwMet5mXTOBhf', 'MYny3w7xJh6PRlRgkJ9604sHouY2MTke6lCPpSHq']
+
+/**
+ * Inits the Sentry env. Overrides if any existing.
+ * @param {FunLogEnv} environment
+ */
+function initSentry(environment: FunLogEnv) {
+  Sentry.init({
+    environment,
+    dsn: SENTRY_DSN,
+  })
+}
 
 class FunLogger {
+  protected apiKey: string | null
+
   constructor() {
-    Sentry.init({
-      environment: ENVIRONMENT,
-      dsn: SENTRY_DSN,
-    })
+    // At initial init, set to dev
+    initSentry(FunLogEnv.DEVELOPMENT)
+    this.apiKey = null
   }
 
   private isSentryReady() {
     return !!Sentry.getCurrentHub().getClient()
   }
 
+  private getFunLogEnv(): FunLogEnv {
+    // If its an invalid api key or is a known dev api key, we are in dev env
+    if (!this.apiKey || FUN_DEV_API_KEYS.includes(this.apiKey)) {
+      return FunLogEnv.DEVELOPMENT
+    } else {
+      return FunLogEnv.PRODUCTION
+    }
+  }
+
   /**
    * Writes to sentry if in production mode
    */
   private writeErrorToSentry(error: Error, otherData?: object) {
-    if (ENVIRONMENT === 'production') {
+    if (this.getFunLogEnv() === FunLogEnv.PRODUCTION) {
       const otherDataSafe = otherData ? otherData : {}
       Sentry.captureException(error, {
         level: FunLogLevel.ERROR,
         extra: { package: '@funkit/react', ...otherDataSafe },
       })
     } else {
-      console.log('skipped_writing_to_sentry', ENVIRONMENT)
+      console.log('skipped_writing_to_sentry')
     }
   }
 
@@ -95,6 +120,16 @@ class FunLogger {
    */
   public error(title: string, error: any, data?: object) {
     this.onError(title, error, data)
+  }
+
+  /**
+   * Sets the apiKey and re-inits sentry
+   */
+  public setFunApiKey(apiKey: string | null) {
+    this.apiKey = apiKey
+    const funLogEnv = this.getFunLogEnv()
+    // Re-init sentry
+    initSentry(funLogEnv)
   }
 }
 
