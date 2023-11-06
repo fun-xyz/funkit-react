@@ -2,9 +2,13 @@ import { Operation, OperationStatus } from '@funkit/core'
 import { useCallback, useEffect, useState } from 'react'
 import { shallow } from 'zustand/shallow'
 
+import { FunLogger } from '@/utils/Logger'
+
 import { useFunStoreInterface } from '../..'
 import { useFun } from '../UseFun'
 import { usePrevious } from '../util'
+
+const logger = new FunLogger()
 
 export const useOperationStatus = (status: OperationStatus = OperationStatus.ALL) => {
   const { funWallet, account } = useFun(
@@ -31,7 +35,7 @@ export const useOperationStatus = (status: OperationStatus = OperationStatus.ALL
       if (operations == null) return setOperationStatuses([])
       setOperationStatuses(operations.sort((a, b) => Number(b.proposedTime) - Number(a.proposedTime)))
     } catch (e) {
-      console.error(e)
+      logger.error('UseOperationStatus_fetchOperations_error', e)
       setOperationStatuses([])
     } finally {
       setFetching(false)

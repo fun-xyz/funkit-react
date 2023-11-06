@@ -4,12 +4,16 @@ import type { Connector } from '@web3-react/types'
 import { useCallback, useEffect, useState } from 'react'
 import { shallow } from 'zustand/shallow'
 
+import { FunLogger } from '@/utils/Logger'
+
 import { ConnectorArray, ConnectorTuple } from '../../connectors/Types'
 import { NoMetaMaskError } from '../../store'
 import { FunError } from '../../store/plugins/ErrorStore'
 import { useFun } from '../index'
 import { connectors } from '../util/UseActiveClients'
 import { usePrimaryConnector } from '../util/UsePrimaryConnector'
+
+const logger = new FunLogger()
 
 export enum CONNECTOR_BY_NAME {
   METAMASK = 0,
@@ -28,7 +32,7 @@ const activateConnector = async (
     if (oAuthProvider) await connector.activate({ oAuthProvider })
     else await connector.activate()
   } catch (err) {
-    console.log(err)
+    logger.error('UseConnector_activateConnector_error', err)
     if ((err as any).constructor.name === 'NoMetaMaskError') handleError(NoMetaMaskError)
   }
 }
@@ -102,7 +106,7 @@ export const useConnector = (args: IUseConnector): IUseConnectorReturn => {
     const connectPromise = connectors[args.index][0].connectEagerly(args.options)
     if (connectPromise && typeof connectPromise.catch === 'function') {
       connectPromise.catch(() => {
-        console.debug(`Failed to connect eagerly`)
+        logger.debug(`Failed to connect eagerly`)
       })
     }
   }, [args.autoConnect, args.index, args.options])
@@ -171,7 +175,7 @@ export const useConnectors = (args: IUseConnectors): IUseConnectorsReturn => {
       })
       if (connectPromise && typeof connectPromise.catch === 'function') {
         connectPromise.catch(() => {
-          console.debug(`Failed to connect eagerly to ${connector[0].constructor.name}`)
+          logger.debug(`Failed to connect eagerly to ${connector[0].constructor.name}`)
         })
       }
     })
