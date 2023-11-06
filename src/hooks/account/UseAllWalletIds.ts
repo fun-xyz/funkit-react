@@ -47,17 +47,16 @@ export const useFunWalletIds = (
     shallow
   )
 
-  useEffect(() => {
-    if (config == null && !options)
-      throw new Error('Config not set. Either pass in a config object or set it using the useConfig hook.')
-    if (config == null && options) updateConfig(options)
-  }, [config, options, updateConfig])
-
   const activeClients = useActiveClients()
   const previousClients = usePrevious(activeClients)
 
+  console.log('FunWalletIds: ', activeClients)
   useEffect(() => {
-    if (chainId == null && inputChain == null) return
+    console.log('useFunWalletIds', activeClients, chainId, inputChain)
+
+    if (chainId == null && inputChain == null)
+      throw new Error('Config not set. Either pass in a config object or set it using the useConfig hook.')
+
     if (activeClients.length === 0) {
       if (FunGroupAccounts.length > 0) setFunGroupAccounts([])
       return

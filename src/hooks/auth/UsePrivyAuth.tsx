@@ -1,11 +1,8 @@
 'use client'
-import { Auth, GlobalEnvOption } from '@funkit/core'
-import { PrivyProvider, usePrivy, useWallets } from '@privy-io/react-auth'
-import React, { useEffect, useState } from 'react'
+import { Auth } from '@funkit/core'
+import { usePrivy, useWallets } from '@privy-io/react-auth'
+import { useEffect, useState } from 'react'
 
-import { useFunStoreInterface } from '@/store'
-
-import { useFun } from '../UseFun'
 import { authHookReturn } from './types'
 
 const PRIVY_EMBEDDED_WALLET_IDENTIFIER = 'privy' // embedded wallets in privy are identified by this string to separate them from external wallets like metamask

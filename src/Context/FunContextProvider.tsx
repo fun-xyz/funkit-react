@@ -1,7 +1,7 @@
 'use client'
 import { GlobalEnvOption } from '@funkit/core'
 import { PrivyProvider } from '@privy-io/react-auth'
-import React, { useEffect } from 'react'
+import React from 'react'
 
 import { useFunStoreInterface } from '@/store'
 
@@ -41,13 +41,13 @@ export function FunContextProvider({
     initializeChainStore: state.initializeChainStore,
   }))
 
-  useEffect(() => {
-    if (!config) {
-      if (!options || !options.chain || options.apiKey) throw new Error('Must provide chain and apiKey')
-      setConfig(options)
-      initializeChainStore(options.chain)
-    }
-  }, [config, initializeChainStore, options, setConfig])
+  // useEffect(() => {
+  if (!config) {
+    if (!options || !options.chain || options.apiKey) throw new Error('Must provide chain and apiKey')
+    setConfig(options)
+    initializeChainStore(options.chain)
+  }
+  // }, [config, initializeChainStore, options, setConfig])
 
   const loginOptions = loginMethods || DEFAULT_PRIVY_LOGIN_OPTIONS
 
