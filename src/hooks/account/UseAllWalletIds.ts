@@ -30,7 +30,7 @@ export const useFunWalletIds = (
   options?: GlobalEnvOption,
   inputChain?: number
 ): IUseFunAccountsReturn => {
-  const { chainId, FunGroupAccounts, setFunGroupAccounts, FunAccounts, setFunAccounts, config, updateConfig } = useFun(
+  const { chainId, FunGroupAccounts, setFunGroupAccounts, FunAccounts, setFunAccounts, config } = useFun(
     (state: useFunStoreInterface) => ({
       wallet: state.FunWallet,
       chainId: state.chainId,
@@ -42,7 +42,6 @@ export const useFunWalletIds = (
       activeUser: state.activeUser,
       setActiveUser: state.setActiveUser,
       config: state.config,
-      updateConfig: state.updateConfig,
     }),
     shallow
   )
