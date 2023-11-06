@@ -16,5 +16,5 @@ jobs:
       - run: yarn install
       # TODO: Staging environment
       - run: yarn build-prod
-        # env:
-        #   SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+        env:
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
