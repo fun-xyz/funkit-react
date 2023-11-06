@@ -1,8 +1,12 @@
 import { Chain, GlobalEnvOption } from '@funkit/core'
 
+import { FunLogger } from '@/utils/Logger'
+
 import { convertToChain } from '../../network/Networks'
 import { buildAndUpdateConfig } from './ConfigureStore'
 import { generateTransactionError, SwitchChainError } from './ErrorStore'
+
+const logger = new FunLogger()
 
 export interface ChainStoreInterface {
   chain: Chain | null
@@ -29,7 +33,7 @@ export const configureChainStore = (get: any, set: any): ChainStoreInterface => 
       const newState = await handleChainSwitching(chainId, oldConfig)
       set(newState)
     } catch (error) {
-      console.log(error)
+      logger.log('switchChain_error', error)
       set({
         error: generateTransactionError(
           SwitchChainError,

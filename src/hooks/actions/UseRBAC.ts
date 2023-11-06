@@ -2,6 +2,8 @@ import { EnvOption, ExecutionReceipt, Operation } from '@funkit/core'
 import { useCallback, useState } from 'react'
 import { shallow } from 'zustand/shallow'
 
+import { FunLogger } from '@/utils/Logger'
+
 import {
   FunError,
   generateTransactionError,
@@ -14,6 +16,8 @@ import { remainingConnectedSignersForOperation, signUntilExecute } from '../../u
 import { useUserInfo } from '../account/UseUserInfo'
 import { useFun } from '../UseFun'
 import { useActiveClients, usePrimaryAuth } from '../util'
+
+const logger = new FunLogger()
 
 export const useRBAC = () => {
   const { wallet, chainId } = useFun(
@@ -71,7 +75,7 @@ export const useRBAC = () => {
         setResult(response)
         return response
       } catch (error) {
-        console.log(error)
+        logger.error('UseRBAC_addOwner_error', error)
         const err = generateTransactionError(TransactionErrorCatch, { newOwnerId }, error)
         setTxError(err)
         return err
@@ -119,7 +123,7 @@ export const useRBAC = () => {
         setResult(response)
         return response
       } catch (error) {
-        console.log(error)
+        logger.error('UseRBAC_removeOwner_error', error)
         const err = generateTransactionError(TransactionErrorCatch, { ownerId }, error)
         setTxError(err)
         return err

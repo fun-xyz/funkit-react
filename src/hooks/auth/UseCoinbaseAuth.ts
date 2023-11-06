@@ -1,6 +1,8 @@
 import { Auth } from '@funkit/core'
 import { useCallback, useEffect, useState } from 'react'
 
+import { FunLogger } from '@/utils/Logger'
+
 import { CoinbaseWalletSDKOptions, InitCoinbaseWalletConnector } from '../../connectors/CoinbaseWallet'
 import { useFunStoreInterface } from '../../store'
 import { convertToValidUserId } from '../../utils'
@@ -8,6 +10,7 @@ import { useFun } from '../UseFun'
 import { authHookReturn } from './types'
 
 const name = 'Coinbase Wallet'
+const logger = new FunLogger()
 
 export interface useCoinbaseAuthArgs {
   // CoinbaseWalletConnector: [CoinbaseWallet, Web3ReactHooks, Web3ReactStore]
@@ -36,7 +39,7 @@ export const useCoinbaseAuth = ({ options, autoConnect }: useCoinbaseAuthArgs): 
   useEffect(() => {
     if (!autoConnect) return
     void connector.connectEagerly(options).catch(() => {
-      console.debug('Failed to connect eagerly to ', name)
+      logger.debug('Failed to connect eagerly to ', name)
     })
   }, [autoConnect, connector, options])
 
@@ -65,7 +68,7 @@ export const useCoinbaseAuth = ({ options, autoConnect }: useCoinbaseAuthArgs): 
     try {
       await connector.activate(options)
     } catch (err) {
-      console.error(err)
+      logger.error('useCoinbaseAuth_login_error', err)
     }
   }, [connector, options])
 
@@ -80,7 +83,7 @@ export const useCoinbaseAuth = ({ options, autoConnect }: useCoinbaseAuthArgs): 
       if (updatedAuthList.length === auth.length) return // no change
       setAuth(updatedAuthList)
     } catch (err) {
-      console.error(err)
+      logger.error('useCoinbaseAuth_logout_error', err)
     }
   }, [account, auth, connector, setAuth])
 

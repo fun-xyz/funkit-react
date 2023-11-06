@@ -2,11 +2,15 @@ import { Auth, EnvOption, Operation } from '@funkit/core'
 import { useCallback, useState } from 'react'
 import { shallow } from 'zustand/shallow'
 
+import { FunLogger } from '@/utils/Logger'
+
 import { ExecutionReceipt, useFunStoreInterface, useUserInfo } from '../..'
 import { FunError, generateTransactionError, MissingActiveSigner, TransactionErrorCatch } from '../../store'
 import { useFun } from '../UseFun'
 import { usePrimaryAuth } from '../util'
 import { ActionType, FirstClassActionParams } from './types'
+
+const logger = new FunLogger()
 
 export const useAction = (args: FirstClassActionParams, txOptions?: EnvOption) => {
   const { wallet } = useFun(
@@ -67,7 +71,7 @@ export const useAction = (args: FirstClassActionParams, txOptions?: EnvOption) =
                   count++
                 })
                 .catch((err) => {
-                  console.log('error signing operation', err)
+                  logger.error('signOperation_error', err)
                 })
             }
           }
@@ -76,7 +80,7 @@ export const useAction = (args: FirstClassActionParams, txOptions?: EnvOption) =
           return operation
         }
       } catch (error: any) {
-        console.log(error)
+        logger.error('executeNewOperation_error', error)
 
         setTxError(
           generateTransactionError(
