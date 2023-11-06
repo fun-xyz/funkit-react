@@ -10,6 +10,7 @@ export {
   InitWalletConnectConnector,
   OAuthProvider,
 } from './connectors'
+export { FunContextProvider } from './Context/FunContextProvider'
 export * from './hooks'
 export * from './hooks/auth'
 export { MagicAuthConnector as SocialLoginConnector } from './magicAuth/src/MagicAuth'
