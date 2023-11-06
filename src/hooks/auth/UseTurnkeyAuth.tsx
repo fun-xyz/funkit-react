@@ -1,4 +1,4 @@
-import { Auth, createTurnkeyPrivateKey, createTurnkeySubOrg } from '@funkit/core'
+import { Auth, createTurnkeyPrivateKey, createTurnkeySubOrg, TPrivateKeyState } from '@funkit/core'
 import { getWebAuthnAttestation, TurnkeyClient } from '@turnkey/http'
 import { createAccount } from '@turnkey/viem'
 import { WebauthnStamper } from '@turnkey/webauthn-stamper'
@@ -6,37 +6,11 @@ import React, { useCallback, useMemo, useState } from 'react'
 import { createWalletClient, http, WalletClient } from 'viem'
 import { goerli } from 'viem/chains'
 
+import { base64UrlEncode, generateRandomBuffer, humanReadableDateTime } from '../util/UseTurnkeyAuth'
 import { TurnkeyAuthHookReturn } from './types'
 
 // This is the public org id for Fun.xyz
 const FUN_TURNKEY_ORG_ID = 'c40bb53d-ee4c-4c01-aaac-c4cca03734f8'
-
-export function refineNonNull<T>(input: T | null | undefined, errorMessage?: string): T {
-  if (input == null) {
-    throw new Error(errorMessage ?? `Unexpected ${JSON.stringify(input)}`)
-  }
-
-  return input
-}
-
-const generateRandomBuffer = (): ArrayBuffer => {
-  const arr = new Uint8Array(32)
-  crypto.getRandomValues(arr)
-  return arr.buffer
-}
-
-const base64UrlEncode = (challenge: ArrayBuffer): string => {
-  return Buffer.from(challenge).toString('base64').replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '')
-}
-
-type TPrivateKeyState = {
-  id: string
-  address: string
-} | null
-
-const humanReadableDateTime = (): string => {
-  return new Date().toLocaleString().replace(/\//g, '-').replace(/:/g, '.')
-}
 
 export const useTurnkeyAuth = (rpId: string): TurnkeyAuthHookReturn => {
   // Create an auth here so we can use it to sign messages
