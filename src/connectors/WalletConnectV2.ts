@@ -5,6 +5,7 @@ import { Connector } from '@web3-react/types'
 import EventEmitter3 from 'eventemitter3'
 
 import { getBestUrlMap, getChainsWithDefault } from './utils'
+import { ErrorLoggingClass } from '@/utils/Logger'
 
 export const URI_AVAILABLE = 'URI_AVAILABLE'
 const DEFAULT_TIMEOUT = 5000
@@ -44,6 +45,7 @@ export interface WalletConnectConstructorArgs {
   onError?: (error: Error) => void
 }
 
+@ErrorLoggingClass
 export class FunKitWalletConnect extends Connector {
   /** {@inheritdoc Connector.provider} */
   public override provider?: WalletConnectProvider
