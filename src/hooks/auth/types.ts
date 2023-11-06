@@ -10,13 +10,6 @@ export interface authHookReturn {
   logout: () => Promise<void>
 }
 
-
-export interface TurnkeyAuthHookReturn {
-  auth: Auth | undefined
-  active: boolean
-  activating: boolean
-  authAddr: string | undefined
-  name: string | undefined
+export interface TurnkeyAuthHookReturn extends Omit<authHookReturn, 'login'> {
   login: (hasExistingPasskey: boolean) => Promise<void>
-  logout: () => Promise<void>
 }
