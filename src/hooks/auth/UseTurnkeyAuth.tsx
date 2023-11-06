@@ -6,7 +6,7 @@ import React, { useState } from 'react'
 import { createWalletClient, http, WalletClient } from 'viem'
 import { goerli } from 'viem/chains'
 
-import { authHookReturn } from './types'
+import { TurnkeyAuthHookReturn } from './types'
 
 export function refineNonNull<T>(input: T | null | undefined, errorMessage?: string): T {
   if (input == null) {
@@ -35,7 +35,7 @@ const humanReadableDateTime = (): string => {
   return new Date().toLocaleString().replace(/\//g, '-').replace(/:/g, '.')
 }
 
-export const useTurnkeyAuth = (rpId: string, existingPasskey = false): authHookReturn => {
+export const useTurnkeyAuth = (rpId: string): TurnkeyAuthHookReturn => {
   // Create an auth here so we can use it to sign messages
   const [auth, setAuth] = React.useState<Auth | undefined>(undefined)
   const [subOrgId, setSubOrgId] = useState<string | null>(null)
@@ -52,12 +52,18 @@ export const useTurnkeyAuth = (rpId: string, existingPasskey = false): authHookR
     stamper
   )
 
-  const createPrivateKeyReact = async (subOrgId: string): Promise<any> => {
+  /**
+   * Creates a Turnkey private key object.
+   * @param hasExistingPasskey True if the user wants to reuse an existing passkey, otherwise false.
+   * @param subOrgId Sub Organization Id from Turnkey, either a new one or an existing one.
+   * @returns Private key object with id and address. This is used by turnkey to create the private key.
+   */
+  const createPrivateKeyReact = async (hasExistingPasskey: boolean, subOrgId: string): Promise<any> => {
     if (!subOrgId) {
       throw new Error('sub-org id not found')
     }
 
-    if (existingPasskey) {
+    if (hasExistingPasskey) {
       const keys = await passkeyHttpClient.getPrivateKeys({ organizationId: subOrgId })
       return {
         id: keys.privateKeys[0].privateKeyId,
@@ -72,7 +78,9 @@ export const useTurnkeyAuth = (rpId: string, existingPasskey = false): authHookR
       parameters: {
         privateKeys: [
           {
-            privateKeyName: `ETH Key ${Math.floor(Math.random() * 1_000_000_000)}`,
+            // There should be only one private key per sub org. This is the name of the key, but
+            // the name of the key does not matter - it is not used for anything else.
+            privateKeyName: `ETH Key`,
             curve: 'CURVE_SECP256K1',
             addressFormats: ['ADDRESS_FORMAT_ETHEREUM'],
             privateKeyTags: [],
@@ -83,6 +91,11 @@ export const useTurnkeyAuth = (rpId: string, existingPasskey = false): authHookR
     return await createTurnkeyPrivateKey(signedRequest)
   }
 
+  /**
+   * Creates a fun.xyz auth object, which can be used to sign messages.
+   * @param subOrgId Id of the sub-org, returned from createSubOrganization
+   * @param privateKey Private key object, returned from createPrivateKeyReact
+   */
   const createAuth = async (subOrgId: string, privateKey: any) => {
     if (!subOrgId || !privateKey) {
       throw new Error('sub-org id or private key not found')
@@ -107,12 +120,23 @@ export const useTurnkeyAuth = (rpId: string, existingPasskey = false): authHookR
     setAuth(auth)
   }
 
-  const createSubOrganization = async (): Promise<string> => {
-    if (existingPasskey) {
+  /**
+   * There are two ways to create a subOrg: with an existing passkey or with a new passkey.
+   * @param hasExistingPasskey True if the user wants to reuse an existing passkey,
+   * false if the user wants to create a new passkey. Each passkey corresponds to one private key.
+   * @returns The subOrgId of the newly created subOrg
+   */
+  const createSubOrganization = async (hasExistingPasskey: boolean): Promise<string> => {
+    // If the user has an existing passkey for this domain and hasExistingPasskey is true,
+    // the user should be able to choose an existing passkey to login with
+    if (hasExistingPasskey) {
+      // This is the public org id for Fun.xyz
+      const FUN_TURNKEY_ORG_ID = 'c40bb53d-ee4c-4c01-aaac-c4cca03734f8'
       const res = await passkeyHttpClient.getWhoami({
-        organizationId: 'c40bb53d-ee4c-4c01-aaac-c4cca03734f8',
+        organizationId: FUN_TURNKEY_ORG_ID,
       })
       if (res && res.organizationId) {
+        // Note: This is the subOrg id, not the org id. The naming within turnkey is a bit off.
         return res.organizationId
       }
     }
@@ -120,11 +144,16 @@ export const useTurnkeyAuth = (rpId: string, existingPasskey = false): authHookR
     const subOrgName = `Fun.xyz - ${humanReadableDateTime()}`
     const authenticatorUserId = generateRandomBuffer()
 
+    // This is the name of the relaying party, in this case, it would be fun.xyz. Currently, the
+    // webauthn standard does not include the name of the relaying party in the attestation, but
+    // may in the future.
+    const RP_NAME = 'Fun.xyz Passkeys'
+
     const attestation = await getWebAuthnAttestation({
       publicKey: {
         rp: {
           id: rpId,
-          name: 'Fun.xyz Passkeys',
+          name: RP_NAME,
         },
         challenge,
         pubKeyCredParams: [
@@ -152,11 +181,14 @@ export const useTurnkeyAuth = (rpId: string, existingPasskey = false): authHookR
     return await createTurnkeySubOrg(createSubOrgRequest)
   }
 
-  // Should create a subOrg all the way to an auth
-  const doEverything = async () => {
-    const newSubOrgId = await createSubOrganization()
+  /**
+   * Creates a private key from a passkey via Turnkey.
+   * @param hasExistingPasskey True if the user wants to reuse an existing passkey, otherwise false.
+   */
+  const doEverything = async (hasExistingPasskey: boolean) => {
+    const newSubOrgId = await createSubOrganization(hasExistingPasskey)
     setSubOrgId(newSubOrgId)
-    const newPrivateKey = await createPrivateKeyReact(newSubOrgId)
+    const newPrivateKey = await createPrivateKeyReact(hasExistingPasskey, newSubOrgId)
     setPrivateKey(newPrivateKey)
     await createAuth(newSubOrgId, newPrivateKey)
   }
@@ -167,9 +199,9 @@ export const useTurnkeyAuth = (rpId: string, existingPasskey = false): authHookR
     activating: false,
     authAddr: privateKey?.address,
     name: 'Turnkey',
-    login: async () => {
+    login: async (hasExistingPasskey: boolean) => {
       return new Promise((resolve) => {
-        resolve(doEverything())
+        resolve(doEverything(hasExistingPasskey))
       })
     },
     logout: async () => {
