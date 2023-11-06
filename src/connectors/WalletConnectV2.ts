@@ -4,6 +4,7 @@ import type { Actions, ProviderRpcError } from '@web3-react/types'
 import { Connector } from '@web3-react/types'
 import EventEmitter3 from 'eventemitter3'
 
+import { ErrorLoggingClass } from '../utils/Logger'
 import { getBestUrlMap, getChainsWithDefault } from './utils'
 
 export const URI_AVAILABLE = 'URI_AVAILABLE'
@@ -44,6 +45,7 @@ export interface WalletConnectConstructorArgs {
   onError?: (error: Error) => void
 }
 
+@ErrorLoggingClass
 export class FunKitWalletConnect extends Connector {
   /** {@inheritdoc Connector.provider} */
   public override provider?: WalletConnectProvider

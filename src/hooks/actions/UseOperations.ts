@@ -15,6 +15,7 @@ import {
   TransactionErrorUserIdMismatch,
   useFunStoreInterface,
 } from '../../store'
+import { logger } from '../../utils/Logger'
 import { convertToValidUserId } from '../../utils/MultiAuth'
 import { remainingConnectedSignersForOperation, signUntilExecute } from '../../utils/transactions/Transactions'
 import { useUserInfo } from '../account/UseUserInfo'
@@ -90,11 +91,11 @@ export const useOperations = () => {
         const signedOperation = await wallet.signOperation(signer, operation, txOption)
         setProcessing(false)
         fetchOperations().catch((err) => {
-          console.error(err)
+          logger.error('signOperation_fetchOperations_error', err)
         })
         return signedOperation
       } catch (err) {
-        console.log('[useOperations ERROR] failed to sign operation', err)
+        logger.error('UseOperations_signOperation_error', err)
         setProcessing(false)
         return generateTransactionError(TransactionErrorFailedToSign, { operation }, err)
       }
@@ -122,7 +123,7 @@ export const useOperations = () => {
         const Operation = await wallet.executeOperation(signer, operation, txOption)
         setProcessing(false)
         fetchOperations().catch((err) => {
-          console.error(err)
+          logger.error('executeOperation_fetchOperations_1_error', err)
         })
         return Operation
       }
@@ -138,7 +139,7 @@ export const useOperations = () => {
         activeClients,
         firstSigner: null,
       })
-      console.log('remainingConnectedSigners', remainingConnectedSigners, signerCount, threshold)
+      logger.log('remainingConnectedSigners', { remainingConnectedSigners, signerCount, threshold })
       if (remainingConnectedSigners.length === 0 && signerCount < threshold)
         return generateTransactionError(TransactionErrorRequiresSigners, {
           operation,
@@ -158,11 +159,11 @@ export const useOperations = () => {
       try {
         const Operation = await wallet.executeOperation(signer, operation, txOption)
         fetchOperations().catch((err) => {
-          console.error(err)
+          logger.error('executeOperation_fetchOperations_2_error', err)
         })
         return Operation
       } catch (err) {
-        console.log('[useOperations ERROR] failed to sign operation', err)
+        logger.error('UseOperations_executeOperation_error', err)
         return generateTransactionError(TransactionErrorFailedToExecute, { operation }, err)
       } finally {
         setProcessing(false)
@@ -222,11 +223,11 @@ export const useOperations = () => {
           })
         }
         fetchOperations().catch((err) => {
-          console.error(err)
+          logger.error('rejectOperation_fetchOperations_error', err)
         })
         return rejectedOperation
       } catch (err) {
-        console.log('[useOperations ERROR] failed to sign operation', err, operation, rejectionMessage, auth, txOptions)
+        logger.error('UseOperations_rejectOperation_error', err, { operation, rejectionMessage, auth, txOptions })
         return generateTransactionError(TransactionErrorRejectionOperation, { operation }, err)
       } finally {
         setProcessing(false)
@@ -254,11 +255,11 @@ export const useOperations = () => {
         const removedOperation = await wallet.removeOperation(firstSigner, operation.opId, txOption)
         setProcessing(false)
         fetchOperations().catch((err) => {
-          console.error(err)
+          logger.error('removeOperation_fetchOperations_error', err)
         })
         return removedOperation
       } catch (err) {
-        console.log('[useOperations ERROR] failed to sign operation', err)
+        logger.error('UseOperations_removeOperation_error', err)
         setProcessing(false)
         return generateTransactionError(TransactionErrorRejectionOperation, { operation }, err)
       }

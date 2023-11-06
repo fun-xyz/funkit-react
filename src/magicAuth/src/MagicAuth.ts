@@ -4,6 +4,8 @@ import { InstanceWithExtensions, SDKBase } from '@magic-sdk/provider'
 import { Actions, Connector, ProviderConnectInfo, ProviderRpcError } from '@web3-react/types'
 import { Magic } from 'magic-sdk'
 
+import { ErrorLoggingClass, logger } from '../../utils/Logger'
+
 function parseChainId(chainId: string | number) {
   return typeof chainId === 'number' ? chainId : Number.parseInt(chainId, chainId.startsWith('0x') ? 16 : 10)
 }
@@ -33,6 +35,7 @@ export interface MagicAuthActivateFunction {
   (args: MagicAuthActivateArgs): Promise<void>
 }
 
+@ErrorLoggingClass
 export class MagicAuthConnector extends Connector {
   name: string
   authId?: string
@@ -147,7 +150,7 @@ export class MagicAuthConnector extends Connector {
         if (isAuthorized) await this.completeActivation()
       })
       .catch((err) => {
-        console.log('oAuth authorization test ERROR: ', err)
+        logger.log('initializeMagicInstance - oAuth authorization test ERROR: ', err)
       })
     return { magic, chainId, provider }
   }
@@ -268,7 +271,7 @@ export class MagicAuthConnector extends Connector {
         return false
       }
     } catch (err) {
-      console.log('oAuth authorization test ERROR: ', err)
+      logger.log('isAuthorized - oAuth authorization test ERROR: ', err)
       return false
     }
   }
