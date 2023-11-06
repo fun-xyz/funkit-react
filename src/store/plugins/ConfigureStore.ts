@@ -17,10 +17,12 @@ export const buildAndUpdateConfig = async (
     ...newConfig,
   }
   await configureEnvironment(finalConfig as GlobalEnvOption)
+  logger.setFunApiKey(finalConfig.apiKey || null)
   return { config: finalConfig }
 }
 
 export const setConfig = async (newConfig: Partial<GlobalEnvOption>) => {
+  logger.setFunApiKey(newConfig.apiKey || null)
   await configureEnvironment(newConfig as GlobalEnvOption)
   return { config: newConfig }
 }
@@ -31,13 +33,11 @@ export const configureConfigurationStore = (
 ): ConfigureStoreInterface => ({
   config: null,
   updateConfig: async (newConfig: any) => {
-    logger.init(newConfig)
     const oldConfig = get().config
     const update = await buildAndUpdateConfig(newConfig, oldConfig || {})
     return set(update)
   },
   setConfig: async (newConfig: any) => {
-    logger.init(newConfig)
     return set(await setConfig(newConfig))
   },
 })
