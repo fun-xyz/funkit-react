@@ -1,6 +1,6 @@
 import * as Sentry from '@sentry/browser'
 
-export enum FunLogLevel {
+enum FunLogLevel {
   INFO = 'info',
   DEBUG = 'debug',
   ERROR = 'error',
@@ -10,11 +10,15 @@ export enum FunLogLevel {
  * FUN LOGGER CLASS
  *================================*/
 
-export class FunLogger {
+const SENTRY_DSN = 'https://c7c82dd7e49a55b93890a4dabbd5d8b5@o4506162121867264.ingest.sentry.io/4506162233212928'
+// TODO: Support env split. For now, fun-devs should change this to 'development' to prevent writing to sentry in local development.
+const ENVIRONMENT = 'production'
+
+class FunLogger {
   constructor() {
     Sentry.init({
-      environment: 'development',
-      dsn: 'https://c7c82dd7e49a55b93890a4dabbd5d8b5@o4506162121867264.ingest.sentry.io/4506162233212928',
+      environment: ENVIRONMENT,
+      dsn: SENTRY_DSN,
     })
   }
 
@@ -23,14 +27,18 @@ export class FunLogger {
   }
 
   /**
-   * Writes to sentry
+   * Writes to sentry if in production mode
    */
   private writeErrorToSentry(error: Error, otherData?: object) {
-    const otherDataSafe = otherData ? otherData : {}
-    Sentry.captureException(error, {
-      level: FunLogLevel.ERROR,
-      extra: { package: '@funkit/react', ...otherDataSafe },
-    })
+    if (ENVIRONMENT === 'production') {
+      const otherDataSafe = otherData ? otherData : {}
+      Sentry.captureException(error, {
+        level: FunLogLevel.ERROR,
+        extra: { package: '@funkit/react', ...otherDataSafe },
+      })
+    } else {
+      console.log('skipped_writing_to_sentry', ENVIRONMENT)
+    }
   }
 
   /**
@@ -94,8 +102,10 @@ export class FunLogger {
  * INITIALIZATION
  *================================*/
 
-// Init funLogger at top-level
-const logger = new FunLogger()
+/**
+ * Global & Singleton instance of FunLogger
+ */
+export const logger = new FunLogger()
 
 /**===============================
  * HIGHER ORDER FUNCTIONS (HOF)
@@ -169,7 +179,8 @@ export function ErrorLoggingClass(constructor) {
 //     try {
 //       return originalMethod.apply(this, args)
 //     } catch (error: any) {
-//       funLogger.onError(error)
+//       logger.error('error_logged', error, { source: 'method function' })
+//       throw error
 //     }
 //   }
 //   return descriptor

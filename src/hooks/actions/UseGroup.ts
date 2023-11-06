@@ -11,15 +11,12 @@ import {
 import { useCallback, useState } from 'react'
 import { shallow } from 'zustand/shallow'
 
-import { FunLogger } from '@/utils/Logger'
-
 import { ExecutionReceipt, useFunStoreInterface, useUserInfo } from '../..'
 import { FunError, generateTransactionError, TransactionErrorCatch } from '../../store'
+import { logger } from '../../utils/Logger'
 import { remainingConnectedSignersForOperation, signUntilExecute } from '../../utils/transactions/Transactions'
 import { useFun } from '../UseFun'
 import { useActiveClients, usePrimaryAuth } from '../util'
-
-const logger = new FunLogger()
 
 export const useGroup = () => {
   const { wallet } = useFun(

@@ -2,15 +2,12 @@ import { Auth, EnvOption, Operation } from '@funkit/core'
 import { useCallback, useState } from 'react'
 import { shallow } from 'zustand/shallow'
 
-import { FunLogger } from '@/utils/Logger'
-
 import { ExecutionReceipt, useFunStoreInterface, useUserInfo } from '../..'
 import { FunError, generateTransactionError, MissingActiveSigner, TransactionErrorCatch } from '../../store'
+import { logger } from '../../utils/Logger'
 import { useFun } from '../UseFun'
 import { usePrimaryAuth } from '../util'
 import { ActionType, FirstClassActionParams } from './types'
-
-const logger = new FunLogger()
 
 export const useAction = (args: FirstClassActionParams, txOptions?: EnvOption) => {
   const { wallet } = useFun(

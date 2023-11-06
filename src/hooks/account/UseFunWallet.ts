@@ -10,11 +10,9 @@ import {
   MissingInitializationArgs,
 } from '../../store'
 import { generateWalletUniqueId } from '../../utils'
-import { FunLogger } from '../../utils/Logger'
+import { logger } from '../../utils/Logger'
 import { useFun } from '../index'
 import { usePrimaryAuth } from '../util'
-
-const logger = new FunLogger()
 
 interface useFunWalletHook {
   active: boolean

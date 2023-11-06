@@ -2,8 +2,6 @@ import { Auth, EnvOption, Operation, OperationStatus } from '@funkit/core'
 import { useCallback, useMemo, useState } from 'react'
 import { shallow } from 'zustand/shallow'
 
-import { FunLogger } from '@/utils/Logger'
-
 import {
   generateTransactionError,
   TransactionErrorFailedToExecute,
@@ -17,14 +15,13 @@ import {
   TransactionErrorUserIdMismatch,
   useFunStoreInterface,
 } from '../../store'
+import { logger } from '../../utils/Logger'
 import { convertToValidUserId } from '../../utils/MultiAuth'
 import { remainingConnectedSignersForOperation, signUntilExecute } from '../../utils/transactions/Transactions'
 import { useUserInfo } from '../account/UseUserInfo'
 import { useOperationStatus } from '../data/UseOperationStatus'
 import { useFun } from '../UseFun'
 import { useActiveClients, usePrimaryAuth } from '../util'
-
-const logger = new FunLogger()
 
 export interface IUseOperationReturn {
   operations: Operation[]

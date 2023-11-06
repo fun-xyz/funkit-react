@@ -2,13 +2,10 @@ import { Operation, OperationStatus } from '@funkit/core'
 import { useCallback, useEffect, useState } from 'react'
 import { shallow } from 'zustand/shallow'
 
-import { FunLogger } from '@/utils/Logger'
-
 import { useFunStoreInterface } from '../..'
+import { logger } from '../../utils/Logger'
 import { useFun } from '../UseFun'
 import { usePrevious } from '../util'
-
-const logger = new FunLogger()
 
 export const useOperationStatus = (status: OperationStatus = OperationStatus.ALL) => {
   const { funWallet, account } = useFun(

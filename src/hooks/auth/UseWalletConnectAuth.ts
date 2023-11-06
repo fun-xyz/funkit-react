@@ -1,15 +1,13 @@
 import { Auth } from '@funkit/core'
 import { useCallback, useEffect, useState } from 'react'
 
-import { FunLogger } from '@/utils/Logger'
-
 import { InitWalletConnectConnector, WalletConnectOptions } from '../../connectors/WalletConnectV2'
 import { useFunStoreInterface } from '../../store'
 import { convertToValidUserId } from '../../utils'
+import { logger } from '../../utils/Logger'
 import { useFun } from '../UseFun'
 import { authHookReturn } from './types'
 
-const logger = new FunLogger()
 const name = 'WalletConnect'
 
 export interface useWalletConnectAuthArgs {

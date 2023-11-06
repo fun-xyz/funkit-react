@@ -1,16 +1,14 @@
 import { Auth } from '@funkit/core'
 import { useCallback, useEffect, useState } from 'react'
 
-import { FunLogger } from '@/utils/Logger'
-
 import { CoinbaseWalletSDKOptions, InitCoinbaseWalletConnector } from '../../connectors/CoinbaseWallet'
 import { useFunStoreInterface } from '../../store'
 import { convertToValidUserId } from '../../utils'
+import { logger } from '../../utils/Logger'
 import { useFun } from '../UseFun'
 import { authHookReturn } from './types'
 
 const name = 'Coinbase Wallet'
-const logger = new FunLogger()
 
 export interface useCoinbaseAuthArgs {
   // CoinbaseWalletConnector: [CoinbaseWallet, Web3ReactHooks, Web3ReactStore]

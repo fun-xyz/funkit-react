@@ -30,11 +30,9 @@ import {
   TransactionErrorInsufficientPaymasterAllowance,
   TransactionErrorLowFunWalletBalance,
 } from '../../store/plugins/ErrorStore'
-import { FunLogger } from '../Logger'
+import { logger } from '../Logger'
 import ERC20_ALLOWANCE_BALANCE from '../miniAbi/ERC20AllowanceBalance.json'
 import { convertToValidUserId } from '../MultiAuth'
-
-const logger = new FunLogger()
 
 export type transactionTypes = 'transfer' | 'approve' | 'swap' | 'stake' | 'unstake' | 'create' | 'execRawTx'
 export type transactionParams =

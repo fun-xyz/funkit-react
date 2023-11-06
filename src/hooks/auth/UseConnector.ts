@@ -4,16 +4,13 @@ import type { Connector } from '@web3-react/types'
 import { useCallback, useEffect, useState } from 'react'
 import { shallow } from 'zustand/shallow'
 
-import { FunLogger } from '@/utils/Logger'
-
 import { ConnectorArray, ConnectorTuple } from '../../connectors/Types'
 import { NoMetaMaskError } from '../../store'
 import { FunError } from '../../store/plugins/ErrorStore'
+import { logger } from '../../utils/Logger'
 import { useFun } from '../index'
 import { connectors } from '../util/UseActiveClients'
 import { usePrimaryConnector } from '../util/UsePrimaryConnector'
-
-const logger = new FunLogger()
 
 export enum CONNECTOR_BY_NAME {
   METAMASK = 0,

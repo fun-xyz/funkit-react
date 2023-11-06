@@ -3,13 +3,10 @@ import { Auth } from '@funkit/core'
 import { OAuthProvider } from '@magic-ext/oauth'
 import { useCallback, useEffect, useState } from 'react'
 
-import { FunLogger } from '@/utils/Logger'
-
 import SocialOauthConnector, { SUPPORTED_OAUTH_PROVIDERS } from '../../../connectors/SocialOAuthConnector'
 import { convertToValidUserId, useFun, useFunStoreInterface } from '../../../index'
+import { logger } from '../../../utils/Logger'
 import { authHookReturn } from '../../auth/types'
-
-const logger = new FunLogger()
 
 export enum SocialAuthProviders {
   Google = 'google',

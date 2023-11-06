@@ -9,9 +9,7 @@ import type {
 } from '@web3-react/types'
 import { Connector } from '@web3-react/types'
 
-import { ErrorLoggingClass, FunLogger } from '../utils/Logger'
-
-const logger = new FunLogger()
+import { ErrorLoggingClass, logger } from '../utils/Logger'
 
 function parseChainId(chainId: string | number) {
   return typeof chainId === 'number' ? chainId : Number.parseInt(chainId, chainId.startsWith('0x') ? 16 : 10)

@@ -2,11 +2,9 @@ import { useCallback, useState } from 'react'
 import { shallow } from 'zustand/shallow'
 
 import { useFunStoreInterface } from '../../store'
-import { FunLogger } from '../../utils/Logger'
+import { logger } from '../../utils/Logger'
 import { useFun } from '../UseFun'
 import { usePrimaryConnector } from '../util'
-
-const logger = new FunLogger()
 
 export const useUserInfo = () => {
   const { wallet, activeUser, setActiveUser, allUsers, setAllUsers } = useFun(

@@ -1,12 +1,9 @@
 import { Chain, GlobalEnvOption } from '@funkit/core'
 
-import { FunLogger } from '@/utils/Logger'
-
 import { convertToChain } from '../../network/Networks'
+import { logger } from '../../utils/Logger'
 import { buildAndUpdateConfig } from './ConfigureStore'
 import { generateTransactionError, SwitchChainError } from './ErrorStore'
-
-const logger = new FunLogger()
 
 export interface ChainStoreInterface {
   chain: Chain | null

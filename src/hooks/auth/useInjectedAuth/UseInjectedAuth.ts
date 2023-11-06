@@ -4,11 +4,10 @@ import { useCallback, useEffect, useState } from 'react'
 import { connector, hooks } from '../../../connectors/MetaMask'
 import { useFunStoreInterface } from '../../../store'
 import { convertToValidUserId } from '../../../utils'
-import { FunLogger } from '../../../utils/Logger'
+import { logger } from '../../../utils/Logger'
 import { useFun } from '../../UseFun'
 import { authHookReturn } from '../types'
 
-const logger = new FunLogger()
 export interface useInjectedAuthArgs {
   name: string
   autoConnect?: boolean

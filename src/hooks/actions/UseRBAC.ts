@@ -2,8 +2,6 @@ import { EnvOption, ExecutionReceipt, Operation } from '@funkit/core'
 import { useCallback, useState } from 'react'
 import { shallow } from 'zustand/shallow'
 
-import { FunLogger } from '@/utils/Logger'
-
 import {
   FunError,
   generateTransactionError,
@@ -12,12 +10,11 @@ import {
   useFunStoreInterface,
 } from '../../store'
 import { convertToValidUserId } from '../../utils'
+import { logger } from '../../utils/Logger'
 import { remainingConnectedSignersForOperation, signUntilExecute } from '../../utils/transactions/Transactions'
 import { useUserInfo } from '../account/UseUserInfo'
 import { useFun } from '../UseFun'
 import { useActiveClients, usePrimaryAuth } from '../util'
-
-const logger = new FunLogger()
 
 export const useRBAC = () => {
   const { wallet, chainId } = useFun(
