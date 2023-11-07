@@ -1,8 +1,8 @@
 name: Build package without publishing
 on:
   push:
-    # default: only "staging".
-    branches: ["staging"]
+    # default: only "main" and "staging".
+    branches: ["main", staging"]
 jobs:
   build:
     runs-on: ubuntu-latest
