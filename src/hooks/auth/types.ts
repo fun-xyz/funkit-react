@@ -9,12 +9,3 @@ export interface authHookReturn {
   login: () => Promise<void>
   logout: () => Promise<void>
 }
-
-export interface TurnkeyAuthHookReturn extends Omit<authHookReturn, 'login'> {
-  login: (hasExistingPasskey: boolean) => Promise<void>
-}
-
-export type TPrivateKeyState = {
-  id: string
-  address: string
-} | null
