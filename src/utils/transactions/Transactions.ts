@@ -30,6 +30,7 @@ import {
   TransactionErrorInsufficientPaymasterAllowance,
   TransactionErrorLowFunWalletBalance,
 } from '../../store/plugins/ErrorStore'
+import { logger } from '../Logger'
 import ERC20_ALLOWANCE_BALANCE from '../miniAbi/ERC20AllowanceBalance.json'
 import { convertToValidUserId } from '../MultiAuth'
 
@@ -266,7 +267,7 @@ export const validateGasSponsorMode = async (
       valid: true,
     }
   } catch (err) {
-    console.log('Error:', err)
+    logger.error('validateGasSponsorMode_error', err)
     return {
       valid: false,
       error: {
@@ -295,7 +296,7 @@ export const estimateGas = async (build: IOperationsArgs, Auth: Auth, wallet: Fu
         resolve(res)
       })
       .catch((err) => {
-        console.log('GasEstimationError Error: ', err)
+        logger.error('estimateGas_error ', err)
       })
   })
 }
@@ -409,7 +410,7 @@ export const signUntilExecute = async ({
           })
           .catch((err) => {
             // we want to catch issues here because they may have rejected the signature on purpose
-            console.log('error signing operation', err)
+            logger.error('signUntilExecute_error', err)
           })
       }
     }

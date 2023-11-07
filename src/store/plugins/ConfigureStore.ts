@@ -1,5 +1,7 @@
 import { configureEnvironment, GlobalEnvOption } from '@funkit/core'
 
+import { logger } from '../../utils/Logger'
+
 export interface ConfigureStoreInterface {
   config: GlobalEnvOption | null
   setConfig: (Config: Partial<GlobalEnvOption>) => void
@@ -15,10 +17,12 @@ export const buildAndUpdateConfig = async (
     ...newConfig,
   }
   await configureEnvironment(finalConfig as GlobalEnvOption)
+  logger.setFunApiKey(finalConfig.apiKey || null)
   return { config: finalConfig }
 }
 
 export const setConfig = async (newConfig: Partial<GlobalEnvOption>) => {
+  logger.setFunApiKey(newConfig.apiKey || null)
   await configureEnvironment(newConfig as GlobalEnvOption)
   return { config: newConfig }
 }

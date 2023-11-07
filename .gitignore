@@ -9,3 +9,6 @@ utils.sh
 **/dist
 
 
+
+# Sentry Config File
+.sentryclirc

@@ -13,6 +13,7 @@ import { shallow } from 'zustand/shallow'
 
 import { ExecutionReceipt, useFunStoreInterface, useUserInfo } from '../..'
 import { FunError, generateTransactionError, TransactionErrorCatch } from '../../store'
+import { logger } from '../../utils/Logger'
 import { remainingConnectedSignersForOperation, signUntilExecute } from '../../utils/transactions/Transactions'
 import { useFun } from '../UseFun'
 import { useActiveClients, usePrimaryAuth } from '../util'
@@ -195,7 +196,7 @@ export const useGroup = () => {
         setResult(response)
         return response
       } catch (error) {
-        console.log('[removeUUserFromGroup Error] ', error)
+        logger.error('removeUserFromGroup_error', error)
         setTxError(generateTransactionError(TransactionErrorCatch, { userId, params }, error))
         return generateTransactionError(TransactionErrorCatch, { userId, params }, error)
       } finally {
@@ -239,7 +240,7 @@ export const useGroup = () => {
         setResult(response)
         return response
       } catch (error) {
-        console.log('[removeUUserFromGroup Error] ', error)
+        logger.error('updateThresholdOfGroup_error', error)
         setTxError(generateTransactionError(TransactionErrorCatch, { userId, params }, error))
         return generateTransactionError(TransactionErrorCatch, { userId, params }, error)
       } finally {

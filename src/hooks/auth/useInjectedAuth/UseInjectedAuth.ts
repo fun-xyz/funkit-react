@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { connector, hooks } from '../../../connectors/MetaMask'
 import { useFunStoreInterface } from '../../../store'
 import { convertToValidUserId } from '../../../utils'
+import { logger } from '../../../utils/Logger'
 import { useFun } from '../../UseFun'
 import { authHookReturn } from '../types'
 
@@ -30,7 +31,7 @@ export const useInjectedAuth = ({ name, autoConnect }: useInjectedAuthArgs): aut
   useEffect(() => {
     if (!autoConnect) return
     void connector.connectEagerly().catch(() => {
-      console.debug('Failed to connect eagerly to ', name)
+      logger.debug('Failed to connect eagerly to ', name)
     })
   }, [autoConnect, name])
 
@@ -59,7 +60,7 @@ export const useInjectedAuth = ({ name, autoConnect }: useInjectedAuthArgs): aut
     try {
       await connector.activate()
     } catch (err) {
-      console.log(err)
+      logger.error('login_error', err)
     }
   }, [])
 
@@ -74,7 +75,7 @@ export const useInjectedAuth = ({ name, autoConnect }: useInjectedAuthArgs): aut
       if (updatedAuthList.length === auth.length) return // no change
       setAuth(updatedAuthList)
     } catch (err) {
-      console.error(err)
+      logger.error('logout_error', err)
     }
   }, [account, auth, setAuth])
 

@@ -5,6 +5,7 @@ import { useCallback, useEffect, useState } from 'react'
 
 import SocialOauthConnector, { SUPPORTED_OAUTH_PROVIDERS } from '../../../connectors/SocialOAuthConnector'
 import { convertToValidUserId, useFun, useFunStoreInterface } from '../../../index'
+import { logger } from '../../../utils/Logger'
 import { authHookReturn } from '../../auth/types'
 
 export enum SocialAuthProviders {
@@ -58,8 +59,8 @@ export const useSocialAuthConnectorBase = ({
   // attempt to connect eagerly on mount
   useEffect(() => {
     if (!autoConnect) return
-    void connector.connectEagerly().catch(() => {
-      console.debug('Failed to connect eagerly to ', name)
+    void connector.connectEagerly().catch((e) => {
+      logger.error('useSocialAuthConnectorBase_connectEagerly_error', e, { name })
     })
   }, [autoConnect, connector, name])
 
@@ -88,7 +89,7 @@ export const useSocialAuthConnectorBase = ({
     try {
       await connector.activate({ oAuthProvider })
     } catch (err) {
-      console.log(err)
+      logger.error('useSocialAuthBase_login_error', err)
     }
   }, [connector, oAuthProvider])
 
@@ -103,7 +104,7 @@ export const useSocialAuthConnectorBase = ({
       if (updatedAuthList.length === auth.length) return // no change
       setAuth(updatedAuthList)
     } catch (err) {
-      console.error(err)
+      logger.error('useSocialAuthBase_logout_error', err)
     }
   }, [account, auth, connector, setAuth])
 

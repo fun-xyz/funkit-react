@@ -10,6 +10,7 @@ import {
   MissingInitializationArgs,
 } from '../../store'
 import { generateWalletUniqueId } from '../../utils'
+import { logger } from '../../utils/Logger'
 import { useFun } from '../index'
 import { usePrimaryAuth } from '../util'
 
@@ -99,12 +100,12 @@ export const useFunWallet = (options?: GlobalEnvOption): useFunWalletHook => {
             setNewAccountUsers(allUsers, allUsers[0])
           })
           .catch((err) => {
-            console.error(err)
+            logger.error('getUsers_error', err)
           })
         setLogin(newAccountAddress, newFunWallet)
         return newFunWallet
       } catch (err) {
-        console.log('Multi Signer Error: ', err)
+        logger.log('Multi_Signer_Error: ', err)
         return handleBuildError({
           code: 0,
           message: 'Failed to configure account',
@@ -137,7 +138,7 @@ export const useFunWallet = (options?: GlobalEnvOption): useFunWalletHook => {
           })
           .catch((err) => {
             // caught the error without crashing the function
-            console.error('post create wallets fetch err: ', err)
+            logger.error('post create wallets fetch err: ', err)
           })
         setNewAccountUsers([{ userId }], { userId })
         setLogin(newAccountAddress, newFunWallet)
