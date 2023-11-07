@@ -3,6 +3,7 @@ import { useEffect } from 'react'
 import { shallow } from 'zustand/shallow'
 
 import { IActiveAuthList, useFunStoreInterface } from '../..'
+import { logger } from '../../utils/Logger'
 import { useFun } from '../UseFun'
 import { useActiveClients, usePrevious } from '../util'
 
@@ -30,7 +31,7 @@ export const useFunWalletIds = (
   options?: GlobalEnvOption,
   inputChain?: number
 ): IUseFunAccountsReturn => {
-  const { chainId, FunGroupAccounts, setFunGroupAccounts, FunAccounts, setFunAccounts, config, updateConfig } = useFun(
+  const { chainId, FunGroupAccounts, setFunGroupAccounts, FunAccounts, setFunAccounts, config } = useFun(
     (state: useFunStoreInterface) => ({
       wallet: state.FunWallet,
       chainId: state.chainId,
@@ -42,85 +43,74 @@ export const useFunWalletIds = (
       activeUser: state.activeUser,
       setActiveUser: state.setActiveUser,
       config: state.config,
-      updateConfig: state.updateConfig,
     }),
     shallow
   )
-
-  useEffect(() => {
-    if (config == null && !options)
-      throw new Error('Config not set. Either pass in a config object or set it using the useConfig hook.')
-    if (config == null && options) updateConfig(options)
-  }, [config, options, updateConfig])
 
   const activeClients = useActiveClients()
   const previousClients = usePrevious(activeClients)
 
   useEffect(() => {
     if (chainId == null && inputChain == null) return
+
     if (activeClients.length === 0) {
       if (FunGroupAccounts.length > 0) setFunGroupAccounts([])
       return
     }
     if (!activeClientsChanged(previousClients, activeClients)) return //
 
-    const chain = inputChain ?? chainId
+    const chain = inputChain ?? chainId ?? config?.chain
     const updateWalletList = async () => {
-      try {
-        const fetchedWalletLists: Wallet[][] = []
-        if (inputAuth) {
-          if (inputAuth instanceof Auth) {
-            try {
-              fetchedWalletLists.push(await inputAuth.getWallets(`${chain}`))
-            } catch (error) {
-              console.error(error)
-            }
-          } else {
-            inputAuth.forEach(async (auth) => {
-              try {
-                fetchedWalletLists.push(await auth.getWallets(`${chain}`))
-              } catch (error) {
-                console.error(error)
-              }
-            })
+      const fetchedWalletLists: Wallet[][] = []
+      if (inputAuth) {
+        if (inputAuth instanceof Auth) {
+          try {
+            fetchedWalletLists.push(await inputAuth.getWallets(`${chain}`))
+          } catch (error: any) {
+            logger.error('inputAuth.getWallets_error', error)
           }
         } else {
-          for (let i = 0; i < activeClients.length; i++) {
-            const currentClient = activeClients[i]
-            if (!currentClient.active) continue
-            const currentAuth = new Auth({ provider: currentClient.provider })
+          inputAuth.forEach(async (auth) => {
             try {
-              fetchedWalletLists.push(await currentAuth.getWallets(`${chain}`))
+              fetchedWalletLists.push(await auth.getWallets(`${chain}`))
             } catch (error) {
-              console.error(error)
-            }
-          }
-        }
-
-        if (fetchedWalletLists.flat().length === 0) return { sortedFunWallets: [] }
-        const WalletSet: {
-          [account: string]: { wallet: Wallet; count: number }
-        } = {}
-        fetchedWalletLists
-          .concat()
-          .flat()
-          .forEach((wallet) => {
-            if (WalletSet[wallet.walletAddr]) {
-              WalletSet[wallet.walletAddr].count++
-            } else {
-              WalletSet[wallet.walletAddr] = { wallet, count: 1 }
+              logger.error('auth.getWallets_error', error)
             }
           })
-
-        const sortedFunWallets = Object.entries(WalletSet)
-          .sort((a, b) => b[1].count - a[1].count)
-          .map(([, val]) => val.wallet)
-        return {
-          sortedFunWallets,
         }
-      } catch (error) {
-        console.error(error)
-        return { error }
+      } else {
+        for (let i = 0; i < activeClients.length; i++) {
+          const currentClient = activeClients[i]
+          if (!currentClient.active) continue
+          const currentAuth = new Auth({ provider: currentClient.provider })
+          try {
+            fetchedWalletLists.push(await currentAuth.getWallets(`${chain}`))
+          } catch (error) {
+            logger.error('currentAuth.getWallets_error', error)
+          }
+        }
+      }
+
+      if (fetchedWalletLists.flat().length === 0) return { sortedFunWallets: [] }
+      const WalletSet: {
+        [account: string]: { wallet: Wallet; count: number }
+      } = {}
+      fetchedWalletLists
+        .concat()
+        .flat()
+        .forEach((wallet) => {
+          if (WalletSet[wallet.walletAddr]) {
+            WalletSet[wallet.walletAddr].count++
+          } else {
+            WalletSet[wallet.walletAddr] = { wallet, count: 1 }
+          }
+        })
+
+      const sortedFunWallets = Object.entries(WalletSet)
+        .sort((a, b) => b[1].count - a[1].count)
+        .map(([, val]) => val.wallet)
+      return {
+        sortedFunWallets,
       }
     }
     updateWalletList()
@@ -130,13 +120,14 @@ export const useFunWalletIds = (
         }
       })
       .catch((err) => {
-        console.error(err)
+        logger.error('updateWalletList_error', err)
       })
   }, [
     FunAccounts,
     FunGroupAccounts,
     activeClients,
     chainId,
+    config?.chain,
     inputAuth,
     inputChain,
     previousClients,

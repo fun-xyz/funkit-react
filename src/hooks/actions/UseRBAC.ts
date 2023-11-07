@@ -10,6 +10,7 @@ import {
   useFunStoreInterface,
 } from '../../store'
 import { convertToValidUserId } from '../../utils'
+import { logger } from '../../utils/Logger'
 import { remainingConnectedSignersForOperation, signUntilExecute } from '../../utils/transactions/Transactions'
 import { useUserInfo } from '../account/UseUserInfo'
 import { useFun } from '../UseFun'
@@ -71,7 +72,7 @@ export const useRBAC = () => {
         setResult(response)
         return response
       } catch (error) {
-        console.log(error)
+        logger.error('UseRBAC_addOwner_error', error)
         const err = generateTransactionError(TransactionErrorCatch, { newOwnerId }, error)
         setTxError(err)
         return err
@@ -119,7 +120,7 @@ export const useRBAC = () => {
         setResult(response)
         return response
       } catch (error) {
-        console.log(error)
+        logger.error('UseRBAC_removeOwner_error', error)
         const err = generateTransactionError(TransactionErrorCatch, { ownerId }, error)
         setTxError(err)
         return err

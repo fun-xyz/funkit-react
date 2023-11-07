@@ -10,14 +10,18 @@
     "alwaysStrict": true,
     "strict": true,
     "removeComments": true,
+    "experimentalDecorators": true,
 
-    "noUnusedLocals": false, // also should be true for production build
-    "noImplicitAny": false, // ideally we should set this to true, but fixing the errors increase dev load so post launch we should fix this
+    // also should be true for production build
+    "noUnusedLocals": false,
+
+    // ideally we should set this to true, but fixing the errors increase dev load so post launch we should fix this
+    "noImplicitAny": false,
+
     "noImplicitThis": false,
     "noImplicitOverride": true,
     "noUnusedParameters": false,
     "noImplicitReturns": true,
-
     "noFallthroughCasesInSwitch": true,
     "strictNullChecks": true,
     "strictFunctionTypes": true,
@@ -30,9 +34,17 @@
     "moduleResolution": "node",
     "esModuleInterop": true,
     "baseUrl": ".",
+
     "paths": {
       "@/*": ["./src/*"]
-    }
+    },
+
+    "inlineSources": true,
+
+    // Set `sourceRoot` to  "/" to strip the build path prefix
+    // from generated source code references.
+    // This improves issue grouping in Sentry.
+    "sourceRoot": "/"
   },
   "include": ["./**/*", "**/.eslintrc.js"],
   "exclude": ["node_modules", "dist", "docs", "../example"]

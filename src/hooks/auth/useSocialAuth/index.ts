@@ -1,4 +1,4 @@
-export { useAppleAuth } from './UseAppleAuth'
-export { useDiscordAuth } from './UseDiscordAuth'
-export { useGoogleAuth } from './UseGoogleAuth'
-export { useTwitterAuth } from './UseTwitterAuth'
+export { useAppleAuth_DEPRECATED } from './UseAppleAuth'
+export { useDiscordAuth_DEPRECATED } from './UseDiscordAuth'
+export { useGoogleAuth_DEPRECATED } from './UseGoogleAuth'
+export { useTwitterAuth_DEPRECATED } from './UseTwitterAuth'

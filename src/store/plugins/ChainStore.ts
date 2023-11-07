@@ -1,6 +1,7 @@
 import { Chain, GlobalEnvOption } from '@funkit/core'
 
 import { convertToChain } from '../../network/Networks'
+import { logger } from '../../utils/Logger'
 import { buildAndUpdateConfig } from './ConfigureStore'
 import { generateTransactionError, SwitchChainError } from './ErrorStore'
 
@@ -10,6 +11,7 @@ export interface ChainStoreInterface {
   supportedChains: (number | string)[]
   setSupportedChains: (chains: (number | string)[]) => void
   switchChain: (chain: number | string) => void
+  initializeChainStore: (chain: number | string | Chain) => void
 }
 
 export const handleChainSwitching = async (newChain: number | string, oldConfig: Partial<GlobalEnvOption> | null) => {
@@ -29,7 +31,7 @@ export const configureChainStore = (get: any, set: any): ChainStoreInterface => 
       const newState = await handleChainSwitching(chainId, oldConfig)
       set(newState)
     } catch (error) {
-      console.log(error)
+      logger.log('switchChain_error', error)
       set({
         error: generateTransactionError(
           SwitchChainError,
@@ -39,6 +41,17 @@ export const configureChainStore = (get: any, set: any): ChainStoreInterface => 
           },
           error
         ),
+      })
+    }
+  },
+  initializeChainStore: async (chain: number | string | Chain) => {
+    if (typeof chain === 'number' || typeof chain === 'string') {
+      const chainClass = await convertToChain(chain)
+      set({ chain: chainClass, chainId: chain })
+    } else {
+      set({
+        chain,
+        chainId: await chain.getChainId(),
       })
     }
   },
