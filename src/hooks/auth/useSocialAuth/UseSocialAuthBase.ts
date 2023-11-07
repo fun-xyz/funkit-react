@@ -32,7 +32,9 @@ export interface useSocialAuthConnectorBaseArgs {
   name: string
   autoConnect?: boolean
 }
-
+/**
+ * @deprecated This provider is deprecated. Please use `usePrivyAuth` instead.
+ */
 export const useSocialAuthConnectorBase = ({
   // SocialAuthConnector,
   oAuthProvider,

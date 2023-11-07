@@ -1,6 +1,9 @@
 import { SocialAuthProviders, useSocialAuthConnectorBase } from './UseSocialAuthBase'
 
-export const useGoogleAuth = () => {
+/**
+ * @deprecated This provider is deprecated. Please use `usePrivyAuth` instead.
+ */
+export const useGoogleAuth_DEPRECATED = () => {
   return useSocialAuthConnectorBase({
     oAuthProvider: SocialAuthProviders.Google,
     name: 'Google',

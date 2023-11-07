@@ -41,14 +41,12 @@ export function FunContextProvider({
     initializeChainStore: state.initializeChainStore,
   }))
 
-  // useEffect(() => {
   if (!config) {
     if (!options || !options.apiKey) throw new Error('Missing required config options')
     setConfig(options)
     if (!options.chain) throw new Error('Missing required chain options in config')
     initializeChainStore(options.chain)
   }
-  // }, [config, initializeChainStore, options, setConfig])
 
   const loginOptions = loginMethods || DEFAULT_PRIVY_LOGIN_OPTIONS
 
@@ -60,11 +58,11 @@ export function FunContextProvider({
         appId={appId}
         config={{
           loginMethods: loginOptions as PrivyLoginOptions,
-          appearance: {
-            theme: 'light',
-            accentColor: '#676FFF',
-            logo: 'https://your-logo-url',
-          },
+          // appearance: {
+          //   theme: 'light',
+          //   accentColor: '#676FFF',
+          //   // logo: 'https://your-logo-url',
+          // },
         }}
       >
         {children}

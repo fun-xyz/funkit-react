@@ -2,5 +2,10 @@ export * from './types'
 export { useCoinbaseAuth } from './UseCoinbaseAuth'
 export { useMetamaskAuth } from './useInjectedAuth/UseMetamaskAuth'
 export { usePrivyAuth } from './UsePrivyAuth'
-export { useAppleAuth, useDiscordAuth, useGoogleAuth, useTwitterAuth } from './useSocialAuth'
+export {
+  useAppleAuth_DEPRECATED,
+  useDiscordAuth_DEPRECATED,
+  useGoogleAuth_DEPRECATED,
+  useTwitterAuth_DEPRECATED,
+} from './useSocialAuth'
 export { useWalletConnectAuth } from './UseWalletConnectAuth'
