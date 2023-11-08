@@ -8,4 +8,5 @@ export {
   useGoogleAuth_DEPRECATED,
   useTwitterAuth_DEPRECATED,
 } from './useSocialAuth'
+export { useTurnkeyAuth } from './UseTurnkeyAuth'
 export { useWalletConnectAuth } from './UseWalletConnectAuth'
