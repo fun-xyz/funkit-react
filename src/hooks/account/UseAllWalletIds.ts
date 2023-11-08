@@ -31,7 +31,7 @@ export const useFunWalletIds = (
   options?: GlobalEnvOption,
   inputChain?: number
 ): IUseFunAccountsReturn => {
-  const { chainId, FunGroupAccounts, setFunGroupAccounts, FunAccounts, setFunAccounts, config, updateConfig } = useFun(
+  const { chainId, FunGroupAccounts, setFunGroupAccounts, FunAccounts, setFunAccounts, config } = useFun(
     (state: useFunStoreInterface) => ({
       wallet: state.FunWallet,
       chainId: state.chainId,
@@ -43,29 +43,23 @@ export const useFunWalletIds = (
       activeUser: state.activeUser,
       setActiveUser: state.setActiveUser,
       config: state.config,
-      updateConfig: state.updateConfig,
     }),
     shallow
   )
-
-  useEffect(() => {
-    if (config == null && !options)
-      throw new Error('Config not set. Either pass in a config object or set it using the useConfig hook.')
-    if (config == null && options) updateConfig(options)
-  }, [config, options, updateConfig])
 
   const activeClients = useActiveClients()
   const previousClients = usePrevious(activeClients)
 
   useEffect(() => {
     if (chainId == null && inputChain == null) return
+
     if (activeClients.length === 0) {
       if (FunGroupAccounts.length > 0) setFunGroupAccounts([])
       return
     }
     if (!activeClientsChanged(previousClients, activeClients)) return //
 
-    const chain = inputChain ?? chainId
+    const chain = inputChain ?? chainId ?? config?.chain
     const updateWalletList = async () => {
       const fetchedWalletLists: Wallet[][] = []
       if (inputAuth) {
@@ -133,6 +127,7 @@ export const useFunWalletIds = (
     FunGroupAccounts,
     activeClients,
     chainId,
+    config?.chain,
     inputAuth,
     inputChain,
     previousClients,

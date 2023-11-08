@@ -66,6 +66,7 @@ export const createUseFunStore = () => {
       supportedChains: chainStore.supportedChains,
       setSupportedChains: chainStore.setSupportedChains,
       switchChain: chainStore.switchChain,
+      initializeChainStore: chainStore.initializeChainStore,
 
       // Configuration Store
       config: configStore.config,
