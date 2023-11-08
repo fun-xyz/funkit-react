@@ -1,7 +1,7 @@
 name: Build package without publishing
 on:
   push:
-    # default: only "staging".
+    # default: only "main" and "staging".
     branches: ["main", "staging"]
 jobs:
   build:
