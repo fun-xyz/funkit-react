@@ -60,7 +60,7 @@ const DEFAULT_FUN_WALLET_CONFIG = {
 
 export default function AppWrapper() {
   return (
-    <FunContextProvider options={DEFAULT_FUN_WALLET_CONFIG} appId={FUN_APP_ID}>
+    <FunContextProvider options={DEFAULT_FUN_WALLET_CONFIG} privyAppId={FUN_APP_ID}>
       <App />
     </FunContextProvider>
   );
